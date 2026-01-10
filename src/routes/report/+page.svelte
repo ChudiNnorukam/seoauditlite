@@ -14,6 +14,7 @@
 
 <svelte:head>
 	<title>AEO Audit Report - {score?.domain || 'Report'}</title>
+	<link rel="canonical" href="https://seoauditlite.vercel.app/report" />
 </svelte:head>
 
 {#if !score}

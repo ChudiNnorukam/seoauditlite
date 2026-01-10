@@ -38,6 +38,7 @@
 <svelte:head>
 	<title>SEOAuditLite - AI Search Readiness Audit</title>
 	<meta name="description" content="Check your site's AEO (Answer Engine Optimization) readiness for Perplexity, ChatGPT, and Claude." />
+	<link rel="canonical" href="https://seoauditlite.vercel.app/" />
 </svelte:head>
 
 <div class="page">
