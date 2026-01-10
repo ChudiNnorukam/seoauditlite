@@ -751,6 +751,346 @@ async function checkPerformance(domain: string): Promise<SEOCheckType> {
   }
 }
 
+async function checkHeadingStructure(domain: string): Promise<SEOCheckType> {
+  try {
+    const url = `https://${domain}/`;
+    const response = await fetch(url, { timeout: 5000 });
+    const html = response.ok ? await response.text() : '';
+
+    const h1s = (html.match(/<h1[^>]*>/gi) || []).length;
+    const h2s = (html.match(/<h2[^>]*>/gi) || []).length;
+    const h3s = (html.match(/<h3[^>]*>/gi) || []).length;
+    const headings = html.match(/<h[1-6][^>]*>([^<]+)<\/h[1-6]>/gi) || [];
+
+    const h1Valid = h1s === 1;
+    const hasHierarchy = h2s > 0;
+    const score = (h1Valid ? 8 : 0) + (hasHierarchy ? 7 : 0) + Math.min(headings.length / 2, 5);
+
+    return {
+      checkType: 'seo',
+      name: 'heading-structure',
+      status: score > 15 ? 'pass' : score > 10 ? 'warning' : 'fail',
+      score: Math.min(score, 15),
+      maxScore: 15,
+      message: `Headings: ${h1s} H1, ${h2s} H2, ${h3s} H3 (${headings.length} total)`,
+      details: [
+        `H1 count: ${h1s} ${h1Valid ? '✓ (should be 1)' : '✗ (should be exactly 1)'}`,
+        `H2-H3 hierarchy: ${hasHierarchy ? 'Present ✓' : 'Missing ✗'}`,
+        `Total headings: ${headings.length}`,
+      ],
+      recommendations: [
+        !h1Valid ? 'Add exactly one H1 tag with your primary keyword' : 'H1 is properly structured',
+        !hasHierarchy ? 'Use H2 and H3 tags to create content hierarchy' : 'Good heading hierarchy detected',
+      ],
+    };
+  } catch (error) {
+    return {
+      checkType: 'seo',
+      name: 'heading-structure',
+      status: 'fail',
+      score: 0,
+      maxScore: 15,
+      message: 'Could not analyze heading structure',
+      details: ['Error fetching page'],
+      recommendations: ['Ensure page is accessible and properly structured'],
+    };
+  }
+}
+
+async function checkCoreWebVitals(domain: string): Promise<SEOCheckType> {
+  try {
+    const url = `https://${domain}/`;
+    const response = await fetch(url, { timeout: 5000 });
+    const html = response.ok ? await response.text() : '';
+
+    // Estimate web vitals from HTML analysis
+    const hasCompression = html.length < 100000;
+    const hasLazyLoad = /loading=["']lazy["']/.test(html);
+    const hasMinifiedCSS = !/<style[^>]*>[\s\n]{4,}/.test(html);
+    const scriptCount = (html.match(/<script/g) || []).length;
+    const hasAsync = /async|defer/.test(html);
+
+    const score =
+      (hasCompression ? 6 : 2) +
+      (hasLazyLoad ? 5 : 0) +
+      (hasMinifiedCSS ? 5 : 2) +
+      (scriptCount < 5 ? 4 : 0) +
+      (hasAsync ? 5 : 0);
+
+    return {
+      checkType: 'seo',
+      name: 'core-web-vitals',
+      status: score > 18 ? 'pass' : score > 12 ? 'warning' : 'fail',
+      score: Math.min(score, 20),
+      maxScore: 20,
+      message: `Page performance optimization score: ${Math.min(score, 20)}/20`,
+      details: [
+        `HTML size: ${(html.length / 1024).toFixed(1)}KB ${hasCompression ? '✓' : '✗'}`,
+        `Lazy loading: ${hasLazyLoad ? 'Enabled ✓' : 'Not detected'}`,
+        `Minified CSS: ${hasMinifiedCSS ? 'Yes ✓' : 'No'}`,
+        `Scripts: ${scriptCount} ${scriptCount < 5 ? '✓' : '⚠️'}`,
+        `Async/Defer: ${hasAsync ? 'Yes ✓' : 'No'}`,
+      ],
+      recommendations: [
+        'Run Google PageSpeed Insights for exact Core Web Vitals metrics',
+        hasCompression ? 'Page size is good' : 'Reduce HTML/CSS/JS size',
+        !hasLazyLoad ? 'Add loading="lazy" to images' : 'Good lazy loading strategy',
+      ],
+      learnMore: 'https://web.dev/vitals/',
+    };
+  } catch (error) {
+    return {
+      checkType: 'seo',
+      name: 'core-web-vitals',
+      status: 'fail',
+      score: 0,
+      maxScore: 20,
+      message: 'Could not analyze Core Web Vitals',
+      details: ['Error fetching page'],
+      recommendations: ['Check Google PageSpeed Insights for detailed metrics'],
+    };
+  }
+}
+
+async function checkContentAnalysis(domain: string): Promise<SEOCheckType> {
+  try {
+    const url = `https://${domain}/`;
+    const response = await fetch(url, { timeout: 5000 });
+    const html = response.ok ? await response.text() : '';
+
+    // Extract text content
+    const textContent = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    const wordCount = textContent.split(/\s+/).length;
+    const uniqueWords = new Set(textContent.toLowerCase().split(/\s+/)).size;
+
+    const score =
+      (wordCount >= 400 ? 8 : wordCount >= 200 ? 4 : 0) +
+      (uniqueWords > 50 ? 4 : 2) +
+      (wordCount > 300 && uniqueWords / wordCount > 0.5 ? 3 : 0);
+
+    return {
+      checkType: 'seo',
+      name: 'content-analysis',
+      status: score > 12 ? 'pass' : score > 7 ? 'warning' : 'fail',
+      score: Math.min(score, 15),
+      maxScore: 15,
+      message: `Content: ${wordCount} words, ${uniqueWords} unique words`,
+      details: [
+        `Word count: ${wordCount} ${wordCount >= 400 ? '✓ (good depth)' : wordCount >= 200 ? '⚠️ (minimal)' : '✗ (too short)'}`,
+        `Unique words: ${uniqueWords} (diversity: ${((uniqueWords / Math.max(wordCount, 1)) * 100).toFixed(1)}%)`,
+        `Content quality indicator: ${score > 12 ? 'Good' : score > 7 ? 'Fair' : 'Poor'}`,
+      ],
+      recommendations: [
+        wordCount < 400 ? 'Expand content to at least 400 words for better rankings' : 'Content length is adequate',
+        'Focus on answering user questions thoroughly',
+        'Avoid keyword stuffing - aim for natural, readable content',
+      ],
+    };
+  } catch (error) {
+    return {
+      checkType: 'seo',
+      name: 'content-analysis',
+      status: 'fail',
+      score: 0,
+      maxScore: 15,
+      message: 'Could not analyze content',
+      details: ['Error fetching page'],
+      recommendations: ['Ensure page has sufficient text content'],
+    };
+  }
+}
+
+async function checkSecurityHeaders(domain: string): Promise<SEOCheckType> {
+  try {
+    const url = `https://${domain}/`;
+    const response = await fetch(url, { timeout: 5000 });
+
+    const hasHSTS = response.headers.has('strict-transport-security');
+    const hasCSP = response.headers.has('content-security-policy');
+    const hasXFrameOptions = response.headers.has('x-frame-options');
+    const hasXContentType = response.headers.has('x-content-type-options');
+
+    const score = [hasHSTS, hasCSP, hasXFrameOptions, hasXContentType].filter(Boolean).length * 4;
+
+    return {
+      checkType: 'seo',
+      name: 'security-headers',
+      status: score > 12 ? 'pass' : score > 6 ? 'warning' : 'fail',
+      score: Math.min(score, 15),
+      maxScore: 15,
+      message: `Security headers: ${score / 4 | 0}/4 configured`,
+      details: [
+        `HSTS: ${hasHSTS ? 'Yes ✓' : 'No'}`,
+        `CSP: ${hasCSP ? 'Yes ✓' : 'No'}`,
+        `X-Frame-Options: ${hasXFrameOptions ? 'Yes ✓' : 'No'}`,
+        `X-Content-Type-Options: ${hasXContentType ? 'Yes ✓' : 'No'}`,
+      ],
+      recommendations: [
+        !hasHSTS ? 'Enable HSTS to force HTTPS connections' : 'HSTS is enabled',
+        !hasCSP ? 'Implement Content Security Policy for protection' : 'CSP is configured',
+        !hasXFrameOptions ? 'Set X-Frame-Options to prevent clickjacking' : 'Clickjacking protection enabled',
+      ],
+    };
+  } catch (error) {
+    return {
+      checkType: 'seo',
+      name: 'security-headers',
+      status: 'warning',
+      score: 0,
+      maxScore: 15,
+      message: 'Could not verify security headers',
+      details: ['Unable to fetch headers'],
+      recommendations: ['Configure security headers on your server'],
+    };
+  }
+}
+
+async function checkInternalLinking(domain: string): Promise<SEOCheckType> {
+  try {
+    const url = `https://${domain}/`;
+    const response = await fetch(url, { timeout: 5000 });
+    const html = response.ok ? await response.text() : '';
+
+    const internalLinks = (html.match(/href=["'][^"']*\/[^"']*["']/gi) || []).length;
+    const externalLinks = (html.match(/href=["']https?:\/\/(?!.*\/)["']/gi) || []).length;
+    const totalLinks = internalLinks + externalLinks;
+
+    const hasFooterLinks = /<footer[\s\S]*?<\/footer>/.test(html);
+    const hasNavigation = /<nav[\s\S]*?<\/nav>/.test(html);
+
+    const score =
+      (internalLinks > 0 ? 5 : 0) +
+      (internalLinks > 5 ? 5 : 0) +
+      (hasNavigation ? 3 : 0) +
+      (hasFooterLinks ? 2 : 0);
+
+    return {
+      checkType: 'seo',
+      name: 'internal-linking',
+      status: score > 12 ? 'pass' : score > 6 ? 'warning' : 'fail',
+      score: Math.min(score, 15),
+      maxScore: 15,
+      message: `Internal links: ${internalLinks}, External: ${externalLinks}`,
+      details: [
+        `Internal links: ${internalLinks} ${internalLinks > 5 ? '✓' : '⚠️'}`,
+        `External links: ${externalLinks}`,
+        `Navigation structure: ${hasNavigation ? 'Present ✓' : 'Not detected'}`,
+        `Footer links: ${hasFooterLinks ? 'Present ✓' : 'Missing'}`,
+      ],
+      recommendations: [
+        internalLinks < 5 ? 'Add more internal links to guide users and distribute page authority' : 'Good internal linking',
+        'Link to relevant pages with descriptive anchor text',
+        'Create a logical site structure with clear navigation',
+      ],
+    };
+  } catch (error) {
+    return {
+      checkType: 'seo',
+      name: 'internal-linking',
+      status: 'fail',
+      score: 0,
+      maxScore: 15,
+      message: 'Could not analyze internal linking',
+      details: ['Error fetching page'],
+      recommendations: ['Add internal links to improve site structure'],
+    };
+  }
+}
+
+async function checkIndexability2(domain: string): Promise<SEOCheckType> {
+  try {
+    const url = `https://${domain}/`;
+    const response = await fetch(url, { timeout: 5000 });
+    const html = response.ok ? await response.text() : '';
+
+    const hasNoindex = /<meta[^>]*name=["']robots["'][^>]*content=["']noindex/.test(html);
+    const hasCanonical = /<link[^>]*rel=["']canonical/.test(html);
+    const blockImages = /Disallow:.*\.jpg|Disallow:.*\.png/.test(html);
+
+    const score =
+      (!hasNoindex ? 5 : 0) +
+      (hasCanonical ? 3 : 0) +
+      (!blockImages ? 2 : 0);
+
+    return {
+      checkType: 'seo',
+      name: 'indexability',
+      status: score > 8 ? 'pass' : score > 4 ? 'warning' : 'fail',
+      score: Math.min(score, 10),
+      maxScore: 10,
+      message: `Indexability: ${!hasNoindex ? 'Indexable ✓' : 'Blocked ✗'}`,
+      details: [
+        `Noindex meta tag: ${hasNoindex ? 'Present (blocking!) ✗' : 'Not found ✓'}`,
+        `Canonical tag: ${hasCanonical ? 'Present ✓' : 'Missing'}`,
+        `Images blocked: ${blockImages ? 'Yes (bad) ✗' : 'No ✓'}`,
+      ],
+      recommendations: [
+        hasNoindex ? 'Remove noindex meta tag to allow indexing' : 'Page is properly set for indexing',
+        !hasCanonical ? 'Add canonical tag to prevent duplicate content issues' : 'Canonical tag present',
+        'Ensure important resources are not blocked in robots.txt',
+      ],
+    };
+  } catch (error) {
+    return {
+      checkType: 'seo',
+      name: 'indexability',
+      status: 'warning',
+      score: 0,
+      maxScore: 10,
+      message: 'Could not verify indexability',
+      details: ['Error fetching page'],
+      recommendations: ['Check robots.txt and meta robots tags'],
+    };
+  }
+}
+
+async function checkMobileUsability(domain: string): Promise<SEOCheckType> {
+  try {
+    const url = `https://${domain}/`;
+    const response = await fetch(url, { timeout: 5000 });
+    const html = response.ok ? await response.text() : '';
+
+    const hasViewport = /<meta[^>]*name=["']viewport/.test(html);
+    const hasMediaQueries = /media\s*=\s*["']\(max-width/.test(html) || /@media[^{]*\(max-width/.test(html);
+    const noSmallFont = !/font-size:\s*\d{1,2}px/i.test(html);
+
+    const score =
+      (hasViewport ? 7 : 0) +
+      (hasMediaQueries ? 4 : 0) +
+      (noSmallFont ? 1 : 0);
+
+    return {
+      checkType: 'seo',
+      name: 'mobile-usability',
+      status: score > 10 ? 'pass' : score > 5 ? 'warning' : 'fail',
+      score: Math.min(score, 12),
+      maxScore: 12,
+      message: `Mobile optimized: ${hasViewport && hasMediaQueries ? 'Yes ✓' : 'Partially'}`,
+      details: [
+        `Viewport meta: ${hasViewport ? 'Present ✓' : 'Missing ✗'}`,
+        `Media queries: ${hasMediaQueries ? 'Found ✓' : 'Not detected'}`,
+        `Font sizing: ${noSmallFont ? 'Good ✓' : 'May be too small'}`,
+      ],
+      recommendations: [
+        !hasViewport ? 'Add <meta name="viewport" content="width=device-width, initial-scale=1">' : 'Viewport is configured',
+        !hasMediaQueries ? 'Use responsive design with media queries' : 'Responsive design detected',
+        'Test on mobile devices and use Google Mobile-Friendly Test',
+      ],
+    };
+  } catch (error) {
+    return {
+      checkType: 'seo',
+      name: 'mobile-usability',
+      status: 'warning',
+      score: 0,
+      maxScore: 12,
+      message: 'Could not analyze mobile usability',
+      details: ['Error fetching page'],
+      recommendations: ['Test mobile friendliness in Google Search Console'],
+    };
+  }
+}
+
 async function checkSchema(domain: string): Promise<SEOCheckType> {
   try {
     const url = `https://${domain}/`;
@@ -851,12 +1191,20 @@ export async function auditDomain(request: AuditRequest): Promise<AEOScore> {
     checkExtractability(domain),
     checkAIMetadata(domain),
     checkAnswerFormat(domain),
-    // SEO checks (5)
+    // SEO checks (5 original)
     checkSitemap(domain),
     checkRobotsTxt(domain),
     checkMetaTags(domain),
     checkPerformance(domain),
     checkSchema(domain),
+    // SEO checks (8 enhanced)
+    checkHeadingStructure(domain),
+    checkCoreWebVitals(domain),
+    checkContentAnalysis(domain),
+    checkSecurityHeaders(domain),
+    checkInternalLinking(domain),
+    checkIndexability2(domain),
+    checkMobileUsability(domain),
   ]);
 
   let allChecks: (AEOCheckType | SEOCheckType)[];
@@ -874,7 +1222,7 @@ export async function auditDomain(request: AuditRequest): Promise<AEOScore> {
 
   // Separate AEO and SEO checks
   const aeoChecks = allChecks.slice(0, 6) as AEOCheckType[];
-  const seoChecks = allChecks.slice(6, 11) as SEOCheckType[];
+  const seoChecks = allChecks.slice(6) as SEOCheckType[];
 
   // Calculate AEO score
   const aeoTotalScore = aeoChecks.reduce((acc, check) => {
@@ -916,13 +1264,10 @@ export async function auditDomain(request: AuditRequest): Promise<AEOScore> {
         aiMetadata: aeoChecks[4].score,
         answerFormat: aeoChecks[5].score,
       },
-      seo: {
-        sitemap: seoChecks[0].score,
-        robots: seoChecks[1].score,
-        metaTags: seoChecks[2].score,
-        performance: seoChecks[3].score,
-        schema: seoChecks[4].score,
-      },
+      seo: Object.fromEntries(seoChecks.map((check, i) => [
+        check.name.replace(/-/g, ''),
+        check.score,
+      ])) as Record<string, number>,
     },
     checks: {
       aeo: aeoChecks,

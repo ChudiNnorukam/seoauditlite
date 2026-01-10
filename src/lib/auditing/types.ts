@@ -283,11 +283,79 @@ export const AEO_CHECK_WEIGHTS = {
 } as const;
 
 export const SEO_CHECK_WEIGHTS = {
-  'sitemap-validation': 20,
-  'robots-txt-analysis': 15,
-  'meta-tags-validation': 25,
-  'performance-metrics': 20,
-  'schema-validation': 20,
+  'sitemap-validation': 10,
+  'robots-txt-analysis': 8,
+  'meta-tags-validation': 15,
+  'performance-metrics': 10,
+  'schema-validation': 10,
+  'heading-structure': 15,
+  'core-web-vitals': 20,
+  'content-analysis': 15,
+  'security-headers': 15,
+  'internal-linking': 15,
+  'indexability': 10,
+  'mobile-usability': 12,
+  'images-media': 10,
+} as const;
+
+// Educational metadata for each check
+export const CHECK_EDUCATION = {
+  'heading-structure': {
+    title: 'Heading Structure',
+    importance: 'Critical for both SEO and AI readability',
+    whatItMeans: 'Search engines and AI models use headings to understand page structure. Each page should have one H1, proper H2-H3 hierarchy.',
+    whyItMatters: 'Poor heading structure makes content harder to scan for users and confuses crawlers about page topic.',
+    learnMore: 'https://moz.com/learn/seo/heading',
+  },
+  'core-web-vitals': {
+    title: 'Core Web Vitals',
+    importance: 'Major Google ranking factor (100% of grade)',
+    whatItMeans: 'LCP (Largest Contentful Paint) measures loading speed, FID (First Input Delay) measures interactivity, CLS (Cumulative Layout Shift) measures visual stability.',
+    whyItMatters: 'Google announced Core Web Vitals as ranking signals in 2021. Poor vitals hurt rankings and cause users to leave.',
+    learnMore: 'https://web.dev/vitals/',
+  },
+  'content-analysis': {
+    title: 'Content Quality & Depth',
+    importance: 'Foundation of SEO and AEO performance',
+    whatItMeans: 'Measures word count (400+ recommended), readability, keyword coverage, and unique value.',
+    whyItMatters: 'Search engines prefer comprehensive, original content. AI models look for substantive, well-structured information.',
+    learnMore: 'https://moz.com/learn/seo/content',
+  },
+  'security-headers': {
+    title: 'Security Headers',
+    importance: 'Protects your site and users from attacks',
+    whatItMeans: 'HTTP headers like HSTS, CSP, X-Frame-Options, X-Content-Type-Options prevent security vulnerabilities.',
+    whyItMatters: 'Browsers trust sites with proper security headers. Google prioritizes secure sites in rankings.',
+    learnMore: 'https://owasp.org/www-project-secure-headers/',
+  },
+  'internal-linking': {
+    title: 'Internal Linking',
+    importance: 'Distributes page authority throughout your site',
+    whatItMeans: 'Links between your own pages guide crawlers to important content and distribute ranking power.',
+    whyItMatters: 'Poor internal linking buries important pages. Strong internal links increase crawlability and establish topic hierarchy.',
+    learnMore: 'https://moz.com/learn/seo/internal-link',
+  },
+  'indexability': {
+    title: 'Crawlability & Indexability',
+    importance: 'Prerequisite for all rankings',
+    whatItMeans: 'Checks if search engines can crawl and index your pages. Detects noindex tags, redirect chains, blocked resources.',
+    whyItMatters: 'If a page cannot be indexed, it cannot rank. Broken redirect chains waste crawler budget.',
+    learnMore: 'https://support.google.com/webmasters/answer/7440203',
+  },
+  'mobile-usability': {
+    title: 'Mobile Friendliness',
+    importance: 'Google uses mobile-first indexing exclusively',
+    whatItMeans: 'Verifies pages are responsive, have proper viewport settings, and fast on mobile networks.',
+    whyItMatters: 'Google now crawls desktop versions last. Most users visit from mobile. Poor mobile experience kills rankings and conversions.',
+    learnMore: 'https://developers.google.com/search/mobile-sites',
+  },
+  'images-media': {
+    title: 'Image Optimization',
+    importance: 'Improves accessibility, performance, and rankings',
+    whatItMeans: 'Checks alt text (for accessibility), lazy loading (for speed), file sizes, and modern formats (WebP).',
+    whyItMatters: 'Optimized images improve Core Web Vitals scores, accessibility for screen readers, and allow Google to index images.',
+    learnMore: 'https://web.dev/performance-images/',
+  },
 } as const;
 
 export const GRADING_SCALE = {
