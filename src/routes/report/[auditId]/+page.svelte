@@ -16,6 +16,8 @@
 	let audit: AuditResult | null = data.audit;
 	let entitlements: EntitlementContext = data.entitlements;
 	let viewAudit: AuditResult | null = null;
+	let upgrading = false;
+	let upgradeError = '';
 	$: viewAudit = audit ? redactAudit(audit, entitlements) : null;
 	$: domain = viewAudit ? extractDomain(viewAudit.audited_url) : '';
 
@@ -30,7 +32,8 @@
 					entitlements = resolveEntitlements({
 						audit: stored,
 						isShareLink: false,
-						isOwner: true
+						isOwner: true,
+						planOverride: entitlements.plan
 					});
 					audit = stored;
 				}
@@ -48,6 +51,31 @@
 			setTimeout(() => (copied = false), 1600);
 		} catch {
 			copied = false;
+		}
+	}
+
+	async function startUpgrade() {
+		if (!viewAudit) return;
+		upgrading = true;
+		upgradeError = '';
+		try {
+			const response = await fetch('/api/billing/checkout', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ auditId: viewAudit.audit_id })
+			});
+
+			const payload = await response.json();
+			if (!response.ok || !payload?.url) {
+				upgradeError = payload?.error || 'Unable to start checkout';
+				upgrading = false;
+				return;
+			}
+
+			window.location.href = payload.url;
+		} catch (error) {
+			upgradeError = error instanceof Error ? error.message : 'Unable to start checkout';
+			upgrading = false;
 		}
 	}
 
@@ -117,6 +145,23 @@
 				</button>
 			</div>
 		</section>
+
+		{#if !entitlements.isShareLink && entitlements.plan === 'free'}
+			<section class="upgrade-card">
+				<div>
+					<h3>Unlock Pro insights</h3>
+					<p class="muted">See full recommendations and deeper analysis.</p>
+				</div>
+				<div class="upgrade-actions">
+					<button class="upgrade-button" type="button" on:click={startUpgrade} disabled={upgrading}>
+						{upgrading ? 'Redirecting…' : 'Upgrade to Pro'}
+					</button>
+					{#if upgradeError}
+						<p class="upgrade-error">{upgradeError}</p>
+					{/if}
+				</div>
+			</section>
+		{/if}
 
 		<section class="checks">
 			<h3>Checks</h3>
@@ -282,6 +327,52 @@
 		background: #f8fafc;
 		margin-bottom: 32px;
 		flex-wrap: wrap;
+	}
+
+	.upgrade-card {
+		display: flex;
+		justify-content: space-between;
+		gap: 24px;
+		align-items: center;
+		padding: 20px;
+		border: 0.5px solid rgba(17, 98, 212, 0.3);
+		border-radius: 10px;
+		background: rgba(17, 98, 212, 0.06);
+		margin-bottom: 32px;
+		flex-wrap: wrap;
+	}
+
+	.upgrade-actions {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+
+	.upgrade-button {
+		padding: 10px 18px;
+		border: none;
+		border-radius: 6px;
+		background: #1162d4;
+		color: #fff;
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.upgrade-button:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.upgrade-button:hover:not(:disabled) {
+		background: #0c4da8;
+	}
+
+	.upgrade-error {
+		margin: 0;
+		color: #dc2626;
+		font-size: 12px;
 	}
 
 	.share-input {

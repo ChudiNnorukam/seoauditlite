@@ -1,10 +1,10 @@
-import type { PageLoad } from './$types';
+import type { PageServerLoad } from './$types';
 import type { AuditApiResponse, AuditResult } from '$lib/auditing/schema';
-import type { EntitlementContext } from '$lib/auditing/entitlements';
-import { resolveEntitlements } from '$lib/auditing/resolve-entitlements';
+import { resolveEntitlementsForRequest } from '$lib/server/entitlements-resolver';
 
-export const load: PageLoad = async ({ fetch, params }) => {
-	const entitlements: EntitlementContext = resolveEntitlements({
+export const load: PageServerLoad = async ({ fetch, params, locals }) => {
+	const entitlements = resolveEntitlementsForRequest({
+		entitlementKey: locals.entitlementKey,
 		isShareLink: true,
 		isOwner: false
 	});

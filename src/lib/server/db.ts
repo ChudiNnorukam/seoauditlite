@@ -20,6 +20,14 @@ function initialize(db: Database.Database): void {
     );
     CREATE INDEX IF NOT EXISTS idx_audits_created_at ON audits (created_at);
     CREATE INDEX IF NOT EXISTS idx_audits_expires_at ON audits (expires_at);
+    CREATE TABLE IF NOT EXISTS entitlements (
+      entitlement_key TEXT PRIMARY KEY,
+      stripe_customer_id TEXT,
+      plan TEXT NOT NULL,
+      status TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_entitlements_customer ON entitlements (stripe_customer_id);
   `);
 }
 

@@ -76,6 +76,10 @@ export function redactAudit(audit: AuditResult, context: EntitlementContext): Au
 
   return {
     ...audit,
+    limits: {
+      ...audit.limits,
+      plan: context.plan,
+    },
     checks,
     notes,
   };

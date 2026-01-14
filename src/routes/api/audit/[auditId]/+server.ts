@@ -2,9 +2,9 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { getAudit } from '$lib/server/audit-store';
 import type { AuditApiResponse } from '$lib/auditing/schema';
 import { redactAudit } from '$lib/auditing/redact';
-import { resolveEntitlements } from '$lib/auditing/resolve-entitlements';
+import { resolveEntitlementsForRequest } from '$lib/server/entitlements-resolver';
 
-export const GET: RequestHandler = async ({ params }): Promise<Response> => {
+export const GET: RequestHandler = async ({ params, locals }): Promise<Response> => {
   const auditId = params.auditId;
   if (!auditId) {
     const response: AuditApiResponse = {
@@ -25,7 +25,8 @@ export const GET: RequestHandler = async ({ params }): Promise<Response> => {
     return json(response, { status: 404 });
   }
 
-  const entitlements = resolveEntitlements({
+  const entitlements = resolveEntitlementsForRequest({
+    entitlementKey: locals.entitlementKey,
     audit,
     isShareLink: true,
     isOwner: false,

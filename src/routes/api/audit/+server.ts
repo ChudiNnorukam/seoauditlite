@@ -4,9 +4,9 @@ import { saveAudit } from '$lib/server/audit-store';
 import type { AuditRequest, AuditApiResponse } from '$lib/auditing/schema';
 import type { AuditError } from '$lib/auditing/types';
 import { redactAudit } from '$lib/auditing/redact';
-import { resolveEntitlements } from '$lib/auditing/resolve-entitlements';
+import { resolveEntitlementsForRequest } from '$lib/server/entitlements-resolver';
 
-export const POST: RequestHandler = async ({ request }): Promise<Response> => {
+export const POST: RequestHandler = async ({ request, locals }): Promise<Response> => {
 	try {
 		// Parse request body
 		const body = await request.json() as AuditRequest;
@@ -14,7 +14,8 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
 		// Run audit
 		const result = await auditDomain(body);
 		saveAudit(result);
-		const entitlements = resolveEntitlements({
+		const entitlements = resolveEntitlementsForRequest({
+			entitlementKey: locals.entitlementKey,
 			audit: result,
 			isShareLink: false,
 			isOwner: true
