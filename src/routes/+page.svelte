@@ -27,7 +27,7 @@
 
 			// Store result and show it
 			sessionStorage.setItem('lastAudit', JSON.stringify(data.data));
-			window.location.href = '/report';
+			window.location.href = `/report/${data.data.audit_id}`;
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Network error';
 			loading = false;

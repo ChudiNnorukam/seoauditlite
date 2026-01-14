@@ -3,10 +3,9 @@
  * Orchestrates all 6 AEO checks and generates score
  */
 
+import { randomUUID } from 'node:crypto';
 import {
-  AEOScore,
   AEOGrade,
-  AuditRequest,
   AEOCheckType,
   SEOCheckType,
   AEOImprovement,
@@ -16,10 +15,15 @@ import {
   NetworkError,
   GRADING_SCALE,
   AEO_CHECK_WEIGHTS,
-  SEO_CHECK_WEIGHTS,
   AI_CRAWLERS,
   AUDIT_TIMEOUT_MS,
 } from './types';
+import {
+  AUDIT_SCHEMA_VERSION,
+  type AuditCheck,
+  type AuditRequest,
+  type AuditResult,
+} from './schema';
 
 // ============================================================================
 // Check 1: AI Crawler Accessibility (20 pts)
@@ -1167,49 +1171,95 @@ async function checkSchema(domain: string): Promise<SEOCheckType> {
   }
 }
 
-export async function auditDomain(request: AuditRequest): Promise<AEOScore> {
-  // Validate domain
-  let domain = request.domain.trim();
-  if (!domain) {
+const AEO_CHECK_MAP = {
+  'ai-crawler-accessibility': {
+    id: 'ai_crawler_access',
+    label: 'AI Crawler Access',
+    category: 'access',
+  },
+  'llms-txt-validation': {
+    id: 'llms_txt',
+    label: 'llms.txt',
+    category: 'access',
+  },
+  'structured-data-quality': {
+    id: 'structured_data',
+    label: 'Structured Data',
+    category: 'metadata',
+  },
+  'content-extractability': {
+    id: 'extractability',
+    label: 'Extractability',
+    category: 'structure',
+  },
+  'ai-metadata': {
+    id: 'ai_metadata',
+    label: 'AI Metadata',
+    category: 'metadata',
+  },
+  'answer-format': {
+    id: 'answer_format',
+    label: 'Answer Format',
+    category: 'content',
+  },
+} as const;
+
+function mapAeoCheck(check: AEOCheckType): AuditCheck {
+  const config = AEO_CHECK_MAP[check.name as keyof typeof AEO_CHECK_MAP];
+  const score = Math.round((check.score / check.maxScore) * 100);
+  const explanation = check.details.join(' ');
+  const recommendation =
+    check.recommendations.find((rec) => rec.trim().length > 0) || 'No changes needed.';
+
+  return {
+    id: config?.id ?? check.name,
+    label: config?.label ?? check.name,
+    status: check.status,
+    score,
+    summary: check.message,
+    details: {
+      explanation,
+      evidence: [],
+      recommendation,
+    },
+    metadata: {
+      is_share_safe: true,
+      is_pro_only: false,
+      category: (config?.category ?? 'content'),
+    },
+  };
+}
+
+function normalizeAuditUrl(input: string): { auditedUrl: string; domain: string } {
+  const trimmed = input.trim();
+  const normalized = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  const parsed = new URL(normalized);
+  return { auditedUrl: parsed.origin, domain: parsed.hostname };
+}
+
+export async function auditDomain(request: AuditRequest): Promise<AuditResult> {
+  if (!request.domain?.trim()) {
     throw new ValidationError('Domain is required');
   }
 
-  // Normalize domain
-  domain = domain.replace(/^https?:\/\//i, '').replace(/\/$/, '');
+  const { auditedUrl, domain } = normalizeAuditUrl(request.domain);
 
-  // Validate domain format
   if (!/^[a-z0-9]([a-z0-9-]*\.)+[a-z]{2,}$/i.test(domain)) {
     throw new ValidationError(`Invalid domain format: ${domain}`);
   }
 
-  // Run all AEO and SEO checks in parallel with timeout
   const checksPromise = Promise.all([
-    // AEO checks (6)
     checkAICrawlerAccessibility(domain),
     checkLLMsTxt(domain),
     checkStructuredData(domain),
     checkExtractability(domain),
     checkAIMetadata(domain),
     checkAnswerFormat(domain),
-    // SEO checks (5 original)
-    checkSitemap(domain),
-    checkRobotsTxt(domain),
-    checkMetaTags(domain),
-    checkPerformance(domain),
-    checkSchema(domain),
-    // SEO checks (8 enhanced)
-    checkHeadingStructure(domain),
-    checkCoreWebVitals(domain),
-    checkContentAnalysis(domain),
-    checkSecurityHeaders(domain),
-    checkInternalLinking(domain),
-    checkIndexability2(domain),
-    checkMobileUsability(domain),
   ]);
 
-  let allChecks: (AEOCheckType | SEOCheckType)[];
+  let aeoChecks: AEOCheckType[];
   try {
-    allChecks = await Promise.race([
+    aeoChecks = await Promise.race([
       checksPromise,
       new Promise<never>((_, reject) =>
         setTimeout(() => reject(new TimeoutError(domain)), AUDIT_TIMEOUT_MS)
@@ -1220,60 +1270,33 @@ export async function auditDomain(request: AuditRequest): Promise<AEOScore> {
     throw new NetworkError(domain, error instanceof Error ? error.message : 'Unknown error');
   }
 
-  // Separate AEO and SEO checks
-  const aeoChecks = allChecks.slice(0, 6) as AEOCheckType[];
-  const seoChecks = allChecks.slice(6) as SEOCheckType[];
+  const overallScore = Math.round(
+    aeoChecks.reduce((acc, check) => {
+      const weight = AEO_CHECK_WEIGHTS[check.name as keyof typeof AEO_CHECK_WEIGHTS] || 0;
+      return acc + (check.score / check.maxScore) * weight;
+    }, 0)
+  );
 
-  // Calculate AEO score
-  const aeoTotalScore = aeoChecks.reduce((acc, check) => {
-    const weight = AEO_CHECK_WEIGHTS[check.name as keyof typeof AEO_CHECK_WEIGHTS] || 0;
-    const maxWeight = Object.values(AEO_CHECK_WEIGHTS).reduce((a, b) => a + b, 0);
-    return acc + (check.score / check.maxScore) * (weight / maxWeight) * 100;
-  }, 0);
-  const aeoScore = Math.round(aeoTotalScore);
-
-  // Calculate SEO score
-  const seoTotalScore = seoChecks.reduce((acc, check) => {
-    const weight = SEO_CHECK_WEIGHTS[check.name as keyof typeof SEO_CHECK_WEIGHTS] || 0;
-    const maxWeight = Object.values(SEO_CHECK_WEIGHTS).reduce((a, b) => a + b, 0);
-    return acc + (check.score / check.maxScore) * (weight / maxWeight) * 100;
-  }, 0);
-  const seoScore = Math.round(seoTotalScore);
-
-  // Calculate combined score
-  const combinedScore = Math.round((aeoScore + seoScore) / 2);
-  const grade = getGrade(combinedScore);
-
-  // Generate improvements from all checks
-  const allImprovements = generateImprovements([...aeoChecks, ...seoChecks]);
+  const safeScore = Math.max(0, Math.min(100, overallScore));
 
   return {
-    domain,
-    auditDate: new Date(),
-    aeoScore,
-    seoScore,
-    combinedScore,
-    grade,
-    message: getScoreMessage(combinedScore, grade),
-    breakdown: {
-      aeo: {
-        aiCrawlers: aeoChecks[0].score,
-        llmsTxt: aeoChecks[1].score,
-        structuredData: aeoChecks[2].score,
-        extractability: aeoChecks[3].score,
-        aiMetadata: aeoChecks[4].score,
-        answerFormat: aeoChecks[5].score,
-      },
-      seo: Object.fromEntries(seoChecks.map((check, i) => [
-        check.name.replace(/-/g, ''),
-        check.score,
-      ])) as Record<string, number>,
+    schema_version: AUDIT_SCHEMA_VERSION,
+    audit_id: randomUUID(),
+    audited_url: auditedUrl,
+    audited_at: new Date().toISOString(),
+    overall_score: safeScore,
+    visibility_summary: {
+      ai_visible_percentage: safeScore,
+      ai_invisible_percentage: 100 - safeScore,
     },
-    checks: {
-      aeo: aeoChecks,
-      seo: seoChecks,
+    checks: aeoChecks.map(mapAeoCheck),
+    notes: [],
+    limits: {
+      plan: 'free',
+      audits_remaining: 3,
+      export_available: false,
+      history_days: 0,
     },
-    improvements: allImprovements,
   };
 }
 

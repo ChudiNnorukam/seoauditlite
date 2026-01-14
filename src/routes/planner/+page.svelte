@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { AEOScore } from '$lib/auditing/types';
+	import type { AuditResult } from '$lib/auditing/schema';
 
 	const focusOptions = [
 		{ id: 'quick', label: 'Quick Wins', hint: 'Low lift, fast impact' },
@@ -95,7 +95,7 @@
 	let domain = '';
 	let focus = 'quick';
 	let tasks = allTasks.map((task) => ({ ...task, selected: task.mode === 'quick' }));
-	let lastAudit: AEOScore | null = null;
+	let lastAudit: AuditResult | null = null;
 	let copied = false;
 
 	onMount(() => {
@@ -103,8 +103,8 @@
 		document.body.classList.add(bodyClass);
 		const cached = sessionStorage.getItem('lastAudit');
 		if (cached) {
-			lastAudit = JSON.parse(cached) as AEOScore;
-			domain = lastAudit.domain;
+			lastAudit = JSON.parse(cached) as AuditResult;
+			domain = extractDomain(lastAudit.audited_url);
 		}
 		return () => {
 			document.body.classList.remove(bodyClass);
@@ -127,6 +127,14 @@
 	$: progress = Math.round((selectedTasks.length / tasks.length) * 100);
 
 	const categoryOrder = ['AI Access', 'Structured Data', 'Content Signals', 'Metadata', 'Answer Formats', 'Crawl Paths', 'Performance'];
+
+	function extractDomain(url: string): string {
+		try {
+			return new URL(url).hostname;
+		} catch {
+			return url;
+		}
+	}
 
 	function buildPlanText() {
 		const siteName = domain ? domain : 'your-site.com';
@@ -229,7 +237,7 @@
 			<label class="input-card">
 				<span>Site domain</span>
 				<input type="text" placeholder="yoursite.com" bind:value={domain} />
-				<em>{lastAudit ? `Last audit loaded for ${lastAudit.domain}` : 'Tip: run an audit to auto-fill.'}</em>
+				<em>{lastAudit ? `Last audit loaded for ${extractDomain(lastAudit.audited_url)}` : 'Tip: run an audit to auto-fill.'}</em>
 			</label>
 			<div class="focus-picker">
 				<span>Focus</span>

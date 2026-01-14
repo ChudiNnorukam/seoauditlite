@@ -1,6 +1,8 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { auditDomain } from '$lib/auditing/auditor';
-import type { AuditRequest, AuditResponse, AuditError } from '$lib/auditing/types';
+import { saveAudit } from '$lib/auditing/audit-store';
+import type { AuditRequest, AuditApiResponse } from '$lib/auditing/schema';
+import type { AuditError } from '$lib/auditing/types';
 
 export const POST: RequestHandler = async ({ request }): Promise<Response> => {
 	try {
@@ -9,9 +11,10 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
 
 		// Run audit
 		const result = await auditDomain(body);
+		saveAudit(result);
 
 		// Return success response
-		const response: AuditResponse = {
+		const response: AuditApiResponse = {
 			success: true,
 			data: result
 		};
@@ -21,7 +24,7 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
 		// Handle errors
 		if (error instanceof Error && 'code' in error) {
 			const auditErr = error as unknown as AuditError;
-			const response: AuditResponse = {
+			const response: AuditApiResponse = {
 				success: false,
 				error: auditErr.message,
 				code: auditErr.code
@@ -30,7 +33,7 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
 		}
 
 		// Generic error
-		const response: AuditResponse = {
+		const response: AuditApiResponse = {
 			success: false,
 			error: 'Internal server error',
 			code: 'INTERNAL_ERROR'
