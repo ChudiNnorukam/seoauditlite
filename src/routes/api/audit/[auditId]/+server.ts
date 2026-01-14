@@ -1,5 +1,5 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { getAudit } from '$lib/auditing/audit-store';
+import { getAudit } from '$lib/server/audit-store';
 import type { AuditApiResponse } from '$lib/auditing/schema';
 
 export const GET: RequestHandler = async ({ params }): Promise<Response> => {

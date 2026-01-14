@@ -1,6 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { auditDomain } from '$lib/auditing/auditor';
-import { saveAudit } from '$lib/auditing/audit-store';
+import { saveAudit } from '$lib/server/audit-store';
 import type { AuditRequest, AuditApiResponse } from '$lib/auditing/schema';
 import type { AuditError } from '$lib/auditing/types';
 
