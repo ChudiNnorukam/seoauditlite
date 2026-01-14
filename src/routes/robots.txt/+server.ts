@@ -1,9 +1,15 @@
 /**
  * robots.txt for SEOAuditLite
  * Allows all AI crawlers and search engines
+ * Uses dynamic origin to support custom domains
  */
 
-export const GET = async () => {
+import type { RequestHandler } from './$types';
+import { getBaseUrl } from '$lib/config/site';
+
+export const GET: RequestHandler = async ({ url }) => {
+  const baseUrl = getBaseUrl(url);
+
   const robots = `# Allow all crawlers
 User-agent: *
 Allow: /
@@ -24,13 +30,23 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# AI Context Files
+# llms.txt - AI-readable site summary
+# See: https://llmstxt.org/
+
 # Sitemap
-Sitemap: https://seoauditlite.vercel.app/sitemap.xml`;
+Sitemap: ${baseUrl}/sitemap.xml`;
 
   return new Response(robots, {
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
+      'Cache-Control': 'public, max-age=86400',
     },
   });
 };

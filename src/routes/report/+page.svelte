@@ -14,7 +14,9 @@
 
 <svelte:head>
 	<title>AEO Audit Report - {score?.domain || 'Report'}</title>
-	<link rel="canonical" href="https://seoauditlite.vercel.app/report" />
+	<meta name="description" content="AEO audit results showing AI search readiness score for {score?.domain || 'your site'}." />
+	<link rel="canonical" href="https://seoauditlite.com/report" />
+	<meta name="robots" content="noindex" />
 </svelte:head>
 
 {#if !score}

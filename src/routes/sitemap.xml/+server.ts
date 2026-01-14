@@ -1,32 +1,29 @@
 /**
  * sitemap.xml for SEOAuditLite
  * Lists main pages for search engines
+ * Uses dynamic origin to support custom domains
  */
 
-export const GET = async () => {
-  const baseUrl = 'https://seoauditlite.vercel.app';
+import type { RequestHandler } from './$types';
+import { getBaseUrl, SITE_PAGES } from '$lib/config/site';
 
-  const pages = [
-    {
-      url: baseUrl,
-      lastmod: new Date().toISOString().split('T')[0],
-      changefreq: 'daily',
-      priority: '1.0',
-    },
-    {
-      url: `${baseUrl}/report`,
-      lastmod: new Date().toISOString().split('T')[0],
-      changefreq: 'weekly',
-      priority: '0.8',
-    },
-  ];
+export const GET: RequestHandler = async ({ url }) => {
+  const baseUrl = getBaseUrl(url);
+  const today = new Date().toISOString().split('T')[0];
+
+  const pages = SITE_PAGES.map((page) => ({
+    url: `${baseUrl}${page.path}`,
+    lastmod: today,
+    changefreq: page.changefreq,
+    priority: page.priority.toString(),
+  }));
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${pages
   .map(
     (page) => `  <url>
-    <loc>${page.url}</loc>
+    <loc>${escapeXml(page.url)}</loc>
     <lastmod>${page.lastmod}</lastmod>
     <changefreq>${page.changefreq}</changefreq>
     <priority>${page.priority}</priority>
@@ -38,7 +35,17 @@ ${pages
   return new Response(sitemap, {
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',
-      'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
+      'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+      'X-Content-Type-Options': 'nosniff'
     },
   });
 };
+
+function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}

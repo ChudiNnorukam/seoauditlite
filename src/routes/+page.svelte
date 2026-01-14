@@ -37,8 +37,43 @@
 
 <svelte:head>
 	<title>SEOAuditLite - AI Search Readiness Audit</title>
-	<meta name="description" content="Check your site's AEO (Answer Engine Optimization) readiness for Perplexity, ChatGPT, and Claude." />
-	<link rel="canonical" href="https://seoauditlite.vercel.app/" />
+	<meta name="description" content="Check your site's AEO (Answer Engine Optimization) readiness for Perplexity, ChatGPT, and Claude. Free audit in 2 minutes." />
+	<link rel="canonical" href="https://seoauditlite.com/" />
+
+	<!-- Open Graph -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="SEOAuditLite - Know Your AI Search Readiness" />
+	<meta property="og:description" content="Check your site's AEO readiness for Perplexity, ChatGPT, and Claude. Free audit in 2 minutes, no signup required." />
+	<meta property="og:url" content="https://seoauditlite.com/" />
+	<meta property="og:site_name" content="SEOAuditLite" />
+
+	<!-- Twitter -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="SEOAuditLite - Know Your AI Search Readiness" />
+	<meta name="twitter:description" content="Check your site's AEO readiness for Perplexity, ChatGPT, and Claude. Free audit in 2 minutes." />
+
+	<!-- JSON-LD SoftwareApplication Schema -->
+	{@html `<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "SoftwareApplication",
+		"name": "SEOAuditLite",
+		"applicationCategory": "BusinessApplication",
+		"operatingSystem": "Web",
+		"description": "Free AEO (Answer Engine Optimization) audit tool for checking AI search readiness",
+		"url": "https://seoauditlite.com",
+		"offers": {
+			"@type": "Offer",
+			"price": "0",
+			"priceCurrency": "USD"
+		},
+		"author": {
+			"@type": "Person",
+			"name": "Chudi Nnorukam",
+			"url": "https://chudi.dev"
+		}
+	}
+	</script>`}
 </svelte:head>
 
 <div class="page">
@@ -110,6 +145,19 @@
 		</div>
 	</section>
 
+	<!-- Micro Apps -->
+	<section class="micro-apps">
+		<h2>Micro Apps</h2>
+		<p class="section-lede">Spin up fast AEO workflows without leaving the audit.</p>
+		<div class="micro-grid">
+			<div class="micro-card">
+				<h3>AEO Quick Wins Planner</h3>
+				<p>Build a prioritized plan, score impact vs effort, and export your sprint list.</p>
+				<a class="micro-link" href="/planner">Open planner</a>
+			</div>
+		</div>
+	</section>
+
 	<!-- Pricing -->
 	<section class="pricing">
 		<h2>Pricing</h2>
@@ -135,6 +183,22 @@
 			</div>
 		</div>
 	</section>
+
+	<!-- Footer -->
+	<footer class="footer">
+		<div class="footer-content">
+			<p class="footer-brand">SEOAuditLite</p>
+			<p class="footer-tagline">Know your AI search readiness</p>
+			<div class="footer-links">
+				<a href="/llms.txt">llms.txt</a>
+				<span class="divider">|</span>
+				<a href="/sitemap.xml">Sitemap</a>
+				<span class="divider">|</span>
+				<a href="https://chudi.dev" target="_blank" rel="noopener">Built by Chudi</a>
+			</div>
+			<p class="footer-copyright">&copy; {new Date().getFullYear()} SEOAuditLite. All rights reserved.</p>
+		</div>
+	</footer>
 </div>
 
 <style>
@@ -294,6 +358,54 @@
 		margin-bottom: 32px;
 	}
 
+	.micro-apps {
+		padding: 60px 20px;
+		border-top: 0.5px solid rgba(15, 23, 42, 0.1);
+		text-align: center;
+	}
+
+	.section-lede {
+		margin: 0 0 28px 0;
+		color: #64748b;
+	}
+
+	.micro-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+		gap: 20px;
+		max-width: 720px;
+		margin: 0 auto;
+	}
+
+	.micro-card {
+		background: white;
+		border: 0.5px solid rgba(15, 23, 42, 0.1);
+		border-radius: 8px;
+		padding: 24px;
+		text-align: left;
+	}
+
+	.micro-card h3 {
+		margin: 0 0 8px 0;
+		font-size: 18px;
+	}
+
+	.micro-card p {
+		margin: 0 0 16px 0;
+		color: #64748b;
+		font-size: 14px;
+	}
+
+	.micro-link {
+		color: #1162d4;
+		font-weight: 600;
+		text-decoration: none;
+	}
+
+	.micro-link:hover {
+		text-decoration: underline;
+	}
+
 	.pricing-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -359,6 +471,58 @@
 
 	.pricing-card li:last-child {
 		border-bottom: none;
+	}
+
+	.footer {
+		padding: 40px 20px;
+		border-top: 0.5px solid rgba(15, 23, 42, 0.1);
+		background: #f8fafc;
+		margin-top: 40px;
+	}
+
+	.footer-content {
+		text-align: center;
+	}
+
+	.footer-brand {
+		font-size: 16px;
+		font-weight: 600;
+		margin: 0 0 4px 0;
+		color: #0f172a;
+	}
+
+	.footer-tagline {
+		font-size: 13px;
+		color: #64748b;
+		margin: 0 0 16px 0;
+	}
+
+	.footer-links {
+		display: flex;
+		justify-content: center;
+		gap: 8px;
+		flex-wrap: wrap;
+		margin-bottom: 16px;
+	}
+
+	.footer-links a {
+		color: #1162d4;
+		text-decoration: none;
+		font-size: 13px;
+	}
+
+	.footer-links a:hover {
+		text-decoration: underline;
+	}
+
+	.footer-links .divider {
+		color: #cbd5e1;
+	}
+
+	.footer-copyright {
+		font-size: 12px;
+		color: #94a3b8;
+		margin: 0;
 	}
 
 	@media (max-width: 640px) {
