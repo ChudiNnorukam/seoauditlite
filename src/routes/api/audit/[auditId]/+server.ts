@@ -1,6 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { getAudit } from '$lib/server/audit-store';
 import type { AuditApiResponse } from '$lib/auditing/schema';
+import { redactAudit } from '$lib/auditing/redact';
 
 export const GET: RequestHandler = async ({ params }): Promise<Response> => {
   const auditId = params.auditId;
@@ -23,9 +24,10 @@ export const GET: RequestHandler = async ({ params }): Promise<Response> => {
     return json(response, { status: 404 });
   }
 
+  const redacted = redactAudit(audit, { plan: 'free', isShareLink: true });
   const response: AuditApiResponse = {
     success: true,
-    data: audit,
+    data: redacted,
   };
 
   return json(response, { status: 200 });

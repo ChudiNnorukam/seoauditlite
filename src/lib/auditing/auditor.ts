@@ -1176,31 +1176,43 @@ const AEO_CHECK_MAP = {
     id: 'ai_crawler_access',
     label: 'AI Crawler Access',
     category: 'access',
+    proOnly: false,
+    shareSafe: true,
   },
   'llms-txt-validation': {
     id: 'llms_txt',
     label: 'llms.txt',
     category: 'access',
+    proOnly: false,
+    shareSafe: true,
   },
   'structured-data-quality': {
     id: 'structured_data',
     label: 'Structured Data',
     category: 'metadata',
+    proOnly: true,
+    shareSafe: true,
   },
   'content-extractability': {
     id: 'extractability',
     label: 'Extractability',
     category: 'structure',
+    proOnly: true,
+    shareSafe: true,
   },
   'ai-metadata': {
     id: 'ai_metadata',
     label: 'AI Metadata',
     category: 'metadata',
+    proOnly: false,
+    shareSafe: true,
   },
   'answer-format': {
     id: 'answer_format',
     label: 'Answer Format',
     category: 'content',
+    proOnly: true,
+    shareSafe: true,
   },
 } as const;
 
@@ -1223,9 +1235,9 @@ function mapAeoCheck(check: AEOCheckType): AuditCheck {
       recommendation,
     },
     metadata: {
-      is_share_safe: true,
-      is_pro_only: false,
-      category: (config?.category ?? 'content'),
+      is_share_safe: config?.shareSafe ?? true,
+      is_pro_only: config?.proOnly ?? false,
+      category: config?.category ?? 'content',
     },
   };
 }

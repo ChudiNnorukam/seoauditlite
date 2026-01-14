@@ -3,6 +3,7 @@ import { auditDomain } from '$lib/auditing/auditor';
 import { saveAudit } from '$lib/server/audit-store';
 import type { AuditRequest, AuditApiResponse } from '$lib/auditing/schema';
 import type { AuditError } from '$lib/auditing/types';
+import { redactAudit } from '$lib/auditing/redact';
 
 export const POST: RequestHandler = async ({ request }): Promise<Response> => {
 	try {
@@ -12,11 +13,12 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
 		// Run audit
 		const result = await auditDomain(body);
 		saveAudit(result);
+		const redacted = redactAudit(result, { plan: 'free', isShareLink: false });
 
 		// Return success response
 		const response: AuditApiResponse = {
 			success: true,
-			data: result
+			data: redacted
 		};
 
 		return json(response, { status: 200 });

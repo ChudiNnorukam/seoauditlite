@@ -6,12 +6,23 @@
 
 	let shareUrl = '';
 	let copied = false;
-
-	$: audit = data.audit;
+	let audit: AuditResult | null = data.audit;
 	$: domain = audit ? extractDomain(audit.audited_url) : '';
 
 	onMount(() => {
 		shareUrl = window.location.href;
+		const cached = sessionStorage.getItem('lastAudit');
+		if (cached) {
+			try {
+				const stored = JSON.parse(cached) as AuditResult;
+				const currentId = window.location.pathname.split('/').pop();
+				if (stored.audit_id && stored.audit_id === currentId) {
+					audit = stored;
+				}
+			} catch {
+				// ignore invalid cache
+			}
+		}
 	});
 
 	async function copyShareLink() {
@@ -104,6 +115,9 @@
 							</div>
 							<div class="check-score">
 								<span class="pill">{statusLabel(check.status)}</span>
+								{#if check.metadata.is_pro_only}
+									<span class="pill pro">Pro</span>
+								{/if}
 								<span class="score">{check.score}</span>
 							</div>
 						</div>
@@ -111,6 +125,13 @@
 						<p class="recommendation">
 							<strong>Next step:</strong> {check.details.recommendation}
 						</p>
+						{#if check.details.evidence.length > 0}
+							<ul class="evidence">
+								{#each check.details.evidence as item}
+									<li>{item}</li>
+								{/each}
+							</ul>
+						{/if}
 					</article>
 				{/each}
 			</div>
@@ -342,6 +363,11 @@
 		color: #0f172a;
 	}
 
+	.pill.pro {
+		background: rgba(17, 98, 212, 0.12);
+		color: #0c4da8;
+	}
+
 	.score {
 		font-family: 'SF Mono', Monaco, monospace;
 		font-size: 14px;
@@ -359,6 +385,13 @@
 		margin: 0;
 		font-size: 14px;
 		color: #0f172a;
+	}
+
+	.evidence {
+		margin: 8px 0 0;
+		padding-left: 18px;
+		color: #475569;
+		font-size: 13px;
 	}
 
 	.muted {
