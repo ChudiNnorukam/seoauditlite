@@ -2,6 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { getAudit } from '$lib/server/audit-store';
 import type { AuditApiResponse } from '$lib/auditing/schema';
 import { redactAudit } from '$lib/auditing/redact';
+import { createEntitlementContext } from '$lib/auditing/entitlements';
 
 export const GET: RequestHandler = async ({ params }): Promise<Response> => {
   const auditId = params.auditId;
@@ -24,7 +25,12 @@ export const GET: RequestHandler = async ({ params }): Promise<Response> => {
     return json(response, { status: 404 });
   }
 
-  const redacted = redactAudit(audit, { plan: 'free', isShareLink: true });
+  const entitlements = createEntitlementContext({
+    plan: audit.limits.plan,
+    isShareLink: true,
+    isOwner: false,
+  });
+  const redacted = redactAudit(audit, entitlements);
   const response: AuditApiResponse = {
     success: true,
     data: redacted,

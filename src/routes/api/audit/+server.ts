@@ -4,6 +4,7 @@ import { saveAudit } from '$lib/server/audit-store';
 import type { AuditRequest, AuditApiResponse } from '$lib/auditing/schema';
 import type { AuditError } from '$lib/auditing/types';
 import { redactAudit } from '$lib/auditing/redact';
+import { createEntitlementContext } from '$lib/auditing/entitlements';
 
 export const POST: RequestHandler = async ({ request }): Promise<Response> => {
 	try {
@@ -13,7 +14,12 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
 		// Run audit
 		const result = await auditDomain(body);
 		saveAudit(result);
-		const redacted = redactAudit(result, { plan: 'free', isShareLink: false });
+		const entitlements = createEntitlementContext({
+			plan: result.limits.plan,
+			isShareLink: false,
+			isOwner: true
+		});
+		const redacted = redactAudit(result, entitlements);
 
 		// Return success response
 		const response: AuditApiResponse = {

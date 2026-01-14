@@ -1,11 +1,5 @@
 import type { AuditResult } from './schema';
-
-type RedactionPlan = 'free' | 'pro';
-
-export interface RedactionContext {
-  plan: RedactionPlan;
-  isShareLink: boolean;
-}
+import type { EntitlementContext } from './entitlements';
 
 const SHARE_EXPLANATION = 'Details are hidden in the share view.';
 const SHARE_RECOMMENDATION = 'Upgrade to unlock detailed recommendations.';
@@ -27,7 +21,7 @@ function teaseRecommendation(text: string, isProOnly: boolean): string {
   return `Preview: ${preview}${truncated ? '...' : ''} ${FREE_RECOMMENDATION_SUFFIX}`;
 }
 
-export function redactAudit(audit: AuditResult, context: RedactionContext): AuditResult {
+export function redactAudit(audit: AuditResult, context: EntitlementContext): AuditResult {
   const shareMode = context.isShareLink;
   const showPro = context.plan === 'pro' && !shareMode;
   let hiddenShareChecks = 0;

@@ -1,13 +1,23 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { AuditResult } from '$lib/auditing/schema';
+	import type { EntitlementContext } from '$lib/auditing/entitlements';
+	import { createEntitlementContext } from '$lib/auditing/entitlements';
+	import { redactAudit } from '$lib/auditing/redact';
 
-	export let data: { audit: AuditResult | null; error?: string | null };
+	export let data: {
+		audit: AuditResult | null;
+		error?: string | null;
+		entitlements: EntitlementContext;
+	};
 
 	let shareUrl = '';
 	let copied = false;
 	let audit: AuditResult | null = data.audit;
-	$: domain = audit ? extractDomain(audit.audited_url) : '';
+	let entitlements: EntitlementContext = data.entitlements;
+	let viewAudit: AuditResult | null = null;
+	$: viewAudit = audit ? redactAudit(audit, entitlements) : null;
+	$: domain = viewAudit ? extractDomain(viewAudit.audited_url) : '';
 
 	onMount(() => {
 		shareUrl = window.location.href;
@@ -17,6 +27,11 @@
 				const stored = JSON.parse(cached) as AuditResult;
 				const currentId = window.location.pathname.split('/').pop();
 				if (stored.audit_id && stored.audit_id === currentId) {
+					entitlements = createEntitlementContext({
+						plan: stored.limits.plan,
+						isShareLink: false,
+						isOwner: true
+					});
 					audit = stored;
 				}
 			} catch {
@@ -61,7 +76,7 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-{#if !audit}
+{#if !viewAudit}
 	<div class="container">
 		<p>{data.error ?? 'No audit data found.'}</p>
 		<a class="link" href="/">Run a new audit</a>
@@ -71,21 +86,21 @@
 		<header class="report-header">
 			<div>
 				<h1>{domain}</h1>
-				<p class="date">{new Date(audit.audited_at).toLocaleDateString()}</p>
+				<p class="date">{new Date(viewAudit.audited_at).toLocaleDateString()}</p>
 			</div>
 			<a href="/" class="link">← New audit</a>
 		</header>
 
 		<section class="score-card">
-			<div class="score-ring" style={`--score:${audit.overall_score}`}>
-				<span class="score-number">{audit.overall_score}</span>
+			<div class="score-ring" style={`--score:${viewAudit.overall_score}`}>
+				<span class="score-number">{viewAudit.overall_score}</span>
 				<span class="score-label">Overall</span>
 			</div>
 			<div class="score-details">
 				<h2>AI Search Readiness</h2>
 				<p>
-					{audit.visibility_summary.ai_visible_percentage}% visible to AI ·
-					{audit.visibility_summary.ai_invisible_percentage}% invisible
+					{viewAudit.visibility_summary.ai_visible_percentage}% visible to AI ·
+					{viewAudit.visibility_summary.ai_invisible_percentage}% invisible
 				</p>
 			</div>
 		</section>
@@ -106,7 +121,7 @@
 		<section class="checks">
 			<h3>Checks</h3>
 			<div class="check-list">
-				{#each audit.checks as check}
+				{#each viewAudit.checks as check}
 					<article class="check-card" data-status={check.status}>
 						<div class="check-header">
 							<div>
@@ -137,11 +152,11 @@
 			</div>
 		</section>
 
-		{#if audit.notes.length > 0}
+		{#if viewAudit.notes.length > 0}
 			<section class="notes">
 				<h3>Notes</h3>
 				<ul>
-					{#each audit.notes as note}
+					{#each viewAudit.notes as note}
 						<li>{note.message}</li>
 					{/each}
 				</ul>
@@ -153,19 +168,19 @@
 			<div class="limits-grid">
 				<div>
 					<span class="label">Plan</span>
-					<span class="value">{audit.limits.plan}</span>
+					<span class="value">{viewAudit.limits.plan}</span>
 				</div>
 				<div>
 					<span class="label">Audits remaining</span>
-					<span class="value">{audit.limits.audits_remaining}</span>
+					<span class="value">{viewAudit.limits.audits_remaining}</span>
 				</div>
 				<div>
 					<span class="label">Export</span>
-					<span class="value">{audit.limits.export_available ? 'Available' : 'Locked'}</span>
+					<span class="value">{viewAudit.limits.export_available ? 'Available' : 'Locked'}</span>
 				</div>
 				<div>
 					<span class="label">History</span>
-					<span class="value">{audit.limits.history_days} days</span>
+					<span class="value">{viewAudit.limits.history_days} days</span>
 				</div>
 			</div>
 		</section>
