@@ -22,7 +22,12 @@
 	$: domain = viewAudit ? extractDomain(viewAudit.audited_url) : '';
 
 	onMount(() => {
-		shareUrl = window.location.href;
+		const url = new URL(window.location.href);
+		const storedReferral = sessionStorage.getItem('rewardful_referral');
+		if (storedReferral && !url.searchParams.get('referral')) {
+			url.searchParams.set('referral', storedReferral);
+		}
+		shareUrl = url.toString();
 		const cached = sessionStorage.getItem('lastAudit');
 		if (cached) {
 			try {

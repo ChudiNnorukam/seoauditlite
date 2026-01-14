@@ -10,7 +10,10 @@ function resolveExpiry(auditedAt: string): string {
   return new Date(start + TTL_MS).toISOString();
 }
 
-export function saveAudit(result: AuditResult): void {
+export function saveAudit(
+  result: AuditResult,
+  meta?: { entitlementKey?: string | null; referralId?: string | null }
+): void {
   const db = getDb();
   const stmt = db.prepare(`
     INSERT OR IGNORE INTO audits (
@@ -19,14 +22,18 @@ export function saveAudit(result: AuditResult): void {
       schema_version,
       payload_json,
       created_at,
-      expires_at
+      expires_at,
+      entitlement_key,
+      referral_id
     ) VALUES (
       @audit_id,
       @audited_url,
       @schema_version,
       @payload_json,
       @created_at,
-      @expires_at
+      @expires_at,
+      @entitlement_key,
+      @referral_id
     )
   `);
 
@@ -37,6 +44,8 @@ export function saveAudit(result: AuditResult): void {
     payload_json: JSON.stringify(result),
     created_at: result.audited_at,
     expires_at: resolveExpiry(result.audited_at),
+    entitlement_key: meta?.entitlementKey ?? null,
+    referral_id: meta?.referralId ?? null,
   });
 }
 

@@ -29,6 +29,24 @@ function initialize(db: Database.Database): void {
     );
     CREATE INDEX IF NOT EXISTS idx_entitlements_customer ON entitlements (stripe_customer_id);
   `);
+
+  ensureColumn(db, 'audits', 'entitlement_key', 'TEXT');
+  ensureColumn(db, 'audits', 'referral_id', 'TEXT');
+  ensureColumn(db, 'entitlements', 'referral_id', 'TEXT');
+  ensureColumn(db, 'entitlements', 'referral_updated_at', 'TEXT');
+}
+
+function ensureColumn(
+  db: Database.Database,
+  table: string,
+  column: string,
+  definition: string
+): void {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
+  const exists = columns.some((col) => col.name === column);
+  if (!exists) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
 }
 
 export function getDb(): Database.Database {

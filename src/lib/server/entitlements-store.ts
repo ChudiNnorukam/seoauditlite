@@ -4,6 +4,7 @@ import type { EntitlementPlan } from '$lib/auditing/entitlements';
 export interface EntitlementRecord {
   entitlement_key: string;
   stripe_customer_id: string | null;
+  referral_id: string | null;
   plan: EntitlementPlan;
   status: string;
   updated_at: string;
@@ -19,10 +20,11 @@ export function ensureEntitlement(entitlementKey: string): void {
     `INSERT OR IGNORE INTO entitlements (
       entitlement_key,
       stripe_customer_id,
+      referral_id,
       plan,
       status,
       updated_at
-    ) VALUES (?, NULL, 'free', 'free', ?)`
+    ) VALUES (?, NULL, NULL, 'free', 'free', ?)`
   ).run(entitlementKey, new Date().toISOString());
 }
 
@@ -30,7 +32,7 @@ export function getEntitlementByKey(entitlementKey: string): EntitlementRecord |
   const db = getDb();
   const row = db
     .prepare(
-      'SELECT entitlement_key, stripe_customer_id, plan, status, updated_at FROM entitlements WHERE entitlement_key = ?'
+      'SELECT entitlement_key, stripe_customer_id, referral_id, plan, status, updated_at FROM entitlements WHERE entitlement_key = ?'
     )
     .get(entitlementKey) as EntitlementRecord | undefined;
 
@@ -42,7 +44,7 @@ export function getEntitlementByCustomerId(customerId: string): EntitlementRecor
   const db = getDb();
   const row = db
     .prepare(
-      'SELECT entitlement_key, stripe_customer_id, plan, status, updated_at FROM entitlements WHERE stripe_customer_id = ?'
+      'SELECT entitlement_key, stripe_customer_id, referral_id, plan, status, updated_at FROM entitlements WHERE stripe_customer_id = ?'
     )
     .get(customerId) as EntitlementRecord | undefined;
 
@@ -61,24 +63,28 @@ export function upsertEntitlement(params: {
     `INSERT INTO entitlements (
       entitlement_key,
       stripe_customer_id,
+      referral_id,
       plan,
       status,
       updated_at
     ) VALUES (
       @entitlement_key,
       @stripe_customer_id,
+      @referral_id,
       @plan,
       @status,
       @updated_at
     )
     ON CONFLICT(entitlement_key) DO UPDATE SET
       stripe_customer_id = COALESCE(excluded.stripe_customer_id, entitlements.stripe_customer_id),
+      referral_id = COALESCE(entitlements.referral_id, excluded.referral_id),
       plan = excluded.plan,
       status = excluded.status,
       updated_at = excluded.updated_at`
   ).run({
     entitlement_key: params.entitlementKey,
     stripe_customer_id: params.stripeCustomerId ?? null,
+    referral_id: null,
     plan: params.plan,
     status: params.status,
     updated_at: new Date().toISOString(),
@@ -100,4 +106,13 @@ export function updateEntitlementByCustomer(params: {
     .run(params.plan, params.status, new Date().toISOString(), params.stripeCustomerId);
 
   return result.changes > 0;
+}
+
+export function setEntitlementReferral(entitlementKey: string, referralId: string): void {
+  const db = getDb();
+  db.prepare(
+    `UPDATE entitlements
+    SET referral_id = ?, referral_updated_at = ?
+    WHERE entitlement_key = ?`
+  ).run(referralId, new Date().toISOString(), entitlementKey);
 }

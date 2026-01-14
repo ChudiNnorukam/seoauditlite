@@ -1,6 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { auditDomain } from '$lib/auditing/auditor';
 import { saveAudit } from '$lib/server/audit-store';
+import { getEntitlementByKey } from '$lib/server/entitlements-store';
 import type { AuditRequest, AuditApiResponse } from '$lib/auditing/schema';
 import type { AuditError } from '$lib/auditing/types';
 import { redactAudit } from '$lib/auditing/redact';
@@ -13,7 +14,13 @@ export const POST: RequestHandler = async ({ request, locals }): Promise<Respons
 
 		// Run audit
 		const result = await auditDomain(body);
-		saveAudit(result);
+		const entitlement = locals.entitlementKey
+			? getEntitlementByKey(locals.entitlementKey)
+			: null;
+		saveAudit(result, {
+			entitlementKey: locals.entitlementKey ?? null,
+			referralId: entitlement?.referral_id ?? null
+		});
 		const entitlements = resolveEntitlementsForRequest({
 			entitlementKey: locals.entitlementKey,
 			audit: result,

@@ -32,16 +32,18 @@ export const POST: RequestHandler = async ({ request, url, locals }): Promise<Re
 			? `${url.origin}/report/${auditId}?checkout=cancel`
 			: `${url.origin}/?checkout=cancel`;
 
+		const referralId = record?.referral_id?.trim();
 		const session = await stripe.checkout.sessions.create({
 			mode: 'subscription',
 			line_items: [{ price: priceId, quantity: 1 }],
 			success_url: successUrl,
 			cancel_url: cancelUrl,
-			client_reference_id: locals.entitlementKey,
+			client_reference_id: referralId || undefined,
 			customer: record?.stripe_customer_id ?? undefined,
 			allow_promotion_codes: true,
 			metadata: {
-				entitlement_key: locals.entitlementKey
+				entitlement_key: locals.entitlementKey,
+				referral_id: referralId || ''
 			}
 		});
 

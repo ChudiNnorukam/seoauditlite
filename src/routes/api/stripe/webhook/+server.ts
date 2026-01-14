@@ -1,7 +1,11 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import type Stripe from 'stripe';
 import { getStripe } from '$lib/server/stripe';
-import { updateEntitlementByCustomer, upsertEntitlement } from '$lib/server/entitlements-store';
+import {
+  setEntitlementReferral,
+  updateEntitlementByCustomer,
+  upsertEntitlement,
+} from '$lib/server/entitlements-store';
 
 function planFromStatus(status?: string | null): 'free' | 'pro' {
   if (status === 'active' || status === 'trialing') return 'pro';
@@ -32,11 +36,11 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
-      const entitlementKey =
-        session.client_reference_id ?? session.metadata?.entitlement_key ?? null;
+      const entitlementKey = session.metadata?.entitlement_key ?? null;
       const customerId =
         typeof session.customer === 'string' ? session.customer : session.customer?.id ?? null;
 
+      const referralId = session.client_reference_id ?? null;
       if (entitlementKey) {
         upsertEntitlement({
           entitlementKey,
@@ -44,6 +48,9 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
           plan: 'pro',
           status: session.payment_status ?? 'paid',
         });
+        if (referralId) {
+          setEntitlementReferral(entitlementKey, referralId);
+        }
       } else if (customerId) {
         updateEntitlementByCustomer({
           stripeCustomerId: customerId,
