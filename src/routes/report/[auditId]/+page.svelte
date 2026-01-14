@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import type { AuditResult } from '$lib/auditing/schema';
 	import type { EntitlementContext } from '$lib/auditing/entitlements';
-	import { createEntitlementContext } from '$lib/auditing/entitlements';
+	import { resolveEntitlements } from '$lib/auditing/resolve-entitlements';
 	import { redactAudit } from '$lib/auditing/redact';
 
 	export let data: {
@@ -27,8 +27,8 @@
 				const stored = JSON.parse(cached) as AuditResult;
 				const currentId = window.location.pathname.split('/').pop();
 				if (stored.audit_id && stored.audit_id === currentId) {
-					entitlements = createEntitlementContext({
-						plan: stored.limits.plan,
+					entitlements = resolveEntitlements({
+						audit: stored,
 						isShareLink: false,
 						isOwner: true
 					});

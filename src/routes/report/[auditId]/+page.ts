@@ -1,11 +1,10 @@
 import type { PageLoad } from './$types';
 import type { AuditApiResponse, AuditResult } from '$lib/auditing/schema';
 import type { EntitlementContext } from '$lib/auditing/entitlements';
-import { createEntitlementContext } from '$lib/auditing/entitlements';
+import { resolveEntitlements } from '$lib/auditing/resolve-entitlements';
 
 export const load: PageLoad = async ({ fetch, params }) => {
-	const entitlements: EntitlementContext = createEntitlementContext({
-		plan: 'free',
+	const entitlements: EntitlementContext = resolveEntitlements({
 		isShareLink: true,
 		isOwner: false
 	});
