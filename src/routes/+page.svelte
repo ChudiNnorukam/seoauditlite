@@ -1,4 +1,7 @@
 <script lang="ts">
+	import Header from '$lib/components/Header.svelte';
+	import { MagnifyingGlass, Robot, FileText, Code, TextAlignLeft, Tag, ListChecks } from 'phosphor-svelte';
+
 	let domain = '';
 	let loading = false;
 	let error = '';
@@ -76,6 +79,8 @@
 	</script>`}
 </svelte:head>
 
+<Header />
+
 <div class="page">
 	<!-- Hero Section -->
 	<section class="hero">
@@ -93,7 +98,12 @@
 					required
 				/>
 				<button type="submit" disabled={loading}>
-					{loading ? 'Analyzing...' : 'Analyze Site'}
+					{#if loading}
+						Analyzing...
+					{:else}
+						<MagnifyingGlass size={16} weight="bold" />
+						Analyze Site
+					{/if}
 				</button>
 			</div>
 			{#if error}
@@ -119,26 +129,32 @@
 		<h2>The 6 AEO Checks</h2>
 		<div class="grid">
 			<div class="card">
+				<div class="card-icon"><Robot size={20} weight="duotone" /></div>
 				<h3>AI Crawler Access</h3>
 				<p>robots.txt allows GPTBot, ClaudeBot, PerplexityBot?</p>
 			</div>
 			<div class="card">
+				<div class="card-icon"><FileText size={20} weight="duotone" /></div>
 				<h3>llms.txt</h3>
 				<p>New robots.txt for AI engines</p>
 			</div>
 			<div class="card">
+				<div class="card-icon"><Code size={20} weight="duotone" /></div>
 				<h3>Structured Data</h3>
 				<p>JSON-LD schema quality</p>
 			</div>
 			<div class="card">
+				<div class="card-icon"><TextAlignLeft size={20} weight="duotone" /></div>
 				<h3>Extractability</h3>
 				<p>Semantic HTML + proper structure</p>
 			</div>
 			<div class="card">
+				<div class="card-icon"><Tag size={20} weight="duotone" /></div>
 				<h3>AI Metadata</h3>
 				<p>Canonical URLs, OG tags, dates</p>
 			</div>
 			<div class="card">
+				<div class="card-icon"><ListChecks size={20} weight="duotone" /></div>
 				<h3>Answer Format</h3>
 				<p>FAQ/HowTo schema + lists</p>
 			</div>
@@ -207,6 +223,7 @@
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 		background: #fff;
 		color: #0f172a;
+		-webkit-font-smoothing: antialiased;
 	}
 
 	.page {
@@ -215,18 +232,20 @@
 	}
 
 	.hero {
-		padding: 60px 20px;
+		padding: 48px 20px 56px;
 		text-align: center;
 	}
 
 	.headline {
-		font-size: 40px;
+		font-size: 36px;
 		margin: 0 0 12px 0;
 		line-height: 1.2;
+		letter-spacing: -0.02em;
+		font-weight: 600;
 	}
 
 	.subheadline {
-		font-size: 18px;
+		font-size: 16px;
 		color: #64748b;
 		margin: 0 0 32px 0;
 	}
@@ -238,7 +257,7 @@
 	.input-group {
 		display: flex;
 		gap: 12px;
-		max-width: 500px;
+		max-width: 480px;
 		margin: 0 auto;
 		flex-wrap: wrap;
 	}
@@ -246,28 +265,34 @@
 	input {
 		flex: 1;
 		padding: 12px 16px;
-		border: 0.5px solid rgba(15, 23, 42, 0.1);
-		border-radius: 4px;
+		border: 0.5px solid rgba(15, 23, 42, 0.12);
+		border-radius: 6px;
 		font-size: 14px;
 		min-width: 200px;
+		background: #fff;
+		transition: border-color 150ms ease, box-shadow 150ms ease;
 	}
 
 	input:focus {
 		outline: none;
 		border-color: #1162d4;
-		box-shadow: 0 0 0 3px rgba(17, 98, 212, 0.1);
+		box-shadow: 0 0 0 3px rgba(17, 98, 212, 0.08);
 	}
 
 	button {
-		padding: 12px 24px;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 12px 20px;
 		background: #1162d4;
 		color: white;
 		border: none;
-		border-radius: 4px;
+		border-radius: 6px;
 		font-size: 14px;
 		font-weight: 500;
 		cursor: pointer;
 		white-space: nowrap;
+		transition: background 150ms ease;
 	}
 
 	button:hover:not(:disabled) {
@@ -281,23 +306,24 @@
 
 	.error {
 		color: #dc2626;
-		font-size: 14px;
+		font-size: 13px;
 		margin: 12px 0 0 0;
 	}
 
 	.stats {
 		display: flex;
 		justify-content: center;
-		gap: 24px;
+		gap: 16px;
 		flex-wrap: wrap;
 	}
 
 	.stat {
-		padding: 16px;
-		border: 0.5px solid rgba(15, 23, 42, 0.1);
+		padding: 16px 20px;
+		border: 0.5px solid rgba(15, 23, 42, 0.08);
 		border-radius: 6px;
 		text-align: center;
 		min-width: 120px;
+		background: #fafbfc;
 	}
 
 	.number {
@@ -306,6 +332,8 @@
 		font-weight: 600;
 		color: #1162d4;
 		margin-bottom: 4px;
+		font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+		font-variant-numeric: tabular-nums;
 	}
 
 	.label {
@@ -315,91 +343,128 @@
 	}
 
 	.how-it-works {
-		padding: 60px 20px;
-		border-top: 0.5px solid rgba(15, 23, 42, 0.1);
+		padding: 48px 20px;
+		border-top: 0.5px solid rgba(15, 23, 42, 0.08);
 	}
 
 	.how-it-works h2 {
 		text-align: center;
-		margin-bottom: 32px;
+		margin-bottom: 28px;
+		font-size: 20px;
+		font-weight: 600;
+		letter-spacing: -0.01em;
 	}
 
 	.grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-		gap: 16px;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 12px;
 	}
 
 	.card {
 		padding: 16px;
-		border: 0.5px solid rgba(15, 23, 42, 0.1);
+		border: 0.5px solid rgba(15, 23, 42, 0.08);
 		border-radius: 6px;
+		background: #fff;
+		transition: border-color 150ms ease;
+	}
+
+	.card:hover {
+		border-color: rgba(15, 23, 42, 0.16);
+	}
+
+	.card-icon {
+		width: 32px;
+		height: 32px;
+		border-radius: 6px;
+		background: rgba(17, 98, 212, 0.08);
+		color: #1162d4;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-bottom: 12px;
 	}
 
 	.card h3 {
-		margin: 0 0 8px 0;
-		font-size: 16px;
+		margin: 0 0 6px 0;
+		font-size: 14px;
+		font-weight: 600;
 	}
 
 	.card p {
 		margin: 0;
-		font-size: 14px;
+		font-size: 13px;
 		color: #64748b;
+		line-height: 1.4;
 	}
 
 	.pricing {
-		padding: 60px 20px;
-		background: #f1f5f9;
-		border-top: 0.5px solid rgba(15, 23, 42, 0.1);
+		padding: 48px 20px;
+		background: #f8fafc;
+		border-top: 0.5px solid rgba(15, 23, 42, 0.08);
 	}
 
 	.pricing h2 {
 		text-align: center;
-		margin-bottom: 32px;
+		margin-bottom: 28px;
+		font-size: 20px;
+		font-weight: 600;
+		letter-spacing: -0.01em;
 	}
 
 	.micro-apps {
-		padding: 60px 20px;
-		border-top: 0.5px solid rgba(15, 23, 42, 0.1);
+		padding: 48px 20px;
+		border-top: 0.5px solid rgba(15, 23, 42, 0.08);
 		text-align: center;
 	}
 
+	.micro-apps h2 {
+		font-size: 20px;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		margin-bottom: 8px;
+	}
+
 	.section-lede {
-		margin: 0 0 28px 0;
+		margin: 0 0 24px 0;
 		color: #64748b;
+		font-size: 14px;
 	}
 
 	.micro-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-		gap: 20px;
+		gap: 16px;
 		max-width: 720px;
 		margin: 0 auto;
 	}
 
 	.micro-card {
 		background: white;
-		border: 0.5px solid rgba(15, 23, 42, 0.1);
-		border-radius: 8px;
-		padding: 24px;
+		border: 0.5px solid rgba(15, 23, 42, 0.08);
+		border-radius: 6px;
+		padding: 20px;
 		text-align: left;
 	}
 
 	.micro-card h3 {
 		margin: 0 0 8px 0;
-		font-size: 18px;
+		font-size: 15px;
+		font-weight: 600;
 	}
 
 	.micro-card p {
 		margin: 0 0 16px 0;
 		color: #64748b;
-		font-size: 14px;
+		font-size: 13px;
+		line-height: 1.5;
 	}
 
 	.micro-link {
 		color: #1162d4;
-		font-weight: 600;
+		font-weight: 500;
 		text-decoration: none;
+		font-size: 13px;
 	}
 
 	.micro-link:hover {
@@ -408,53 +473,57 @@
 
 	.pricing-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-		gap: 24px;
-		max-width: 900px;
+		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+		gap: 16px;
+		max-width: 600px;
 		margin: 0 auto;
 	}
 
 	.pricing-card {
-		padding: 24px;
-		border: 0.5px solid rgba(15, 23, 42, 0.1);
+		padding: 20px;
+		border: 0.5px solid rgba(15, 23, 42, 0.08);
 		border-radius: 6px;
 		background: white;
 		position: relative;
 	}
 
 	.pricing-card.featured {
-		border-color: #1162d4;
+		border-color: rgba(17, 98, 212, 0.3);
 		background: rgba(17, 98, 212, 0.02);
 	}
 
 	.badge {
 		position: absolute;
-		top: -12px;
-		right: 24px;
+		top: -10px;
+		right: 20px;
 		background: #1162d4;
 		color: white;
-		padding: 4px 12px;
-		border-radius: 4px;
-		font-size: 12px;
-		font-weight: 500;
+		padding: 4px 10px;
+		border-radius: 6px;
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.02em;
 	}
 
 	.pricing-card h3 {
-		margin: 12px 0 8px 0;
-		font-size: 20px;
+		margin: 8px 0 6px 0;
+		font-size: 16px;
+		font-weight: 600;
 	}
 
 	.price {
 		margin: 0 0 16px 0;
-		font-size: 32px;
+		font-size: 28px;
 		font-weight: 600;
-		color: #1162d4;
+		color: #0f172a;
+		font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
 	}
 
 	.price span {
-		font-size: 14px;
+		font-size: 13px;
 		font-weight: 400;
 		color: #64748b;
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 	}
 
 	.pricing-card ul {
@@ -465,8 +534,9 @@
 
 	.pricing-card li {
 		padding: 8px 0;
-		font-size: 14px;
-		border-bottom: 0.5px solid rgba(15, 23, 42, 0.1);
+		font-size: 13px;
+		color: #475569;
+		border-bottom: 0.5px solid rgba(15, 23, 42, 0.06);
 	}
 
 	.pricing-card li:last-child {
@@ -474,10 +544,9 @@
 	}
 
 	.footer {
-		padding: 40px 20px;
-		border-top: 0.5px solid rgba(15, 23, 42, 0.1);
-		background: #f8fafc;
-		margin-top: 40px;
+		padding: 32px 20px;
+		border-top: 0.5px solid rgba(15, 23, 42, 0.08);
+		background: #fafbfc;
 	}
 
 	.footer-content {
@@ -485,14 +554,14 @@
 	}
 
 	.footer-brand {
-		font-size: 16px;
+		font-size: 14px;
 		font-weight: 600;
 		margin: 0 0 4px 0;
 		color: #0f172a;
 	}
 
 	.footer-tagline {
-		font-size: 13px;
+		font-size: 12px;
 		color: #64748b;
 		margin: 0 0 16px 0;
 	}
@@ -502,25 +571,26 @@
 		justify-content: center;
 		gap: 8px;
 		flex-wrap: wrap;
-		margin-bottom: 16px;
+		margin-bottom: 12px;
 	}
 
 	.footer-links a {
-		color: #1162d4;
+		color: #64748b;
 		text-decoration: none;
-		font-size: 13px;
+		font-size: 12px;
+		transition: color 150ms ease;
 	}
 
 	.footer-links a:hover {
-		text-decoration: underline;
+		color: #1162d4;
 	}
 
 	.footer-links .divider {
-		color: #cbd5e1;
+		color: #e2e8f0;
 	}
 
 	.footer-copyright {
-		font-size: 12px;
+		font-size: 11px;
 		color: #94a3b8;
 		margin: 0;
 	}
@@ -537,6 +607,10 @@
 		input,
 		button {
 			width: 100%;
+		}
+
+		button {
+			justify-content: center;
 		}
 	}
 </style>

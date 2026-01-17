@@ -5,6 +5,7 @@
 	"type": "module",
 	"dependencies": {
 		"@libsql/client": "^0.17.0",
+		"phosphor-svelte": "^3.0.1",
 		"stripe": "^16.5.0"
 	},
 	"scripts": {
