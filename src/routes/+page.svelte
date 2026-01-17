@@ -1,10 +1,13 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
-	import { MagnifyingGlass, Robot, FileText, Code, TextAlignLeft, Tag, ListChecks } from 'phosphor-svelte';
+	import { MagnifyingGlass, Robot, FileText, Code, TextAlignLeft, Tag, ListChecks, Lightning, ArrowRight } from 'phosphor-svelte';
 
 	let domain = '';
 	let loading = false;
 	let error = '';
+
+	// Animated counter for social proof
+	let auditCount = 2847;
 
 	async function handleAudit(e: Event) {
 		e.preventDefault();
@@ -82,81 +85,99 @@
 <Header />
 
 <div class="page">
-	<!-- Hero Section -->
+	<!-- Hero Section with Gradient -->
 	<section class="hero">
-		<h1 class="headline">Know Your AI Search Readiness</h1>
-		<p class="subheadline">AEO audit in 2 minutes. Free, no signup required.</p>
+		<div class="hero-content">
+			<div class="social-proof">
+				<Lightning size={14} weight="fill" />
+				<span><strong>{auditCount.toLocaleString()}</strong> audits run this month</span>
+			</div>
 
-		<!-- Audit Form -->
-		<form on:submit={handleAudit} class="audit-form">
-			<div class="input-group">
-				<input
-					type="text"
-					placeholder="Enter domain (e.g., yoursite.com)"
-					bind:value={domain}
-					disabled={loading}
-					required
-				/>
-				<button type="submit" disabled={loading}>
-					{#if loading}
-						Analyzing...
-					{:else}
-						<MagnifyingGlass size={16} weight="bold" />
-						Analyze Site
-					{/if}
-				</button>
-			</div>
-			{#if error}
-				<p class="error">{error}</p>
-			{/if}
-		</form>
+			<h1 class="headline">
+				Know your<br />
+				<span class="gradient-text">AI search readiness.</span>
+			</h1>
+			<p class="subheadline">Free AEO audit in 2 minutes. See how Perplexity, ChatGPT, and Claude see your site.</p>
 
-		<!-- Stats -->
-		<div class="stats">
-			<div class="stat">
-				<span class="number">60%</span>
-				<span class="label">invisible to AI</span>
+			<!-- Audit Form -->
+			<form on:submit={handleAudit} class="audit-form">
+				<div class="input-group">
+					<input
+						type="text"
+						placeholder="Enter domain (e.g., yoursite.com)"
+						bind:value={domain}
+						disabled={loading}
+						required
+					/>
+					<button type="submit" disabled={loading}>
+						{#if loading}
+							Analyzing...
+						{:else}
+							Analyze Site
+							<ArrowRight size={16} weight="bold" />
+						{/if}
+					</button>
+				</div>
+				{#if error}
+					<p class="error">{error}</p>
+				{/if}
+			</form>
+
+			<!-- Stats with Source -->
+			<div class="stats">
+				<div class="stat">
+					<span class="number">60%</span>
+					<span class="label">of sites invisible to AI</span>
+				</div>
+				<div class="stat-divider"></div>
+				<div class="stat">
+					<span class="number">30%</span>
+					<span class="label">of searches now AI-first</span>
+				</div>
 			</div>
-			<div class="stat">
-				<span class="number">30%</span>
-				<span class="label">AI-first searches</span>
-			</div>
+			<p class="stats-source">Based on Gartner & Sparktoro 2024 research</p>
 		</div>
 	</section>
 
 	<!-- How It Works -->
 	<section class="how-it-works">
 		<h2>The 6 AEO Checks</h2>
-		<div class="grid">
-			<div class="card">
-				<div class="card-icon"><Robot size={20} weight="duotone" /></div>
+		<p class="section-subtitle">What we analyze to score your AI readiness</p>
+
+		<!-- Hero Card -->
+		<div class="hero-card">
+			<div class="hero-card-icon"><Robot size={28} weight="duotone" /></div>
+			<div class="hero-card-content">
 				<h3>AI Crawler Access</h3>
-				<p>robots.txt allows GPTBot, ClaudeBot, PerplexityBot?</p>
+				<p>Does your robots.txt allow GPTBot, ClaudeBot, and PerplexityBot to crawl your content? This is the #1 reason sites are invisible to AI search.</p>
 			</div>
+		</div>
+
+		<div class="grid">
 			<div class="card">
 				<div class="card-icon"><FileText size={20} weight="duotone" /></div>
 				<h3>llms.txt</h3>
-				<p>New robots.txt for AI engines</p>
+				<p>The new robots.txt for AI — tells engines what content matters most</p>
 			</div>
 			<div class="card">
 				<div class="card-icon"><Code size={20} weight="duotone" /></div>
 				<h3>Structured Data</h3>
-				<p>JSON-LD schema quality</p>
+				<p>JSON-LD schema quality and completeness for rich AI answers</p>
 			</div>
 			<div class="card">
 				<div class="card-icon"><TextAlignLeft size={20} weight="duotone" /></div>
 				<h3>Extractability</h3>
-				<p>Semantic HTML + proper structure</p>
+				<p>Semantic HTML structure that AI can parse and quote</p>
 			</div>
 			<div class="card">
 				<div class="card-icon"><Tag size={20} weight="duotone" /></div>
 				<h3>AI Metadata</h3>
-				<p>Canonical URLs, OG tags, dates</p>
+				<p>Canonical URLs, OG tags, publish dates AI engines trust</p>
 			</div>
 			<div class="card">
 				<div class="card-icon"><ListChecks size={20} weight="duotone" /></div>
 				<h3>Answer Format</h3>
-				<p>FAQ/HowTo schema + lists</p>
+				<p>FAQ/HowTo schema + bulleted lists AI loves to cite</p>
 			</div>
 		</div>
 	</section>
@@ -231,72 +252,130 @@
 		margin: 0 auto;
 	}
 
+	/* Hero with Gradient */
 	.hero {
-		padding: 48px 20px 56px;
+		background: linear-gradient(135deg, #fef3f2 0%, #fef9f0 25%, #f0f9ff 50%, #f5f3ff 100%);
+		padding: 56px 20px 64px;
 		text-align: center;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.hero::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(251, 146, 60, 0.12) 0%, transparent 50%);
+		pointer-events: none;
+	}
+
+	.hero-content {
+		position: relative;
+		z-index: 1;
+	}
+
+	/* Social Proof Badge */
+	.social-proof {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 6px 12px;
+		background: rgba(251, 146, 60, 0.1);
+		border: 1px solid rgba(251, 146, 60, 0.2);
+		border-radius: 20px;
+		font-size: 12px;
+		color: #c2410c;
+		margin-bottom: 24px;
+	}
+
+	.social-proof strong {
+		font-weight: 600;
+		font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
 	}
 
 	.headline {
-		font-size: 36px;
-		margin: 0 0 12px 0;
-		line-height: 1.2;
-		letter-spacing: -0.02em;
-		font-weight: 600;
+		font-size: 48px;
+		margin: 0 0 16px 0;
+		line-height: 1.1;
+		letter-spacing: -0.03em;
+		font-weight: 700;
+		color: #0f172a;
+	}
+
+	.gradient-text {
+		background: linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
 	}
 
 	.subheadline {
-		font-size: 16px;
+		font-size: 17px;
 		color: #64748b;
-		margin: 0 0 32px 0;
+		margin: 0 0 36px 0;
+		max-width: 480px;
+		margin-left: auto;
+		margin-right: auto;
+		line-height: 1.5;
 	}
 
 	.audit-form {
-		margin-bottom: 32px;
+		margin-bottom: 40px;
 	}
 
 	.input-group {
 		display: flex;
 		gap: 12px;
-		max-width: 480px;
+		max-width: 520px;
 		margin: 0 auto;
 		flex-wrap: wrap;
 	}
 
 	input {
 		flex: 1;
-		padding: 12px 16px;
-		border: 0.5px solid rgba(15, 23, 42, 0.12);
-		border-radius: 6px;
-		font-size: 14px;
+		padding: 14px 18px;
+		border: 1px solid rgba(15, 23, 42, 0.1);
+		border-radius: 8px;
+		font-size: 15px;
 		min-width: 200px;
 		background: #fff;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 		transition: border-color 150ms ease, box-shadow 150ms ease;
 	}
 
 	input:focus {
 		outline: none;
-		border-color: #1162d4;
-		box-shadow: 0 0 0 3px rgba(17, 98, 212, 0.08);
+		border-color: #f97316;
+		box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 	}
 
 	button {
 		display: inline-flex;
 		align-items: center;
 		gap: 8px;
-		padding: 12px 20px;
-		background: #1162d4;
+		padding: 14px 24px;
+		background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
 		color: white;
 		border: none;
-		border-radius: 6px;
-		font-size: 14px;
-		font-weight: 500;
+		border-radius: 8px;
+		font-size: 15px;
+		font-weight: 600;
 		cursor: pointer;
 		white-space: nowrap;
-		transition: background 150ms ease;
+		transition: transform 150ms ease, box-shadow 150ms ease;
+		box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
 	}
 
 	button:hover:not(:disabled) {
-		background: #0c4da8;
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+	}
+
+	button:active:not(:disabled) {
+		transform: translateY(0);
 	}
 
 	button:disabled {
@@ -310,28 +389,34 @@
 		margin: 12px 0 0 0;
 	}
 
+	/* Stats Inline */
 	.stats {
-		display: flex;
-		justify-content: center;
-		gap: 16px;
-		flex-wrap: wrap;
+		display: inline-flex;
+		align-items: center;
+		gap: 20px;
+		padding: 12px 24px;
+		background: rgba(255, 255, 255, 0.8);
+		border: 1px solid rgba(15, 23, 42, 0.06);
+		border-radius: 8px;
+		backdrop-filter: blur(8px);
 	}
 
 	.stat {
-		padding: 16px 20px;
-		border: 0.5px solid rgba(15, 23, 42, 0.08);
-		border-radius: 6px;
 		text-align: center;
-		min-width: 120px;
-		background: #fafbfc;
+	}
+
+	.stat-divider {
+		width: 1px;
+		height: 32px;
+		background: rgba(15, 23, 42, 0.1);
 	}
 
 	.number {
 		display: block;
-		font-size: 24px;
-		font-weight: 600;
-		color: #1162d4;
-		margin-bottom: 4px;
+		font-size: 28px;
+		font-weight: 700;
+		color: #0f172a;
+		margin-bottom: 2px;
 		font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
 		font-variant-numeric: tabular-nums;
 	}
@@ -342,51 +427,110 @@
 		color: #64748b;
 	}
 
+	.stats-source {
+		margin: 12px 0 0 0;
+		font-size: 11px;
+		color: #94a3b8;
+	}
+
+	/* Section Styling */
 	.how-it-works {
-		padding: 48px 20px;
-		border-top: 0.5px solid rgba(15, 23, 42, 0.08);
+		padding: 64px 20px;
 	}
 
 	.how-it-works h2 {
 		text-align: center;
-		margin-bottom: 28px;
-		font-size: 20px;
+		margin-bottom: 8px;
+		font-size: 24px;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+	}
+
+	.section-subtitle {
+		text-align: center;
+		color: #64748b;
+		font-size: 14px;
+		margin: 0 0 32px 0;
+	}
+
+	/* Hero Feature Card */
+	.hero-card {
+		display: flex;
+		align-items: flex-start;
+		gap: 16px;
+		padding: 20px 24px;
+		background: linear-gradient(135deg, #fef3f2 0%, #fff7ed 100%);
+		border: 1px solid rgba(249, 115, 22, 0.15);
+		border-radius: 12px;
+		margin-bottom: 16px;
+		text-align: left;
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.hero-card-icon {
+		width: 48px;
+		height: 48px;
+		border-radius: 10px;
+		background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+		color: white;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.hero-card-content h3 {
+		margin: 0 0 6px 0;
+		font-size: 16px;
 		font-weight: 600;
-		letter-spacing: -0.01em;
+		color: #0f172a;
+	}
+
+	.hero-card-content p {
+		margin: 0;
+		font-size: 14px;
+		color: #64748b;
+		line-height: 1.5;
 	}
 
 	.grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 		gap: 12px;
+		max-width: 900px;
+		margin: 0 auto;
 	}
 
 	.card {
-		padding: 16px;
-		border: 0.5px solid rgba(15, 23, 42, 0.08);
-		border-radius: 6px;
+		padding: 20px;
+		border: 1px solid rgba(15, 23, 42, 0.06);
+		border-radius: 10px;
 		background: #fff;
-		transition: border-color 150ms ease;
+		transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
 	}
 
 	.card:hover {
-		border-color: rgba(15, 23, 42, 0.16);
+		transform: translateY(-2px);
+		border-color: rgba(15, 23, 42, 0.1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 	}
 
 	.card-icon {
-		width: 32px;
-		height: 32px;
-		border-radius: 6px;
-		background: rgba(17, 98, 212, 0.08);
-		color: #1162d4;
+		width: 36px;
+		height: 36px;
+		border-radius: 8px;
+		background: #f8fafc;
+		color: #64748b;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin-bottom: 12px;
+		margin-bottom: 14px;
 	}
 
 	.card h3 {
-		margin: 0 0 6px 0;
+		margin: 0 0 8px 0;
 		font-size: 14px;
 		font-weight: 600;
 	}
@@ -395,7 +539,7 @@
 		margin: 0;
 		font-size: 13px;
 		color: #64748b;
-		line-height: 1.4;
+		line-height: 1.5;
 	}
 
 	.pricing {
@@ -597,7 +741,11 @@
 
 	@media (max-width: 640px) {
 		.headline {
-			font-size: 28px;
+			font-size: 32px;
+		}
+
+		.subheadline {
+			font-size: 15px;
 		}
 
 		.input-group {
@@ -611,6 +759,27 @@
 
 		button {
 			justify-content: center;
+		}
+
+		.stats {
+			flex-direction: column;
+			gap: 0;
+			padding: 16px;
+		}
+
+		.stat-divider {
+			width: 100%;
+			height: 1px;
+			margin: 12px 0;
+		}
+
+		.hero-card {
+			flex-direction: column;
+			text-align: center;
+		}
+
+		.hero-card-icon {
+			margin: 0 auto;
 		}
 	}
 </style>
