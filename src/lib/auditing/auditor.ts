@@ -5,10 +5,10 @@
 
 import { randomUUID } from 'node:crypto';
 import {
-  AEOGrade,
-  AEOCheckType,
-  SEOCheckType,
-  AEOImprovement,
+  type AEOGrade,
+  type AEOCheckType,
+  type SEOCheckType,
+  type AEOImprovement,
   AuditError,
   ValidationError,
   TimeoutError,
@@ -25,6 +25,18 @@ import {
   type AuditResult,
 } from './schema';
 
+// Helper for fetch with timeout using AbortController
+async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 // ============================================================================
 // Check 1: AI Crawler Accessibility (20 pts)
 // ============================================================================
@@ -34,7 +46,7 @@ async function checkAICrawlerAccessibility(
 ): Promise<AEOCheckType> {
   try {
     const robotsUrl = new URL('/robots.txt', `https://${domain}`).href;
-    const response = await fetch(robotsUrl, { timeout: 5000 });
+    const response = await fetchWithTimeout(robotsUrl, 5000);
 
     const content = response.ok ? await response.text() : null;
     const robotsAccessible = response.ok && response.status === 200;
@@ -119,7 +131,7 @@ function robotsContentAllows(content: string, userAgent: string): boolean {
 async function checkLLMsTxt(domain: string): Promise<AEOCheckType> {
   try {
     const llmsUrl = new URL('/llms.txt', `https://${domain}`).href;
-    const response = await fetch(llmsUrl, { timeout: 5000 });
+    const response = await fetchWithTimeout(llmsUrl, 5000);
 
     const llmsExists = response.ok && response.status === 200;
     const llmsContent = llmsExists ? await response.text() : null;
@@ -165,7 +177,7 @@ async function checkLLMsTxt(domain: string): Promise<AEOCheckType> {
 
 async function checkStructuredData(domain: string): Promise<AEOCheckType> {
   try {
-    const response = await fetch(`https://${domain}`, { timeout: 10000 });
+    const response = await fetchWithTimeout(`https://${domain}`, 10000);
     const html = await response.text();
 
     // Parse schemas from HTML
@@ -179,11 +191,25 @@ async function checkStructuredData(domain: string): Promise<AEOCheckType> {
       { type: 'HowTo', weight: 2 },
     ];
 
-    const schemaResults = schemaTypes.map((st) => ({
-      type: st.type,
-      present: schemas.some((s) => s['@type']?.includes(st.type)),
-      valid: schemas.some((s) => s['@type']?.includes(st.type) && validateSchema(s)),
-    }));
+    const schemaResults = schemaTypes.map((st) => {
+      const getSchemaType = (s: Record<string, unknown>): string | string[] | undefined => {
+        const t = s['@type'];
+        if (typeof t === 'string') return t;
+        if (Array.isArray(t)) return t;
+        return undefined;
+      };
+      const matchesType = (s: Record<string, unknown>) => {
+        const t = getSchemaType(s);
+        if (typeof t === 'string') return t === st.type;
+        if (Array.isArray(t)) return t.includes(st.type);
+        return false;
+      };
+      return {
+        type: st.type,
+        present: schemas.some(matchesType),
+        valid: schemas.some((s) => matchesType(s) && validateSchema(s)),
+      };
+    });
 
     const score = schemaResults.reduce(
       (acc, s) => acc + (s.present ? (s.valid ? 5 : 2) : 0),
@@ -260,7 +286,7 @@ function validateSchema(schema: Record<string, unknown>): boolean {
 
 async function checkExtractability(domain: string): Promise<AEOCheckType> {
   try {
-    const response = await fetch(`https://${domain}`, { timeout: 10000 });
+    const response = await fetchWithTimeout(`https://${domain}`, 10000);
     const html = await response.text();
 
     // Count semantic tags
@@ -343,7 +369,7 @@ function validateHeadingHierarchy(headings: string[]): boolean {
 
 async function checkAIMetadata(domain: string): Promise<AEOCheckType> {
   try {
-    const response = await fetch(`https://${domain}`, { timeout: 10000 });
+    const response = await fetchWithTimeout(`https://${domain}`, 10000);
     const html = await response.text();
 
     const metaExtractors = {
@@ -414,7 +440,7 @@ async function checkAIMetadata(domain: string): Promise<AEOCheckType> {
 
 async function checkAnswerFormat(domain: string): Promise<AEOCheckType> {
   try {
-    const response = await fetch(`https://${domain}`, { timeout: 10000 });
+    const response = await fetchWithTimeout(`https://${domain}`, 10000);
     const html = await response.text();
 
     const hasFAQSchema = /"@type"\s*:\s*"FAQPage"/.test(html);
@@ -483,7 +509,7 @@ async function checkAnswerFormat(domain: string): Promise<AEOCheckType> {
 async function checkSitemap(domain: string): Promise<SEOCheckType> {
   try {
     const sitemapUrl = new URL('/sitemap.xml', `https://${domain}`).href;
-    const response = await fetch(sitemapUrl, { timeout: 5000 });
+    const response = await fetchWithTimeout(sitemapUrl, 5000);
     const sitemapExists = response.ok && response.status === 200;
     let urlCount = 0;
     let lastModRecent = false;
@@ -549,7 +575,7 @@ async function checkSitemap(domain: string): Promise<SEOCheckType> {
 async function checkRobotsTxt(domain: string): Promise<SEOCheckType> {
   try {
     const robotsUrl = new URL('/robots.txt', `https://${domain}`).href;
-    const response = await fetch(robotsUrl, { timeout: 5000 });
+    const response = await fetchWithTimeout(robotsUrl, 5000);
     const robotsValid = response.ok && response.status === 200;
     let content = '';
     let blocksUserAgent = false;
@@ -608,7 +634,7 @@ async function checkRobotsTxt(domain: string): Promise<SEOCheckType> {
 async function checkMetaTags(domain: string): Promise<SEOCheckType> {
   try {
     const url = `https://${domain}/`;
-    const response = await fetch(url, { timeout: 5000 });
+    const response = await fetchWithTimeout(url, 5000);
     const html = response.ok ? await response.text() : '';
 
     const titleMatch = html.match(/<title>([^<]+)<\/title>/);
@@ -688,7 +714,7 @@ async function checkMetaTags(domain: string): Promise<SEOCheckType> {
 async function checkPerformance(domain: string): Promise<SEOCheckType> {
   try {
     const url = `https://${domain}/`;
-    const response = await fetch(url, { timeout: 5000 });
+    const response = await fetchWithTimeout(url, 5000);
     const html = response.ok ? await response.text() : '';
 
     const hasCharset = /<meta\s+charset/.test(html);
@@ -758,7 +784,7 @@ async function checkPerformance(domain: string): Promise<SEOCheckType> {
 async function checkHeadingStructure(domain: string): Promise<SEOCheckType> {
   try {
     const url = `https://${domain}/`;
-    const response = await fetch(url, { timeout: 5000 });
+    const response = await fetchWithTimeout(url, 5000);
     const html = response.ok ? await response.text() : '';
 
     const h1s = (html.match(/<h1[^>]*>/gi) || []).length;
@@ -804,7 +830,7 @@ async function checkHeadingStructure(domain: string): Promise<SEOCheckType> {
 async function checkCoreWebVitals(domain: string): Promise<SEOCheckType> {
   try {
     const url = `https://${domain}/`;
-    const response = await fetch(url, { timeout: 5000 });
+    const response = await fetchWithTimeout(url, 5000);
     const html = response.ok ? await response.text() : '';
 
     // Estimate web vitals from HTML analysis
@@ -859,7 +885,7 @@ async function checkCoreWebVitals(domain: string): Promise<SEOCheckType> {
 async function checkContentAnalysis(domain: string): Promise<SEOCheckType> {
   try {
     const url = `https://${domain}/`;
-    const response = await fetch(url, { timeout: 5000 });
+    const response = await fetchWithTimeout(url, 5000);
     const html = response.ok ? await response.text() : '';
 
     // Extract text content
@@ -907,7 +933,7 @@ async function checkContentAnalysis(domain: string): Promise<SEOCheckType> {
 async function checkSecurityHeaders(domain: string): Promise<SEOCheckType> {
   try {
     const url = `https://${domain}/`;
-    const response = await fetch(url, { timeout: 5000 });
+    const response = await fetchWithTimeout(url, 5000);
 
     const hasHSTS = response.headers.has('strict-transport-security');
     const hasCSP = response.headers.has('content-security-policy');
@@ -952,7 +978,7 @@ async function checkSecurityHeaders(domain: string): Promise<SEOCheckType> {
 async function checkInternalLinking(domain: string): Promise<SEOCheckType> {
   try {
     const url = `https://${domain}/`;
-    const response = await fetch(url, { timeout: 5000 });
+    const response = await fetchWithTimeout(url, 5000);
     const html = response.ok ? await response.text() : '';
 
     const internalLinks = (html.match(/href=["'][^"']*\/[^"']*["']/gi) || []).length;
@@ -1004,7 +1030,7 @@ async function checkInternalLinking(domain: string): Promise<SEOCheckType> {
 async function checkIndexability2(domain: string): Promise<SEOCheckType> {
   try {
     const url = `https://${domain}/`;
-    const response = await fetch(url, { timeout: 5000 });
+    const response = await fetchWithTimeout(url, 5000);
     const html = response.ok ? await response.text() : '';
 
     const hasNoindex = /<meta[^>]*name=["']robots["'][^>]*content=["']noindex/.test(html);
@@ -1051,7 +1077,7 @@ async function checkIndexability2(domain: string): Promise<SEOCheckType> {
 async function checkMobileUsability(domain: string): Promise<SEOCheckType> {
   try {
     const url = `https://${domain}/`;
-    const response = await fetch(url, { timeout: 5000 });
+    const response = await fetchWithTimeout(url, 5000);
     const html = response.ok ? await response.text() : '';
 
     const hasViewport = /<meta[^>]*name=["']viewport/.test(html);
@@ -1098,7 +1124,7 @@ async function checkMobileUsability(domain: string): Promise<SEOCheckType> {
 async function checkSchema(domain: string): Promise<SEOCheckType> {
   try {
     const url = `https://${domain}/`;
-    const response = await fetch(url, { timeout: 5000 });
+    const response = await fetchWithTimeout(url, 5000);
     const html = response.ok ? await response.text() : '';
 
     const schemaMatches = html.match(/<script\s+type="application\/ld\+json"[^>]*>([^<]+)<\/script>/g) || [];

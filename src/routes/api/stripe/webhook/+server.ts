@@ -46,18 +46,18 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
 
         const referralId = session.client_reference_id ?? null;
         if (entitlementKey) {
-          upsertEntitlement({
+          await upsertEntitlement({
             entitlementKey,
             stripeCustomerId: customerId,
             plan: 'pro',
             status: session.payment_status ?? 'paid',
           });
           if (referralId) {
-            setEntitlementReferral(entitlementKey, referralId);
+            await setEntitlementReferral(entitlementKey, referralId);
           }
           console.log(`Checkout completed: ${entitlementKey} upgraded to pro`);
         } else if (customerId) {
-          updateEntitlementByCustomer({
+          await updateEntitlementByCustomer({
             stripeCustomerId: customerId,
             plan: 'pro',
             status: session.payment_status ?? 'paid',
@@ -78,7 +78,7 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
         if (!customerId) break;
 
         const newPlan = planFromStatus(subscription.status);
-        updateEntitlementByCustomer({
+        await updateEntitlementByCustomer({
           stripeCustomerId: customerId,
           plan: newPlan,
           status: subscription.status ?? 'unknown',
@@ -95,7 +95,7 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
 
         // Only update if this is a subscription invoice
         if (invoice.subscription) {
-          updateEntitlementByCustomer({
+          await updateEntitlementByCustomer({
             stripeCustomerId: customerId,
             plan: 'pro',
             status: 'active',
@@ -111,7 +111,7 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
           typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id ?? null;
         if (!customerId) break;
 
-        updateEntitlementByCustomer({
+        await updateEntitlementByCustomer({
           stripeCustomerId: customerId,
           plan: 'free',
           status: 'payment_failed',
@@ -127,7 +127,7 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
 
         if (customerId) {
           // Clear customer's subscription data (GDPR compliance)
-          deleteEntitlementByCustomer(customerId);
+          await deleteEntitlementByCustomer(customerId);
           console.log(`Customer deleted: ${customerId} entitlement cleared`);
         }
         break;

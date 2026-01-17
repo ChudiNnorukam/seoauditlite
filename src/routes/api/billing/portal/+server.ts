@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ url, locals }): Promise<Response> =
 			return json({ error: 'Missing entitlement key' }, { status: 400 });
 		}
 
-		const record = getEntitlementByKey(locals.entitlementKey);
+		const record = await getEntitlementByKey(locals.entitlementKey);
 
 		if (!record?.stripe_customer_id) {
 			return json(

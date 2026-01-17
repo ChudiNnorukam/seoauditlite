@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import favicon from '$lib/assets/favicon.svg';
-	import { PUBLIC_REWARDFUL_API_KEY } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
+
+	const PUBLIC_REWARDFUL_API_KEY = env.PUBLIC_REWARDFUL_API_KEY ?? '';
 
 	let { children } = $props();
 

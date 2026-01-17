@@ -155,12 +155,48 @@ export interface SchemaValidationResult extends SEOCheckResult {
   schemaValid: boolean;
 }
 
+export interface HeadingStructureResult extends SEOCheckResult {
+  name: 'heading-structure';
+}
+
+export interface CoreWebVitalsResult extends SEOCheckResult {
+  name: 'core-web-vitals';
+  learnMore?: string;
+}
+
+export interface ContentAnalysisResult extends SEOCheckResult {
+  name: 'content-analysis';
+}
+
+export interface SecurityHeadersResult extends SEOCheckResult {
+  name: 'security-headers';
+}
+
+export interface InternalLinkingResult extends SEOCheckResult {
+  name: 'internal-linking';
+}
+
+export interface IndexabilityResult extends SEOCheckResult {
+  name: 'indexability';
+}
+
+export interface MobileUsabilityResult extends SEOCheckResult {
+  name: 'mobile-usability';
+}
+
 export type SEOCheckType =
   | SitemapCheckResult
   | RobotsCheckResultSEO
   | MetaTagsCheckResult
   | PerformanceCheckResult
-  | SchemaValidationResult;
+  | SchemaValidationResult
+  | HeadingStructureResult
+  | CoreWebVitalsResult
+  | ContentAnalysisResult
+  | SecurityHeadersResult
+  | InternalLinkingResult
+  | IndexabilityResult
+  | MobileUsabilityResult;
 
 export interface AEOScore {
   domain: string;

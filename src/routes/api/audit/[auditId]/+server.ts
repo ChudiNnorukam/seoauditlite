@@ -15,7 +15,7 @@ export const GET: RequestHandler = async ({ params, locals }): Promise<Response>
     return json(response, { status: 400 });
   }
 
-  const audit = getAudit(auditId);
+  const audit = await getAudit(auditId);
   if (!audit) {
     const response: AuditApiResponse = {
       success: false,
@@ -25,7 +25,7 @@ export const GET: RequestHandler = async ({ params, locals }): Promise<Response>
     return json(response, { status: 404 });
   }
 
-  const entitlements = resolveEntitlementsForRequest({
+  const entitlements = await resolveEntitlementsForRequest({
     entitlementKey: locals.entitlementKey,
     audit,
     isShareLink: true,

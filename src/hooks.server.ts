@@ -22,7 +22,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	event.locals.entitlementKey = entitlementKey;
-	ensureEntitlement(entitlementKey);
+	await ensureEntitlement(entitlementKey);
 
 	return resolve(event);
 };

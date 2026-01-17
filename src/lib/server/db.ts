@@ -1,60 +1,56 @@
-import Database from 'better-sqlite3';
-import { mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { createClient, type Client } from '@libsql/client';
 
-const DEFAULT_DB_PATH = resolve(process.cwd(), 'data', 'audits.sqlite');
-const DB_PATH = process.env.AUDIT_DB_PATH ?? DEFAULT_DB_PATH;
+let client: Client | null = null;
+let initialized = false;
 
-let dbInstance: Database.Database | null = null;
+function getClient(): Client {
+  if (!client) {
+    const url = process.env.TURSO_DATABASE_URL;
+    if (!url) {
+      throw new Error('TURSO_DATABASE_URL environment variable is not set');
+    }
+    client = createClient({
+      url,
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    });
+  }
+  return client;
+}
 
-function initialize(db: Database.Database): void {
-  db.pragma('journal_mode = WAL');
-  db.exec(`
+async function initialize(): Promise<void> {
+  if (initialized) return;
+
+  const db = getClient();
+  await db.executeMultiple(`
     CREATE TABLE IF NOT EXISTS audits (
       audit_id TEXT PRIMARY KEY,
       audited_url TEXT NOT NULL,
       schema_version TEXT NOT NULL,
       payload_json TEXT NOT NULL,
       created_at TEXT NOT NULL,
-      expires_at TEXT
+      expires_at TEXT,
+      entitlement_key TEXT,
+      referral_id TEXT
     );
     CREATE INDEX IF NOT EXISTS idx_audits_created_at ON audits (created_at);
     CREATE INDEX IF NOT EXISTS idx_audits_expires_at ON audits (expires_at);
+
     CREATE TABLE IF NOT EXISTS entitlements (
       entitlement_key TEXT PRIMARY KEY,
       stripe_customer_id TEXT,
       plan TEXT NOT NULL,
       status TEXT NOT NULL,
+      referral_id TEXT,
+      referral_updated_at TEXT,
       updated_at TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_entitlements_customer ON entitlements (stripe_customer_id);
   `);
 
-  ensureColumn(db, 'audits', 'entitlement_key', 'TEXT');
-  ensureColumn(db, 'audits', 'referral_id', 'TEXT');
-  ensureColumn(db, 'entitlements', 'referral_id', 'TEXT');
-  ensureColumn(db, 'entitlements', 'referral_updated_at', 'TEXT');
+  initialized = true;
 }
 
-function ensureColumn(
-  db: Database.Database,
-  table: string,
-  column: string,
-  definition: string
-): void {
-  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
-  const exists = columns.some((col) => col.name === column);
-  if (!exists) {
-    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
-  }
-}
-
-export function getDb(): Database.Database {
-  if (!dbInstance) {
-    mkdirSync(dirname(DB_PATH), { recursive: true });
-    dbInstance = new Database(DB_PATH);
-    initialize(dbInstance);
-  }
-
-  return dbInstance;
+export async function getDb(): Promise<Client> {
+  await initialize();
+  return getClient();
 }

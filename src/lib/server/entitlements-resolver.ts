@@ -3,17 +3,17 @@ import type { EntitlementContext } from '$lib/auditing/entitlements';
 import { resolveEntitlements } from '$lib/auditing/resolve-entitlements';
 import { ensureEntitlement, getEntitlementByKey } from './entitlements-store';
 
-export function resolveEntitlementsForRequest(input: {
+export async function resolveEntitlementsForRequest(input: {
   entitlementKey?: string | null;
   audit?: AuditResult | null;
   isShareLink: boolean;
   isOwner: boolean;
-}): EntitlementContext {
+}): Promise<EntitlementContext> {
   let planOverride: EntitlementContext['plan'] | undefined;
 
   if (input.entitlementKey) {
-    ensureEntitlement(input.entitlementKey);
-    const record = getEntitlementByKey(input.entitlementKey);
+    await ensureEntitlement(input.entitlementKey);
+    const record = await getEntitlementByKey(input.entitlementKey);
     planOverride = record?.plan;
   }
 

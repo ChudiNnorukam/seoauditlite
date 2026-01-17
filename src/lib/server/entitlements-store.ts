@@ -14,125 +14,143 @@ function normalizePlan(plan?: string | null): EntitlementPlan {
   return plan === 'pro' ? 'pro' : 'free';
 }
 
-export function ensureEntitlement(entitlementKey: string): void {
-  const db = getDb();
-  db.prepare(
-    `INSERT OR IGNORE INTO entitlements (
-      entitlement_key,
-      stripe_customer_id,
-      referral_id,
-      plan,
-      status,
-      updated_at
-    ) VALUES (?, NULL, NULL, 'free', 'free', ?)`
-  ).run(entitlementKey, new Date().toISOString());
+export async function ensureEntitlement(entitlementKey: string): Promise<void> {
+  const db = await getDb();
+
+  await db.execute({
+    sql: `INSERT OR IGNORE INTO entitlements (
+            entitlement_key,
+            stripe_customer_id,
+            referral_id,
+            plan,
+            status,
+            updated_at
+          ) VALUES (?, NULL, NULL, 'free', 'free', ?)`,
+    args: [entitlementKey, new Date().toISOString()],
+  });
 }
 
-export function getEntitlementByKey(entitlementKey: string): EntitlementRecord | null {
-  const db = getDb();
-  const row = db
-    .prepare(
-      'SELECT entitlement_key, stripe_customer_id, referral_id, plan, status, updated_at FROM entitlements WHERE entitlement_key = ?'
-    )
-    .get(entitlementKey) as EntitlementRecord | undefined;
+export async function getEntitlementByKey(entitlementKey: string): Promise<EntitlementRecord | null> {
+  const db = await getDb();
 
+  const result = await db.execute({
+    sql: `SELECT entitlement_key, stripe_customer_id, referral_id, plan, status, updated_at
+          FROM entitlements WHERE entitlement_key = ?`,
+    args: [entitlementKey],
+  });
+
+  const row = result.rows[0];
   if (!row) return null;
-  return { ...row, plan: normalizePlan(row.plan) };
+
+  return {
+    entitlement_key: row.entitlement_key as string,
+    stripe_customer_id: row.stripe_customer_id as string | null,
+    referral_id: row.referral_id as string | null,
+    plan: normalizePlan(row.plan as string | null),
+    status: row.status as string,
+    updated_at: row.updated_at as string,
+  };
 }
 
-export function getEntitlementByCustomerId(customerId: string): EntitlementRecord | null {
-  const db = getDb();
-  const row = db
-    .prepare(
-      'SELECT entitlement_key, stripe_customer_id, referral_id, plan, status, updated_at FROM entitlements WHERE stripe_customer_id = ?'
-    )
-    .get(customerId) as EntitlementRecord | undefined;
+export async function getEntitlementByCustomerId(customerId: string): Promise<EntitlementRecord | null> {
+  const db = await getDb();
 
+  const result = await db.execute({
+    sql: `SELECT entitlement_key, stripe_customer_id, referral_id, plan, status, updated_at
+          FROM entitlements WHERE stripe_customer_id = ?`,
+    args: [customerId],
+  });
+
+  const row = result.rows[0];
   if (!row) return null;
-  return { ...row, plan: normalizePlan(row.plan) };
+
+  return {
+    entitlement_key: row.entitlement_key as string,
+    stripe_customer_id: row.stripe_customer_id as string | null,
+    referral_id: row.referral_id as string | null,
+    plan: normalizePlan(row.plan as string | null),
+    status: row.status as string,
+    updated_at: row.updated_at as string,
+  };
 }
 
-export function upsertEntitlement(params: {
+export async function upsertEntitlement(params: {
   entitlementKey: string;
   plan: EntitlementPlan;
   status: string;
   stripeCustomerId?: string | null;
-}): void {
-  const db = getDb();
-  db.prepare(
-    `INSERT INTO entitlements (
-      entitlement_key,
-      stripe_customer_id,
-      referral_id,
-      plan,
-      status,
-      updated_at
-    ) VALUES (
-      @entitlement_key,
-      @stripe_customer_id,
-      @referral_id,
-      @plan,
-      @status,
-      @updated_at
-    )
-    ON CONFLICT(entitlement_key) DO UPDATE SET
-      stripe_customer_id = COALESCE(excluded.stripe_customer_id, entitlements.stripe_customer_id),
-      referral_id = COALESCE(entitlements.referral_id, excluded.referral_id),
-      plan = excluded.plan,
-      status = excluded.status,
-      updated_at = excluded.updated_at`
-  ).run({
-    entitlement_key: params.entitlementKey,
-    stripe_customer_id: params.stripeCustomerId ?? null,
-    referral_id: null,
-    plan: params.plan,
-    status: params.status,
-    updated_at: new Date().toISOString(),
+}): Promise<void> {
+  const db = await getDb();
+
+  await db.execute({
+    sql: `INSERT INTO entitlements (
+            entitlement_key,
+            stripe_customer_id,
+            referral_id,
+            plan,
+            status,
+            updated_at
+          ) VALUES (?, ?, NULL, ?, ?, ?)
+          ON CONFLICT(entitlement_key) DO UPDATE SET
+            stripe_customer_id = COALESCE(excluded.stripe_customer_id, entitlements.stripe_customer_id),
+            referral_id = COALESCE(entitlements.referral_id, excluded.referral_id),
+            plan = excluded.plan,
+            status = excluded.status,
+            updated_at = excluded.updated_at`,
+    args: [
+      params.entitlementKey,
+      params.stripeCustomerId ?? null,
+      params.plan,
+      params.status,
+      new Date().toISOString(),
+    ],
   });
 }
 
-export function updateEntitlementByCustomer(params: {
+export async function updateEntitlementByCustomer(params: {
   stripeCustomerId: string;
   plan: EntitlementPlan;
   status: string;
-}): boolean {
-  const db = getDb();
-  const result = db
-    .prepare(
-      `UPDATE entitlements
-      SET plan = ?, status = ?, updated_at = ?
-      WHERE stripe_customer_id = ?`
-    )
-    .run(params.plan, params.status, new Date().toISOString(), params.stripeCustomerId);
+}): Promise<boolean> {
+  const db = await getDb();
 
-  return result.changes > 0;
+  const result = await db.execute({
+    sql: `UPDATE entitlements
+          SET plan = ?, status = ?, updated_at = ?
+          WHERE stripe_customer_id = ?`,
+    args: [params.plan, params.status, new Date().toISOString(), params.stripeCustomerId],
+  });
+
+  return result.rowsAffected > 0;
 }
 
-export function setEntitlementReferral(entitlementKey: string, referralId: string): void {
-  const db = getDb();
-  db.prepare(
-    `UPDATE entitlements
-    SET referral_id = ?, referral_updated_at = ?
-    WHERE entitlement_key = ?`
-  ).run(referralId, new Date().toISOString(), entitlementKey);
+export async function setEntitlementReferral(entitlementKey: string, referralId: string): Promise<void> {
+  const db = await getDb();
+
+  await db.execute({
+    sql: `UPDATE entitlements
+          SET referral_id = ?, referral_updated_at = ?
+          WHERE entitlement_key = ?`,
+    args: [referralId, new Date().toISOString(), entitlementKey],
+  });
 }
 
 /**
  * Delete entitlement data for a customer (GDPR compliance).
  * Called when a customer is deleted from Stripe.
  */
-export function deleteEntitlementByCustomer(stripeCustomerId: string): boolean {
-  const db = getDb();
-  const result = db
-    .prepare(
-      `UPDATE entitlements
-       SET stripe_customer_id = NULL,
-           plan = 'free',
-           status = 'deleted',
-           updated_at = ?
-       WHERE stripe_customer_id = ?`
-    )
-    .run(new Date().toISOString(), stripeCustomerId);
+export async function deleteEntitlementByCustomer(stripeCustomerId: string): Promise<boolean> {
+  const db = await getDb();
 
-  return result.changes > 0;
+  const result = await db.execute({
+    sql: `UPDATE entitlements
+          SET stripe_customer_id = NULL,
+              plan = 'free',
+              status = 'deleted',
+              updated_at = ?
+          WHERE stripe_customer_id = ?`,
+    args: [new Date().toISOString(), stripeCustomerId],
+  });
+
+  return result.rowsAffected > 0;
 }

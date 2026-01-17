@@ -3,7 +3,6 @@ import { getDb } from './db';
 
 const DEFAULT_TTL_DAYS = 7;
 const PRO_TTL_DAYS = 30;
-const TTL_MS = 1000 * 60 * 60 * 24 * DEFAULT_TTL_DAYS;
 
 // Free tier audit limit (per 7-day period)
 const FREE_AUDIT_LIMIT = 3;
@@ -19,29 +18,29 @@ function resolveExpiry(auditedAt: string, isPro: boolean = false): string {
  * Count audits created by an entitlement key in the past 7 days.
  * Used for enforcing free tier limits.
  */
-export function countRecentAudits(entitlementKey: string): number {
-  const db = getDb();
+export async function countRecentAudits(entitlementKey: string): Promise<number> {
+  const db = await getDb();
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  const result = db
-    .prepare(
-      `SELECT COUNT(*) as count FROM audits
-       WHERE entitlement_key = ?
-       AND created_at > ?`
-    )
-    .get(entitlementKey, sevenDaysAgo) as { count: number };
+  const result = await db.execute({
+    sql: `SELECT COUNT(*) as count FROM audits
+          WHERE entitlement_key = ?
+          AND created_at > ?`,
+    args: [entitlementKey, sevenDaysAgo],
+  });
 
-  return result?.count ?? 0;
+  const row = result.rows[0];
+  return (row?.count as number) ?? 0;
 }
 
 /**
  * Check if an entitlement key can create a new audit.
  * Returns { allowed: boolean, remaining: number, limit: number }
  */
-export function canCreateAudit(
+export async function canCreateAudit(
   entitlementKey: string | null,
   plan: 'free' | 'pro'
-): { allowed: boolean; remaining: number; limit: number } {
+): Promise<{ allowed: boolean; remaining: number; limit: number }> {
   // Pro users have unlimited audits
   if (plan === 'pro') {
     return { allowed: true, remaining: Infinity, limit: Infinity };
@@ -52,80 +51,84 @@ export function canCreateAudit(
     return { allowed: true, remaining: 1, limit: 1 };
   }
 
-  const count = countRecentAudits(entitlementKey);
+  const count = await countRecentAudits(entitlementKey);
   const remaining = Math.max(0, FREE_AUDIT_LIMIT - count);
 
   return {
     allowed: remaining > 0,
     remaining,
-    limit: FREE_AUDIT_LIMIT
+    limit: FREE_AUDIT_LIMIT,
   };
 }
 
-export function saveAudit(
+export async function saveAudit(
   result: AuditResult,
   meta?: { entitlementKey?: string | null; referralId?: string | null }
-): void {
-  const db = getDb();
-  const stmt = db.prepare(`
-    INSERT OR IGNORE INTO audits (
-      audit_id,
-      audited_url,
-      schema_version,
-      payload_json,
-      created_at,
-      expires_at,
-      entitlement_key,
-      referral_id
-    ) VALUES (
-      @audit_id,
-      @audited_url,
-      @schema_version,
-      @payload_json,
-      @created_at,
-      @expires_at,
-      @entitlement_key,
-      @referral_id
-    )
-  `);
+): Promise<void> {
+  const db = await getDb();
 
-  stmt.run({
-    audit_id: result.audit_id,
-    audited_url: result.audited_url,
-    schema_version: result.schema_version,
-    payload_json: JSON.stringify(result),
-    created_at: result.audited_at,
-    expires_at: resolveExpiry(result.audited_at),
-    entitlement_key: meta?.entitlementKey ?? null,
-    referral_id: meta?.referralId ?? null,
+  await db.execute({
+    sql: `INSERT OR IGNORE INTO audits (
+            audit_id,
+            audited_url,
+            schema_version,
+            payload_json,
+            created_at,
+            expires_at,
+            entitlement_key,
+            referral_id
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [
+      result.audit_id,
+      result.audited_url,
+      result.schema_version,
+      JSON.stringify(result),
+      result.audited_at,
+      resolveExpiry(result.audited_at),
+      meta?.entitlementKey ?? null,
+      meta?.referralId ?? null,
+    ],
   });
 }
 
-export function getAudit(auditId: string): AuditResult | null {
-  const db = getDb();
-  const row = db
-    .prepare('SELECT payload_json, expires_at FROM audits WHERE audit_id = ?')
-    .get(auditId) as { payload_json: string; expires_at: string | null } | undefined;
+export async function getAudit(auditId: string): Promise<AuditResult | null> {
+  const db = await getDb();
 
+  const result = await db.execute({
+    sql: 'SELECT payload_json, expires_at FROM audits WHERE audit_id = ?',
+    args: [auditId],
+  });
+
+  const row = result.rows[0];
   if (!row) return null;
 
-  if (row.expires_at && Date.parse(row.expires_at) <= Date.now()) {
-    db.prepare('DELETE FROM audits WHERE audit_id = ?').run(auditId);
+  const expiresAt = row.expires_at as string | null;
+  if (expiresAt && Date.parse(expiresAt) <= Date.now()) {
+    await db.execute({
+      sql: 'DELETE FROM audits WHERE audit_id = ?',
+      args: [auditId],
+    });
     return null;
   }
 
   try {
-    return JSON.parse(row.payload_json) as AuditResult;
+    return JSON.parse(row.payload_json as string) as AuditResult;
   } catch {
-    db.prepare('DELETE FROM audits WHERE audit_id = ?').run(auditId);
+    await db.execute({
+      sql: 'DELETE FROM audits WHERE audit_id = ?',
+      args: [auditId],
+    });
     return null;
   }
 }
 
-export function pruneExpiredAudits(): number {
-  const db = getDb();
-  const result = db
-    .prepare('DELETE FROM audits WHERE expires_at IS NOT NULL AND expires_at <= ?')
-    .run(new Date().toISOString());
-  return result.changes;
+export async function pruneExpiredAudits(): Promise<number> {
+  const db = await getDb();
+
+  const result = await db.execute({
+    sql: 'DELETE FROM audits WHERE expires_at IS NOT NULL AND expires_at <= ?',
+    args: [new Date().toISOString()],
+  });
+
+  return result.rowsAffected;
 }

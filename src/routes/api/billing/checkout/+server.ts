@@ -23,7 +23,7 @@ export const POST: RequestHandler = async ({ request, url, locals }): Promise<Re
 		}
 
 		const stripe = getStripe();
-		const record = getEntitlementByKey(locals.entitlementKey);
+		const record = await getEntitlementByKey(locals.entitlementKey);
 
 		const successUrl = auditId
 			? `${url.origin}/report/${auditId}?checkout=success`

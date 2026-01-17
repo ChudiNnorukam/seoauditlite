@@ -32,10 +32,10 @@ export const POST: RequestHandler = async ({ request, locals }): Promise<Respons
 
 		// 2. Get entitlement and check subscription limits
 		const entitlement = locals.entitlementKey
-			? getEntitlementByKey(locals.entitlementKey)
+			? await getEntitlementByKey(locals.entitlementKey)
 			: null;
 		const plan = entitlement?.plan ?? 'free';
-		const auditLimit = canCreateAudit(locals.entitlementKey ?? null, plan);
+		const auditLimit = await canCreateAudit(locals.entitlementKey ?? null, plan);
 
 		if (!auditLimit.allowed) {
 			const response: AuditApiResponse = {
@@ -51,11 +51,11 @@ export const POST: RequestHandler = async ({ request, locals }): Promise<Respons
 
 		// Run audit
 		const result = await auditDomain(body);
-		saveAudit(result, {
+		await saveAudit(result, {
 			entitlementKey: locals.entitlementKey ?? null,
 			referralId: entitlement?.referral_id ?? null
 		});
-		const entitlements = resolveEntitlementsForRequest({
+		const entitlements = await resolveEntitlementsForRequest({
 			entitlementKey: locals.entitlementKey,
 			audit: result,
 			isShareLink: false,

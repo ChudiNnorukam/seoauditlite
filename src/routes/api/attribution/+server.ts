@@ -14,8 +14,8 @@ export const POST: RequestHandler = async ({ request, locals }): Promise<Respons
 			return json({ ok: true }, { status: 200 });
 		}
 
-		ensureEntitlement(locals.entitlementKey);
-		setEntitlementReferral(locals.entitlementKey, referralId);
+		await ensureEntitlement(locals.entitlementKey);
+		await setEntitlementReferral(locals.entitlementKey, referralId);
 
 		return json({ ok: true }, { status: 200 });
 	} catch (error) {
