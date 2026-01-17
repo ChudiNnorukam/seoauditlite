@@ -30,7 +30,8 @@ async function initialize(): Promise<void> {
       created_at TEXT NOT NULL,
       expires_at TEXT,
       entitlement_key TEXT,
-      referral_id TEXT
+      referral_id TEXT,
+      og_image_url TEXT
     );
     CREATE INDEX IF NOT EXISTS idx_audits_created_at ON audits (created_at);
     CREATE INDEX IF NOT EXISTS idx_audits_expires_at ON audits (expires_at);
@@ -45,6 +46,19 @@ async function initialize(): Promise<void> {
       updated_at TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_entitlements_customer ON entitlements (stripe_customer_id);
+
+    CREATE TABLE IF NOT EXISTS og_images (
+      image_id TEXT PRIMARY KEY,
+      audit_id TEXT UNIQUE NOT NULL,
+      prompt TEXT NOT NULL,
+      replicate_id TEXT,
+      image_url TEXT,
+      status TEXT DEFAULT 'pending',
+      error_message TEXT,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_og_images_audit ON og_images (audit_id);
+    CREATE INDEX IF NOT EXISTS idx_og_images_status ON og_images (status);
   `);
 
   initialized = true;

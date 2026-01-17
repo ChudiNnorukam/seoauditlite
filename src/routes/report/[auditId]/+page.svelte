@@ -11,6 +11,7 @@
 		audit: AuditResult | null;
 		error?: string | null;
 		entitlements: EntitlementContext;
+		ogImageUrl: string | null;
 	};
 
 	let shareUrl = '';
@@ -109,6 +110,31 @@
 	/>
 	<link rel="canonical" href="https://seoauditlite.com/report" />
 	<meta name="robots" content="noindex" />
+
+	<!-- Open Graph -->
+	<meta property="og:title" content="AEO Audit Report - {domain || 'Report'}" />
+	<meta
+		property="og:description"
+		content="AI search readiness score: {viewAudit?.overall_score ?? 0}/100 for {domain || 'your site'}."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content={shareUrl || `https://seoauditlite.com/report/${viewAudit?.audit_id ?? ''}`} />
+	{#if data.ogImageUrl}
+		<meta property="og:image" content={data.ogImageUrl} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+	{/if}
+
+	<!-- Twitter Card -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="AEO Audit Report - {domain || 'Report'}" />
+	<meta
+		name="twitter:description"
+		content="AI search readiness score: {viewAudit?.overall_score ?? 0}/100 for {domain || 'your site'}."
+	/>
+	{#if data.ogImageUrl}
+		<meta name="twitter:image" content={data.ogImageUrl} />
+	{/if}
 </svelte:head>
 
 <Header showBack={true} />

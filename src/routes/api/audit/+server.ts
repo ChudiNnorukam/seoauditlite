@@ -7,6 +7,7 @@ import type { AuditRequest, AuditApiResponse } from '$lib/auditing/schema';
 import type { AuditError } from '$lib/auditing/types';
 import { redactAudit } from '$lib/auditing/redact';
 import { resolveEntitlementsForRequest } from '$lib/server/entitlements-resolver';
+import { queueOgImageGeneration } from '$lib/server/og-image-generator';
 
 export const POST: RequestHandler = async ({ request, locals }): Promise<Response> => {
 	try {
@@ -55,6 +56,12 @@ export const POST: RequestHandler = async ({ request, locals }): Promise<Respons
 			entitlementKey: locals.entitlementKey ?? null,
 			referralId: entitlement?.referral_id ?? null
 		});
+
+		// Queue OG image generation (non-blocking)
+		queueOgImageGeneration(result).catch((err) => {
+			console.error('Failed to queue OG image generation:', err);
+		});
+
 		const entitlements = await resolveEntitlementsForRequest({
 			entitlementKey: locals.entitlementKey,
 			audit: result,
