@@ -2,12 +2,64 @@ import type { AuditResult } from '$lib/auditing/schema';
 import { getDb } from './db';
 
 const DEFAULT_TTL_DAYS = 7;
+const PRO_TTL_DAYS = 30;
 const TTL_MS = 1000 * 60 * 60 * 24 * DEFAULT_TTL_DAYS;
 
-function resolveExpiry(auditedAt: string): string {
+// Free tier audit limit (per 7-day period)
+const FREE_AUDIT_LIMIT = 3;
+
+function resolveExpiry(auditedAt: string, isPro: boolean = false): string {
   const base = Date.parse(auditedAt);
   const start = Number.isNaN(base) ? Date.now() : base;
-  return new Date(start + TTL_MS).toISOString();
+  const ttlDays = isPro ? PRO_TTL_DAYS : DEFAULT_TTL_DAYS;
+  return new Date(start + 1000 * 60 * 60 * 24 * ttlDays).toISOString();
+}
+
+/**
+ * Count audits created by an entitlement key in the past 7 days.
+ * Used for enforcing free tier limits.
+ */
+export function countRecentAudits(entitlementKey: string): number {
+  const db = getDb();
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const result = db
+    .prepare(
+      `SELECT COUNT(*) as count FROM audits
+       WHERE entitlement_key = ?
+       AND created_at > ?`
+    )
+    .get(entitlementKey, sevenDaysAgo) as { count: number };
+
+  return result?.count ?? 0;
+}
+
+/**
+ * Check if an entitlement key can create a new audit.
+ * Returns { allowed: boolean, remaining: number, limit: number }
+ */
+export function canCreateAudit(
+  entitlementKey: string | null,
+  plan: 'free' | 'pro'
+): { allowed: boolean; remaining: number; limit: number } {
+  // Pro users have unlimited audits
+  if (plan === 'pro') {
+    return { allowed: true, remaining: Infinity, limit: Infinity };
+  }
+
+  // Anonymous users (no entitlement key) get 1 audit
+  if (!entitlementKey) {
+    return { allowed: true, remaining: 1, limit: 1 };
+  }
+
+  const count = countRecentAudits(entitlementKey);
+  const remaining = Math.max(0, FREE_AUDIT_LIMIT - count);
+
+  return {
+    allowed: remaining > 0,
+    remaining,
+    limit: FREE_AUDIT_LIMIT
+  };
 }
 
 export function saveAudit(

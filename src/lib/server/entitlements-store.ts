@@ -116,3 +116,23 @@ export function setEntitlementReferral(entitlementKey: string, referralId: strin
     WHERE entitlement_key = ?`
   ).run(referralId, new Date().toISOString(), entitlementKey);
 }
+
+/**
+ * Delete entitlement data for a customer (GDPR compliance).
+ * Called when a customer is deleted from Stripe.
+ */
+export function deleteEntitlementByCustomer(stripeCustomerId: string): boolean {
+  const db = getDb();
+  const result = db
+    .prepare(
+      `UPDATE entitlements
+       SET stripe_customer_id = NULL,
+           plan = 'free',
+           status = 'deleted',
+           updated_at = ?
+       WHERE stripe_customer_id = ?`
+    )
+    .run(new Date().toISOString(), stripeCustomerId);
+
+  return result.changes > 0;
+}
