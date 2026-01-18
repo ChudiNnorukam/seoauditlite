@@ -26,10 +26,44 @@ function getScoreColor(score: number): string {
 }
 
 export function generateSeoAuditPrompt(audit: AuditResult): string {
+  const score = Math.round(audit.overall_score);
+  const scoreColor = getScoreColor(score);
+
+  // Generate abstract background - text will be overlaid programmatically
+  const colorPalette = scoreColor === 'green'
+    ? 'emerald green and teal accents'
+    : scoreColor === 'amber/yellow'
+    ? 'amber and warm orange accents'
+    : 'coral red and warm pink accents';
+
+  return `Abstract minimalist background for a professional tech report card. Clean white background with subtle geometric patterns.
+
+Visual elements:
+- Soft ${colorPalette} gradient orbs in corners
+- Delicate grid lines or dot pattern
+- Subtle flowing curves suggesting data visualization
+- Modern glassmorphism effects with soft shadows
+- Empty center-left area for score display (leave blank)
+- Empty right area for text content (leave blank)
+
+Style: Ultra-minimal, professional, 1200x630 pixels, soft and modern, inspired by Linear and Notion design. NO TEXT, NO NUMBERS, NO LETTERS - purely abstract decorative background.`;
+}
+
+export interface AuditImageData {
+  domain: string;
+  score: number;
+  grade: string;
+  scoreColor: 'green' | 'amber' | 'red';
+  passes: number;
+  warnings: number;
+  fails: number;
+}
+
+export function extractAuditImageData(audit: AuditResult): AuditImageData {
   const domain = new URL(audit.audited_url).hostname;
   const score = Math.round(audit.overall_score);
   const grade = getScoreGrade(score);
-  const scoreColor = getScoreColor(score);
+  const scoreColor = score >= 80 ? 'green' : score >= 60 ? 'amber' : 'red';
 
   const statusCounts = audit.checks.reduce(
     (acc, check) => {
@@ -39,16 +73,15 @@ export function generateSeoAuditPrompt(audit: AuditResult): string {
     { pass: 0, warning: 0, fail: 0 } as Record<AuditCheckStatus, number>
   );
 
-  return `Professional minimalist OG image card for an SEO audit report. Clean white background with subtle grid pattern.
-
-Main elements:
-- Large circular score indicator showing "${score}" with grade "${grade}" in ${scoreColor} color
-- Domain name "${domain}" in clean sans-serif typography
-- Three small status badges: ${statusCounts.pass} green checkmarks, ${statusCounts.warning} amber warnings, ${statusCounts.fail} red X marks
-- "AI Engine Optimization Audit" subtitle text
-- Modern, tech-forward aesthetic like Linear or Notion
-
-Style: Ultra-minimal, professional, 1200x630 pixels, high contrast, no gradients, clean typography, Jony Ive inspired design aesthetic.`;
+  return {
+    domain,
+    score,
+    grade,
+    scoreColor,
+    passes: statusCounts.pass,
+    warnings: statusCounts.warning,
+    fails: statusCounts.fail,
+  };
 }
 
 export function generateLinkedInThumbnailPrompt(config: TemplateConfig): string {

@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
 import type { AuditApiResponse, AuditResult } from '$lib/auditing/schema';
 import { resolveEntitlementsForRequest } from '$lib/server/entitlements-resolver';
-import { getAuditOgImageUrl } from '$lib/server/image-store';
+import { env as publicEnv } from '$env/dynamic/public';
 
 export const load: PageServerLoad = async ({ fetch, params, locals }) => {
 	const entitlements = resolveEntitlementsForRequest({
@@ -22,13 +22,9 @@ export const load: PageServerLoad = async ({ fetch, params, locals }) => {
 
 	const payload = (await response.json()) as AuditApiResponse;
 
-	// Fetch OG image URL
-	let ogImageUrl: string | null = null;
-	try {
-		ogImageUrl = await getAuditOgImageUrl(params.auditId);
-	} catch (err) {
-		console.error('Failed to fetch OG image URL:', err);
-	}
+	// Construct OG image URL using the compose endpoint
+	const appUrl = publicEnv.PUBLIC_APP_URL || 'https://seoauditlite.com';
+	const ogImageUrl = `${appUrl}/api/images/og/${params.auditId}`;
 
 	return {
 		audit: payload.data ?? null,
