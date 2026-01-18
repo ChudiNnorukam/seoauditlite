@@ -1,4 +1,5 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
 import { generateImageSync } from '$lib/image-generation/replicate';
 import {
   generatePromptFromTemplate,
@@ -23,7 +24,7 @@ interface GenerateResponse {
 const VALID_TEMPLATES: ImageTemplate[] = ['linkedin-thumbnail', 'blog-header', 'product-card'];
 
 function validateApiKey(apiKey: string): boolean {
-  const validKey = process.env.IMAGE_API_KEY;
+  const validKey = env.IMAGE_API_KEY;
   if (!validKey) {
     console.warn('IMAGE_API_KEY not configured - API access disabled');
     return false;
@@ -33,7 +34,7 @@ function validateApiKey(apiKey: string): boolean {
 
 export const POST: RequestHandler = async ({ request }): Promise<Response> => {
   // Check if RunPod is configured
-  if (!process.env.RUNPOD_API_KEY) {
+  if (!env.RUNPOD_API_KEY) {
     const response: GenerateResponse = {
       success: false,
       error: 'Image generation service not configured',

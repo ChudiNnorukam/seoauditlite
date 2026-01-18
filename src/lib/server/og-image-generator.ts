@@ -1,10 +1,11 @@
 import type { AuditResult } from '$lib/auditing/schema';
+import { env } from '$env/dynamic/private';
 import { generateImage } from '$lib/image-generation/replicate';
 import { generateSeoAuditPrompt } from '$lib/image-generation/templates';
 import { createOgImageRecord } from './image-store';
 
 function getWebhookUrl(): string {
-  const appUrl = process.env.PUBLIC_APP_URL;
+  const appUrl = env.PUBLIC_APP_URL;
   if (!appUrl) {
     throw new Error('PUBLIC_APP_URL environment variable is not set');
   }
@@ -13,7 +14,7 @@ function getWebhookUrl(): string {
 
 export async function queueOgImageGeneration(audit: AuditResult): Promise<void> {
   // Check if RunPod is configured
-  if (!process.env.RUNPOD_API_KEY) {
+  if (!env.RUNPOD_API_KEY) {
     console.log('Skipping OG image generation: RUNPOD_API_KEY not configured');
     return;
   }

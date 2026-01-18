@@ -1,10 +1,12 @@
 // RunPod API client for Flux image generation
 // Renamed file kept for backwards compatibility with imports
 
+import { env } from '$env/dynamic/private';
+
 const RUNPOD_FLUX_SCHNELL_ENDPOINT = 'https://api.runpod.ai/v2/black-forest-labs-flux-1-schnell';
 
 function getApiKey(): string {
-  const token = process.env.RUNPOD_API_KEY;
+  const token = env.RUNPOD_API_KEY;
   if (!token) {
     throw new Error('RUNPOD_API_KEY environment variable is not set');
   }

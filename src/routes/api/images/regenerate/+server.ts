@@ -1,4 +1,5 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
 import { getAudit } from '$lib/server/audit-store';
 import { queueOgImageGeneration } from '$lib/server/og-image-generator';
 
@@ -7,8 +8,11 @@ interface RegenerateRequest {
 }
 
 export const POST: RequestHandler = async ({ request }): Promise<Response> => {
+  // Debug: log env var presence
+  console.log('RUNPOD_API_KEY present:', !!env.RUNPOD_API_KEY);
+
   // Check if RunPod is configured
-  if (!process.env.RUNPOD_API_KEY) {
+  if (!env.RUNPOD_API_KEY) {
     return json(
       { success: false, error: 'Image generation service not configured' },
       { status: 503 }
