@@ -12,9 +12,9 @@ function getWebhookUrl(): string {
 }
 
 export async function queueOgImageGeneration(audit: AuditResult): Promise<void> {
-  // Check if Replicate is configured
-  if (!process.env.REPLICATE_API_TOKEN) {
-    console.log('Skipping OG image generation: REPLICATE_API_TOKEN not configured');
+  // Check if RunPod is configured
+  if (!process.env.RUNPOD_API_KEY) {
+    console.log('Skipping OG image generation: RUNPOD_API_KEY not configured');
     return;
   }
 

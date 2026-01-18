@@ -1,16 +1,14 @@
-import Replicate from 'replicate';
+// RunPod API client for Flux image generation
+// Renamed file kept for backwards compatibility with imports
 
-let replicateClient: Replicate | null = null;
+const RUNPOD_FLUX_SCHNELL_ENDPOINT = 'https://api.runpod.ai/v2/black-forest-labs-flux-1-schnell';
 
-function getClient(): Replicate {
-  if (!replicateClient) {
-    const token = process.env.REPLICATE_API_TOKEN;
-    if (!token) {
-      throw new Error('REPLICATE_API_TOKEN environment variable is not set');
-    }
-    replicateClient = new Replicate({ auth: token });
+function getApiKey(): string {
+  const token = process.env.RUNPOD_API_KEY;
+  if (!token) {
+    throw new Error('RUNPOD_API_KEY environment variable is not set');
   }
-  return replicateClient;
+  return token;
 }
 
 export interface ImageGenerationInput {
@@ -23,84 +21,139 @@ export interface ImageGenerationInput {
 export type ImageStatus = 'starting' | 'processing' | 'succeeded' | 'failed' | 'canceled';
 
 export interface ImageGenerationResult {
-  replicateId: string;
+  replicateId: string; // Kept for backwards compatibility, now stores RunPod job ID
   status: ImageStatus;
   imageUrl?: string;
   error?: string;
 }
 
-function normalizeStatus(status: string): ImageStatus {
-  if (['starting', 'processing', 'succeeded', 'failed', 'canceled'].includes(status)) {
-    return status as ImageStatus;
-  }
-  // Map 'aborted' and any other unknown status to 'failed'
-  return 'failed';
+interface RunPodResponse {
+  id: string;
+  status: 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
+  output?: {
+    image_url?: string;
+    images?: string[];
+  };
+  error?: string;
 }
 
-const FLUX_SCHNELL_MODEL = 'black-forest-labs/flux-schnell';
+function normalizeRunPodStatus(status: string): ImageStatus {
+  switch (status) {
+    case 'IN_QUEUE':
+      return 'starting';
+    case 'IN_PROGRESS':
+      return 'processing';
+    case 'COMPLETED':
+      return 'succeeded';
+    case 'FAILED':
+      return 'failed';
+    case 'CANCELLED':
+      return 'canceled';
+    default:
+      return 'failed';
+  }
+}
+
+function extractImageUrl(output: RunPodResponse['output']): string | undefined {
+  if (!output) return undefined;
+  if (output.image_url) return output.image_url;
+  if (output.images && output.images.length > 0) return output.images[0];
+  return undefined;
+}
 
 export async function generateImage(input: ImageGenerationInput): Promise<ImageGenerationResult> {
-  const client = getClient();
+  const apiKey = getApiKey();
 
-  const prediction = await client.predictions.create({
-    model: FLUX_SCHNELL_MODEL,
-    input: {
-      prompt: input.prompt,
-      width: input.width ?? 1200,
-      height: input.height ?? 630,
-      num_outputs: 1,
-      output_format: 'webp',
-      output_quality: 90,
+  const response = await fetch(`${RUNPOD_FLUX_SCHNELL_ENDPOINT}/run`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
     },
-    webhook: input.webhookUrl,
-    webhook_events_filter: ['completed'],
+    body: JSON.stringify({
+      input: {
+        prompt: input.prompt,
+        width: input.width ?? 1200,
+        height: input.height ?? 630,
+        num_inference_steps: 4,
+        guidance: 3.5,
+      },
+      webhook: input.webhookUrl,
+    }),
   });
 
-  const output = prediction.output as string[] | undefined;
-  const errorMsg = typeof prediction.error === 'string' ? prediction.error : undefined;
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`RunPod API error: ${response.status} - ${errorText}`);
+  }
+
+  const data: RunPodResponse = await response.json();
 
   return {
-    replicateId: prediction.id,
-    status: normalizeStatus(prediction.status),
-    imageUrl: output?.[0],
-    error: errorMsg,
+    replicateId: data.id,
+    status: normalizeRunPodStatus(data.status),
+    imageUrl: extractImageUrl(data.output),
+    error: data.error,
   };
 }
 
-export async function getImageStatus(replicateId: string): Promise<ImageGenerationResult> {
-  const client = getClient();
-  const prediction = await client.predictions.get(replicateId);
+export async function getImageStatus(jobId: string): Promise<ImageGenerationResult> {
+  const apiKey = getApiKey();
 
-  const output = prediction.output as string[] | undefined;
-  const errorMsg = typeof prediction.error === 'string' ? prediction.error : undefined;
+  const response = await fetch(`${RUNPOD_FLUX_SCHNELL_ENDPOINT}/status/${jobId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`RunPod API error: ${response.status} - ${errorText}`);
+  }
+
+  const data: RunPodResponse = await response.json();
 
   return {
-    replicateId: prediction.id,
-    status: normalizeStatus(prediction.status),
-    imageUrl: Array.isArray(output) ? output[0] : undefined,
-    error: errorMsg,
+    replicateId: data.id,
+    status: normalizeRunPodStatus(data.status),
+    imageUrl: extractImageUrl(data.output),
+    error: data.error,
   };
 }
 
 export async function generateImageSync(input: ImageGenerationInput): Promise<ImageGenerationResult> {
-  const client = getClient();
+  const apiKey = getApiKey();
 
-  const output = await client.run(FLUX_SCHNELL_MODEL, {
-    input: {
-      prompt: input.prompt,
-      width: input.width ?? 1200,
-      height: input.height ?? 630,
-      num_outputs: 1,
-      output_format: 'webp',
-      output_quality: 90,
+  const response = await fetch(`${RUNPOD_FLUX_SCHNELL_ENDPOINT}/runsync`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify({
+      input: {
+        prompt: input.prompt,
+        width: input.width ?? 1200,
+        height: input.height ?? 630,
+        num_inference_steps: 4,
+        guidance: 3.5,
+      },
+    }),
   });
 
-  const imageUrl = Array.isArray(output) ? output[0] : undefined;
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`RunPod API error: ${response.status} - ${errorText}`);
+  }
+
+  const data: RunPodResponse = await response.json();
+  const imageUrl = extractImageUrl(data.output);
 
   return {
-    replicateId: 'sync',
-    status: imageUrl ? 'succeeded' : 'failed',
-    imageUrl: typeof imageUrl === 'string' ? imageUrl : undefined,
+    replicateId: data.id,
+    status: imageUrl ? 'succeeded' : normalizeRunPodStatus(data.status),
+    imageUrl,
+    error: data.error,
   };
 }

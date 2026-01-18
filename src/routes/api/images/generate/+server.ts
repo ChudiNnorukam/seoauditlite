@@ -32,8 +32,8 @@ function validateApiKey(apiKey: string): boolean {
 }
 
 export const POST: RequestHandler = async ({ request }): Promise<Response> => {
-  // Check if Replicate is configured
-  if (!process.env.REPLICATE_API_TOKEN) {
+  // Check if RunPod is configured
+  if (!process.env.RUNPOD_API_KEY) {
     const response: GenerateResponse = {
       success: false,
       error: 'Image generation service not configured',
