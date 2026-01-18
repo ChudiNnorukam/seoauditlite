@@ -1,11 +1,12 @@
 import type { AuditResult } from '$lib/auditing/schema';
 import { env } from '$env/dynamic/private';
+import { env as publicEnv } from '$env/dynamic/public';
 import { generateImage } from '$lib/image-generation/replicate';
 import { generateSeoAuditPrompt } from '$lib/image-generation/templates';
 import { createOgImageRecord } from './image-store';
 
 function getWebhookUrl(): string {
-  const appUrl = env.PUBLIC_APP_URL;
+  const appUrl = publicEnv.PUBLIC_APP_URL;
   if (!appUrl) {
     throw new Error('PUBLIC_APP_URL environment variable is not set');
   }
