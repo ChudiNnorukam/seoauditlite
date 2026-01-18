@@ -2,6 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import { getAudit } from '$lib/server/audit-store';
 import { queueOgImageGeneration } from '$lib/server/og-image-generator';
+import { deleteOgImageByAuditId } from '$lib/server/image-store';
 
 interface RegenerateRequest {
   auditId: string;
@@ -37,6 +38,9 @@ export const POST: RequestHandler = async ({ request }): Promise<Response> => {
   }
 
   try {
+    // Delete existing og_image record if any (allows re-generation)
+    await deleteOgImageByAuditId(body.auditId);
+
     await queueOgImageGeneration(audit);
     return json({
       success: true,

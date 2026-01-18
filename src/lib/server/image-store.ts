@@ -141,3 +141,16 @@ export async function getPendingOgImages(): Promise<OgImageRecord[]> {
     created_at: row.created_at as string,
   }));
 }
+
+export async function deleteOgImageByAuditId(auditId: string): Promise<void> {
+  const db = await getDb();
+  await db.execute({
+    sql: 'DELETE FROM og_images WHERE audit_id = ?',
+    args: [auditId],
+  });
+  // Also clear the og_image_url from the audits table
+  await db.execute({
+    sql: 'UPDATE audits SET og_image_url = NULL WHERE audit_id = ?',
+    args: [auditId],
+  });
+}
