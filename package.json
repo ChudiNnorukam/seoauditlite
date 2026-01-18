@@ -5,6 +5,7 @@
 	"type": "module",
 	"dependencies": {
 		"@libsql/client": "^0.17.0",
+		"@vercel/og": "^0.8.6",
 		"phosphor-svelte": "^3.0.1",
 		"sharp": "^0.34.5",
 		"stripe": "^16.5.0"
