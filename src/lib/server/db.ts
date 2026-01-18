@@ -61,6 +61,19 @@ async function initialize(): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_og_images_status ON og_images (status);
   `);
 
+  // Migration: Add og_image_url column to existing audits table if it doesn't exist
+  // SQLite doesn't have ADD COLUMN IF NOT EXISTS, so we check the schema first
+  try {
+    const tableInfo = await db.execute("PRAGMA table_info(audits)");
+    const hasOgImageUrl = tableInfo.rows.some((row) => row.name === 'og_image_url');
+    if (!hasOgImageUrl) {
+      await db.execute("ALTER TABLE audits ADD COLUMN og_image_url TEXT");
+      console.log('Migration: Added og_image_url column to audits table');
+    }
+  } catch (error) {
+    console.error('Migration check failed:', error);
+  }
+
   initialized = true;
 }
 
