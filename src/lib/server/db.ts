@@ -73,7 +73,7 @@ async function initialize(): Promise<void> {
     );
 
     CREATE TABLE IF NOT EXISTS sessions (
-      session_id TEXT PRIMARY KEY,
+      id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
       expires_at TEXT NOT NULL,
       created_at TEXT NOT NULL
@@ -122,6 +122,20 @@ async function initialize(): Promise<void> {
     }
   } catch (error) {
     console.error('LemonSqueezy migration check failed:', error);
+  }
+
+  // Migration: Rename session_id to id for Lucia compatibility
+  try {
+    const sessionsInfo = await db.execute("PRAGMA table_info(sessions)");
+    const hasSessionId = sessionsInfo.rows.some((row) => row.name === 'session_id');
+    const hasId = sessionsInfo.rows.some((row) => row.name === 'id');
+
+    if (hasSessionId && !hasId) {
+      await db.execute("ALTER TABLE sessions RENAME COLUMN session_id TO id");
+      console.log('Migration: Renamed sessions.session_id to id for Lucia compatibility');
+    }
+  } catch (error) {
+    console.error('Sessions migration check failed:', error);
   }
 
   initialized = true;
