@@ -1,8 +1,55 @@
 <script lang="ts">
-	import { MagnifyingGlass, ArrowLeft } from 'phosphor-svelte';
+	import { MagnifyingGlass, ArrowLeft, User, CaretDown, SignOut, Gauge, GearSix } from 'phosphor-svelte';
 
-	export let showBack = false;
+	interface Props {
+		showBack?: boolean;
+		user?: {
+			id: string;
+			email: string;
+			name: string | null;
+			avatarUrl: string | null;
+		} | null;
+		plan?: 'free' | 'pro';
+	}
+
+	let { showBack = false, user = null, plan = 'free' }: Props = $props();
+
+	let dropdownOpen = $state(false);
+	let signingIn = $state(false);
+
+	async function handleSignIn() {
+		signingIn = true;
+		try {
+			const response = await fetch('/api/auth/login', { method: 'POST' });
+			const data = await response.json();
+			if (data.url) {
+				window.location.href = data.url;
+			}
+		} catch (e) {
+			console.error('Sign in error:', e);
+			signingIn = false;
+		}
+	}
+
+	async function handleSignOut() {
+		dropdownOpen = false;
+		await fetch('/api/auth/logout', { method: 'POST' });
+		window.location.href = '/';
+	}
+
+	function toggleDropdown() {
+		dropdownOpen = !dropdownOpen;
+	}
+
+	function closeDropdown(e: MouseEvent) {
+		const target = e.target as HTMLElement;
+		if (!target.closest('.user-menu')) {
+			dropdownOpen = false;
+		}
+	}
 </script>
+
+<svelte:window onclick={closeDropdown} />
 
 <header class="header">
 	<div class="header-content">
@@ -22,6 +69,51 @@
 		<nav class="header-nav">
 			{#if !showBack}
 				<a href="/planner" class="nav-link">Planner</a>
+			{/if}
+
+			{#if user}
+				<div class="user-menu">
+					<button class="user-button" onclick={toggleDropdown} type="button">
+						{#if user.avatarUrl}
+							<img src={user.avatarUrl} alt="" class="avatar" />
+						{:else}
+							<div class="avatar-placeholder">
+								<User size={14} weight="bold" />
+							</div>
+						{/if}
+						<span class="user-name">{user.name || user.email}</span>
+						{#if plan === 'pro'}
+							<span class="plan-badge pro">Pro</span>
+						{/if}
+						<CaretDown size={12} weight="bold" class="caret" />
+					</button>
+
+					{#if dropdownOpen}
+						<div class="dropdown">
+							<a href="/dashboard" class="dropdown-item" onclick={() => dropdownOpen = false}>
+								<Gauge size={16} weight="regular" />
+								<span>Dashboard</span>
+							</a>
+							<a href="/account" class="dropdown-item" onclick={() => dropdownOpen = false}>
+								<GearSix size={16} weight="regular" />
+								<span>Account</span>
+							</a>
+							<div class="dropdown-divider"></div>
+							<button class="dropdown-item" onclick={handleSignOut} type="button">
+								<SignOut size={16} weight="regular" />
+								<span>Sign out</span>
+							</button>
+						</div>
+					{/if}
+				</div>
+			{:else}
+				<button class="sign-in-button" onclick={handleSignIn} disabled={signingIn} type="button">
+					{#if signingIn}
+						Signing in...
+					{:else}
+						Sign in
+					{/if}
+				</button>
 			{/if}
 		</nav>
 	</div>
@@ -96,5 +188,135 @@
 
 	.nav-link:hover {
 		color: #0f172a;
+	}
+
+	/* Sign in button */
+	.sign-in-button {
+		background: #0f172a;
+		color: #fff;
+		border: none;
+		border-radius: 6px;
+		padding: 6px 12px;
+		font-size: 13px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background 150ms ease;
+	}
+
+	.sign-in-button:hover:not(:disabled) {
+		background: #1e293b;
+	}
+
+	.sign-in-button:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	/* User menu */
+	.user-menu {
+		position: relative;
+	}
+
+	.user-button {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		background: none;
+		border: 1px solid rgba(15, 23, 42, 0.1);
+		border-radius: 6px;
+		padding: 4px 10px 4px 4px;
+		cursor: pointer;
+		transition: border-color 150ms ease;
+	}
+
+	.user-button:hover {
+		border-color: rgba(15, 23, 42, 0.2);
+	}
+
+	.avatar {
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+
+	.avatar-placeholder {
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		background: #e2e8f0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #64748b;
+	}
+
+	.user-name {
+		font-size: 13px;
+		font-weight: 500;
+		color: #0f172a;
+		max-width: 120px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.plan-badge {
+		font-size: 10px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+		padding: 2px 6px;
+		border-radius: 4px;
+	}
+
+	.plan-badge.pro {
+		background: linear-gradient(135deg, #1162d4 0%, #0891b2 100%);
+		color: #fff;
+	}
+
+	:global(.caret) {
+		color: #64748b;
+	}
+
+	/* Dropdown */
+	.dropdown {
+		position: absolute;
+		top: calc(100% + 4px);
+		right: 0;
+		background: #fff;
+		border: 1px solid rgba(15, 23, 42, 0.1);
+		border-radius: 8px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		min-width: 160px;
+		padding: 4px;
+		z-index: 200;
+	}
+
+	.dropdown-item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 10px;
+		font-size: 13px;
+		font-weight: 500;
+		color: #0f172a;
+		text-decoration: none;
+		border-radius: 4px;
+		border: none;
+		background: none;
+		width: 100%;
+		cursor: pointer;
+		transition: background 150ms ease;
+	}
+
+	.dropdown-item:hover {
+		background: #f1f5f9;
+	}
+
+	.dropdown-divider {
+		height: 1px;
+		background: rgba(15, 23, 42, 0.08);
+		margin: 4px 0;
 	}
 </style>

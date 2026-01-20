@@ -7,22 +7,16 @@
 	import Header from '$lib/components/Header.svelte';
 	import { CheckCircle, XCircle, Warning, Copy, ArrowSquareOut, Crown } from 'phosphor-svelte';
 
-	export let data: {
-		audit: AuditResult | null;
-		error?: string | null;
-		entitlements: EntitlementContext;
-		ogImageUrl: string | null;
-	};
+	let { data } = $props();
 
-	let shareUrl = '';
-	let copied = false;
-	let audit: AuditResult | null = data.audit;
-	let entitlements: EntitlementContext = data.entitlements;
-	let viewAudit: AuditResult | null = null;
-	let upgrading = false;
-	let upgradeError = '';
-	$: viewAudit = audit ? redactAudit(audit, entitlements) : null;
-	$: domain = viewAudit ? extractDomain(viewAudit.audited_url) : '';
+	let shareUrl = $state('');
+	let copied = $state(false);
+	let audit = $state<AuditResult | null>(data.audit);
+	let entitlements = $state<EntitlementContext>(data.entitlements);
+	let viewAudit = $derived(audit ? redactAudit(audit, entitlements) : null);
+	let domain = $derived(viewAudit ? extractDomain(viewAudit.audited_url) : '');
+	let upgrading = $state(false);
+	let upgradeError = $state('');
 
 	onMount(() => {
 		const url = new URL(window.location.href);
@@ -137,7 +131,7 @@
 	{/if}
 </svelte:head>
 
-<Header showBack={true} />
+<Header showBack={true} user={data.user} plan={data.plan} />
 
 {#if !viewAudit}
 	<div class="container">
@@ -174,7 +168,7 @@
 			</div>
 			<div class="share-input">
 				<input type="text" readonly value={shareUrl} />
-				<button type="button" on:click={copyShareLink}>
+				<button type="button" onclick={copyShareLink}>
 					{#if copied}
 						Copied
 					{:else}
@@ -192,7 +186,7 @@
 					<p class="muted">See full recommendations and deeper analysis.</p>
 				</div>
 				<div class="upgrade-actions">
-					<button class="upgrade-button" type="button" on:click={startUpgrade} disabled={upgrading}>
+					<button class="upgrade-button" type="button" onclick={startUpgrade} disabled={upgrading}>
 						{#if upgrading}
 							Redirecting…
 						{:else}

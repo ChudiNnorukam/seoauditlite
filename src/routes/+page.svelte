@@ -2,9 +2,11 @@
 	import Header from '$lib/components/Header.svelte';
 	import { MagnifyingGlass, Robot, FileText, Code, TextAlignLeft, Tag, ListChecks, Lightning, ArrowRight } from 'phosphor-svelte';
 
-	let domain = '';
-	let loading = false;
-	let error = '';
+	let { data } = $props();
+
+	let domain = $state('');
+	let loading = $state(false);
+	let error = $state('');
 
 	// Animated counter for social proof
 	let auditCount = 2847;
@@ -82,7 +84,7 @@
 	</script>`}
 </svelte:head>
 
-<Header />
+<Header user={data.user} plan={data.plan} />
 
 <div class="page">
 	<!-- Hero Section with Gradient -->
@@ -100,7 +102,7 @@
 			<p class="subheadline">Free AEO audit in 2 minutes. See how Perplexity, ChatGPT, and Claude see your site.</p>
 
 			<!-- Audit Form -->
-			<form on:submit={handleAudit} class="audit-form">
+			<form onsubmit={handleAudit} class="audit-form">
 				<div class="input-group">
 					<input
 						type="text"
