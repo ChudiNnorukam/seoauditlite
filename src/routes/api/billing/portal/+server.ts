@@ -1,18 +1,18 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { getStripe } from '$lib/server/stripe';
+import { getCustomerPortalUrl } from '$lib/server/lemonsqueezy';
 import { getEntitlementByKey } from '$lib/server/entitlements-store';
 
 /**
  * POST /api/billing/portal
  *
- * Creates a Stripe Customer Portal session for managing subscriptions.
+ * Returns the LemonSqueezy Customer Portal URL for managing subscriptions.
  * Users can:
  * - View and download invoices
  * - Update payment methods
  * - Cancel subscription
  * - View billing history
  */
-export const POST: RequestHandler = async ({ url, locals }): Promise<Response> => {
+export const POST: RequestHandler = async ({ locals }): Promise<Response> => {
 	try {
 		if (!locals.entitlementKey) {
 			return json({ error: 'Missing entitlement key' }, { status: 400 });
@@ -20,22 +20,23 @@ export const POST: RequestHandler = async ({ url, locals }): Promise<Response> =
 
 		const record = await getEntitlementByKey(locals.entitlementKey);
 
-		if (!record?.stripe_customer_id) {
+		if (!record?.lemonsqueezy_customer_id) {
 			return json(
 				{ error: 'No subscription found. Please subscribe first.' },
 				{ status: 400 }
 			);
 		}
 
-		const stripe = getStripe();
+		const portalUrl = await getCustomerPortalUrl(record.lemonsqueezy_customer_id);
 
-		// Create portal session
-		const portalSession = await stripe.billingPortal.sessions.create({
-			customer: record.stripe_customer_id,
-			return_url: `${url.origin}/?portal=return`
-		});
+		if (!portalUrl) {
+			return json(
+				{ error: 'Unable to retrieve customer portal URL' },
+				{ status: 500 }
+			);
+		}
 
-		return json({ url: portalSession.url }, { status: 200 });
+		return json({ url: portalUrl }, { status: 200 });
 	} catch (error) {
 		console.error('Billing portal error:', error);
 		return json(

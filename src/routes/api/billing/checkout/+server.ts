@@ -1,6 +1,5 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { getStripe } from '$lib/server/stripe';
-import { getEntitlementByKey } from '$lib/server/entitlements-store';
+import { createCheckoutUrl } from '$lib/server/lemonsqueezy';
 
 export const POST: RequestHandler = async ({ request, url, locals }): Promise<Response> => {
 	try {
@@ -14,43 +13,21 @@ export const POST: RequestHandler = async ({ request, url, locals }): Promise<Re
 			);
 		}
 
-		const priceId = process.env.STRIPE_PRICE_ID;
-		if (!priceId) {
-			return json(
-				{ error: 'Stripe price is not configured' },
-				{ status: 500 }
-			);
-		}
-
-		const stripe = getStripe();
-		const record = await getEntitlementByKey(locals.entitlementKey);
-
 		const successUrl = auditId
 			? `${url.origin}/report/${auditId}?checkout=success`
 			: `${url.origin}/?checkout=success`;
-		const cancelUrl = auditId
-			? `${url.origin}/report/${auditId}?checkout=cancel`
-			: `${url.origin}/?checkout=cancel`;
 
-		const referralId = record?.referral_id?.trim();
-		const session = await stripe.checkout.sessions.create({
-			mode: 'subscription',
-			line_items: [{ price: priceId, quantity: 1 }],
-			success_url: successUrl,
-			cancel_url: cancelUrl,
-			client_reference_id: referralId || undefined,
-			customer: record?.stripe_customer_id ?? undefined,
-			allow_promotion_codes: true,
-			metadata: {
-				entitlement_key: locals.entitlementKey,
-				referral_id: referralId || ''
-			}
+		const checkoutUrl = createCheckoutUrl({
+			entitlementKey: locals.entitlementKey,
+			userId: locals.user?.id,
+			email: locals.user?.email ?? undefined,
+			successUrl,
 		});
 
-		return json({ url: session.url }, { status: 200 });
+		return json({ url: checkoutUrl }, { status: 200 });
 	} catch (error) {
 		return json(
-			{ error: error instanceof Error ? error.message : 'Unable to create checkout session' },
+			{ error: error instanceof Error ? error.message : 'Unable to create checkout URL' },
 			{ status: 500 }
 		);
 	}

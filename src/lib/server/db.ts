@@ -1,17 +1,17 @@
 import { createClient, type Client } from '@libsql/client';
+import { TURSO_DATABASE_URL, TURSO_AUTH_TOKEN } from '$env/static/private';
 
 let client: Client | null = null;
 let initialized = false;
 
 function getClient(): Client {
   if (!client) {
-    const url = process.env.TURSO_DATABASE_URL;
-    if (!url) {
+    if (!TURSO_DATABASE_URL) {
       throw new Error('TURSO_DATABASE_URL environment variable is not set');
     }
     client = createClient({
-      url,
-      authToken: process.env.TURSO_AUTH_TOKEN,
+      url: TURSO_DATABASE_URL,
+      authToken: TURSO_AUTH_TOKEN,
     });
   }
   return client;
@@ -38,14 +38,15 @@ async function initialize(): Promise<void> {
 
     CREATE TABLE IF NOT EXISTS entitlements (
       entitlement_key TEXT PRIMARY KEY,
-      stripe_customer_id TEXT,
+      lemonsqueezy_customer_id TEXT,
+      lemonsqueezy_subscription_id TEXT,
       plan TEXT NOT NULL,
       status TEXT NOT NULL,
       referral_id TEXT,
       referral_updated_at TEXT,
       updated_at TEXT NOT NULL
     );
-    CREATE INDEX IF NOT EXISTS idx_entitlements_customer ON entitlements (stripe_customer_id);
+    CREATE INDEX IF NOT EXISTS idx_entitlements_customer ON entitlements (lemonsqueezy_customer_id);
 
     CREATE TABLE IF NOT EXISTS og_images (
       image_id TEXT PRIMARY KEY,
@@ -59,6 +60,34 @@ async function initialize(): Promise<void> {
     );
     CREATE INDEX IF NOT EXISTS idx_og_images_audit ON og_images (audit_id);
     CREATE INDEX IF NOT EXISTS idx_og_images_status ON og_images (status);
+
+    -- Auth tables
+    CREATE TABLE IF NOT EXISTS users (
+      user_id TEXT PRIMARY KEY,
+      email TEXT NOT NULL UNIQUE,
+      google_id TEXT UNIQUE,
+      name TEXT,
+      avatar_url TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS sessions (
+      session_id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+      expires_at TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS entitlements_user_map (
+      entitlement_key TEXT PRIMARY KEY REFERENCES entitlements(entitlement_key),
+      user_id TEXT REFERENCES users(user_id) ON DELETE SET NULL,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id);
+    CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+    CREATE INDEX IF NOT EXISTS idx_entitlements_map_user ON entitlements_user_map(user_id);
   `);
 
   // Migration: Add og_image_url column to existing audits table if it doesn't exist
@@ -72,6 +101,27 @@ async function initialize(): Promise<void> {
     }
   } catch (error) {
     console.error('Migration check failed:', error);
+  }
+
+  // Migration: Rename stripe_customer_id to lemonsqueezy_customer_id
+  // and add lemonsqueezy_subscription_id column
+  try {
+    const entitlementsInfo = await db.execute("PRAGMA table_info(entitlements)");
+    const hasStripeCustomerId = entitlementsInfo.rows.some((row) => row.name === 'stripe_customer_id');
+    const hasLsCustomerId = entitlementsInfo.rows.some((row) => row.name === 'lemonsqueezy_customer_id');
+    const hasLsSubscriptionId = entitlementsInfo.rows.some((row) => row.name === 'lemonsqueezy_subscription_id');
+
+    if (hasStripeCustomerId && !hasLsCustomerId) {
+      await db.execute("ALTER TABLE entitlements RENAME COLUMN stripe_customer_id TO lemonsqueezy_customer_id");
+      console.log('Migration: Renamed stripe_customer_id to lemonsqueezy_customer_id');
+    }
+
+    if (!hasLsSubscriptionId) {
+      await db.execute("ALTER TABLE entitlements ADD COLUMN lemonsqueezy_subscription_id TEXT");
+      console.log('Migration: Added lemonsqueezy_subscription_id column to entitlements table');
+    }
+  } catch (error) {
+    console.error('LemonSqueezy migration check failed:', error);
   }
 
   initialized = true;

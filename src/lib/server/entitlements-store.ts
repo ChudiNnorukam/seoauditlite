@@ -3,7 +3,8 @@ import type { EntitlementPlan } from '$lib/auditing/entitlements';
 
 export interface EntitlementRecord {
   entitlement_key: string;
-  stripe_customer_id: string | null;
+  lemonsqueezy_customer_id: string | null;
+  lemonsqueezy_subscription_id: string | null;
   referral_id: string | null;
   plan: EntitlementPlan;
   status: string;
@@ -20,12 +21,13 @@ export async function ensureEntitlement(entitlementKey: string): Promise<void> {
   await db.execute({
     sql: `INSERT OR IGNORE INTO entitlements (
             entitlement_key,
-            stripe_customer_id,
+            lemonsqueezy_customer_id,
+            lemonsqueezy_subscription_id,
             referral_id,
             plan,
             status,
             updated_at
-          ) VALUES (?, NULL, NULL, 'free', 'free', ?)`,
+          ) VALUES (?, NULL, NULL, NULL, 'free', 'free', ?)`,
     args: [entitlementKey, new Date().toISOString()],
   });
 }
@@ -34,7 +36,7 @@ export async function getEntitlementByKey(entitlementKey: string): Promise<Entit
   const db = await getDb();
 
   const result = await db.execute({
-    sql: `SELECT entitlement_key, stripe_customer_id, referral_id, plan, status, updated_at
+    sql: `SELECT entitlement_key, lemonsqueezy_customer_id, lemonsqueezy_subscription_id, referral_id, plan, status, updated_at
           FROM entitlements WHERE entitlement_key = ?`,
     args: [entitlementKey],
   });
@@ -44,7 +46,8 @@ export async function getEntitlementByKey(entitlementKey: string): Promise<Entit
 
   return {
     entitlement_key: row.entitlement_key as string,
-    stripe_customer_id: row.stripe_customer_id as string | null,
+    lemonsqueezy_customer_id: row.lemonsqueezy_customer_id as string | null,
+    lemonsqueezy_subscription_id: row.lemonsqueezy_subscription_id as string | null,
     referral_id: row.referral_id as string | null,
     plan: normalizePlan(row.plan as string | null),
     status: row.status as string,
@@ -56,8 +59,8 @@ export async function getEntitlementByCustomerId(customerId: string): Promise<En
   const db = await getDb();
 
   const result = await db.execute({
-    sql: `SELECT entitlement_key, stripe_customer_id, referral_id, plan, status, updated_at
-          FROM entitlements WHERE stripe_customer_id = ?`,
+    sql: `SELECT entitlement_key, lemonsqueezy_customer_id, lemonsqueezy_subscription_id, referral_id, plan, status, updated_at
+          FROM entitlements WHERE lemonsqueezy_customer_id = ?`,
     args: [customerId],
   });
 
@@ -66,7 +69,8 @@ export async function getEntitlementByCustomerId(customerId: string): Promise<En
 
   return {
     entitlement_key: row.entitlement_key as string,
-    stripe_customer_id: row.stripe_customer_id as string | null,
+    lemonsqueezy_customer_id: row.lemonsqueezy_customer_id as string | null,
+    lemonsqueezy_subscription_id: row.lemonsqueezy_subscription_id as string | null,
     referral_id: row.referral_id as string | null,
     plan: normalizePlan(row.plan as string | null),
     status: row.status as string,
@@ -78,28 +82,32 @@ export async function upsertEntitlement(params: {
   entitlementKey: string;
   plan: EntitlementPlan;
   status: string;
-  stripeCustomerId?: string | null;
+  lemonSqueezyCustomerId?: string | null;
+  lemonSqueezySubscriptionId?: string | null;
 }): Promise<void> {
   const db = await getDb();
 
   await db.execute({
     sql: `INSERT INTO entitlements (
             entitlement_key,
-            stripe_customer_id,
+            lemonsqueezy_customer_id,
+            lemonsqueezy_subscription_id,
             referral_id,
             plan,
             status,
             updated_at
-          ) VALUES (?, ?, NULL, ?, ?, ?)
+          ) VALUES (?, ?, ?, NULL, ?, ?, ?)
           ON CONFLICT(entitlement_key) DO UPDATE SET
-            stripe_customer_id = COALESCE(excluded.stripe_customer_id, entitlements.stripe_customer_id),
+            lemonsqueezy_customer_id = COALESCE(excluded.lemonsqueezy_customer_id, entitlements.lemonsqueezy_customer_id),
+            lemonsqueezy_subscription_id = COALESCE(excluded.lemonsqueezy_subscription_id, entitlements.lemonsqueezy_subscription_id),
             referral_id = COALESCE(entitlements.referral_id, excluded.referral_id),
             plan = excluded.plan,
             status = excluded.status,
             updated_at = excluded.updated_at`,
     args: [
       params.entitlementKey,
-      params.stripeCustomerId ?? null,
+      params.lemonSqueezyCustomerId ?? null,
+      params.lemonSqueezySubscriptionId ?? null,
       params.plan,
       params.status,
       new Date().toISOString(),
@@ -108,7 +116,7 @@ export async function upsertEntitlement(params: {
 }
 
 export async function updateEntitlementByCustomer(params: {
-  stripeCustomerId: string;
+  lemonSqueezyCustomerId: string;
   plan: EntitlementPlan;
   status: string;
 }): Promise<boolean> {
@@ -117,8 +125,8 @@ export async function updateEntitlementByCustomer(params: {
   const result = await db.execute({
     sql: `UPDATE entitlements
           SET plan = ?, status = ?, updated_at = ?
-          WHERE stripe_customer_id = ?`,
-    args: [params.plan, params.status, new Date().toISOString(), params.stripeCustomerId],
+          WHERE lemonsqueezy_customer_id = ?`,
+    args: [params.plan, params.status, new Date().toISOString(), params.lemonSqueezyCustomerId],
   });
 
   return result.rowsAffected > 0;
@@ -135,21 +143,39 @@ export async function setEntitlementReferral(entitlementKey: string, referralId:
   });
 }
 
-/**
- * Delete entitlement data for a customer (GDPR compliance).
- * Called when a customer is deleted from Stripe.
- */
-export async function deleteEntitlementByCustomer(stripeCustomerId: string): Promise<boolean> {
+export async function updateEntitlementBySubscription(params: {
+  lemonSqueezySubscriptionId: string;
+  plan: EntitlementPlan;
+  status: string;
+}): Promise<boolean> {
   const db = await getDb();
 
   const result = await db.execute({
     sql: `UPDATE entitlements
-          SET stripe_customer_id = NULL,
+          SET plan = ?, status = ?, updated_at = ?
+          WHERE lemonsqueezy_subscription_id = ?`,
+    args: [params.plan, params.status, new Date().toISOString(), params.lemonSqueezySubscriptionId],
+  });
+
+  return result.rowsAffected > 0;
+}
+
+/**
+ * Delete entitlement data for a customer (GDPR compliance).
+ * Called when a customer is deleted from LemonSqueezy.
+ */
+export async function deleteEntitlementByCustomer(lemonSqueezyCustomerId: string): Promise<boolean> {
+  const db = await getDb();
+
+  const result = await db.execute({
+    sql: `UPDATE entitlements
+          SET lemonsqueezy_customer_id = NULL,
+              lemonsqueezy_subscription_id = NULL,
               plan = 'free',
               status = 'deleted',
               updated_at = ?
-          WHERE stripe_customer_id = ?`,
-    args: [new Date().toISOString(), stripeCustomerId],
+          WHERE lemonsqueezy_customer_id = ?`,
+    args: [new Date().toISOString(), lemonSqueezyCustomerId],
   });
 
   return result.rowsAffected > 0;
