@@ -1,8 +1,20 @@
-import type { Handle } from '@sveltejs/kit';
+import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { randomUUID } from 'node:crypto';
 import { ensureEntitlement } from '$lib/server/entitlements-store';
 import { lucia, type LuciaUserAttributes } from '$lib/server/lucia';
 import { dev } from '$app/environment';
+import * as Sentry from '@sentry/sveltekit';
+import { env } from '$env/dynamic/private';
+
+// Initialize Sentry for server-side error tracking
+const SENTRY_DSN = env.SENTRY_DSN;
+if (SENTRY_DSN && !dev) {
+	Sentry.init({
+		dsn: SENTRY_DSN,
+		environment: dev ? 'development' : 'production',
+		tracesSampleRate: 0.1,
+	});
+}
 
 const ENTITLEMENT_COOKIE = 'seoauditlite_entitlement';
 
@@ -82,3 +94,17 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	return response;
 };
+
+// Sentry error handler for server-side errors
+export const handleError: HandleServerError = Sentry.handleErrorWithSentry(({ error, event }) => {
+	// Log error details
+	console.error('[server-error]', {
+		path: event.url.pathname,
+		message: error instanceof Error ? error.message : 'Unknown error',
+	});
+
+	return {
+		message: 'An unexpected error occurred',
+		code: 'INTERNAL_ERROR',
+	};
+});
