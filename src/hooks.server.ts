@@ -1,7 +1,8 @@
 import type { Handle } from '@sveltejs/kit';
 import { randomUUID } from 'node:crypto';
 import { ensureEntitlement } from '$lib/server/entitlements-store';
-import { lucia } from '$lib/server/lucia';
+import { lucia, type LuciaUserAttributes } from '$lib/server/lucia';
+import { dev } from '$app/environment';
 
 const ENTITLEMENT_COOKIE = 'seoauditlite_entitlement';
 
@@ -30,12 +31,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 			});
 		}
 		if (user && session) {
+			// User attributes are transformed by Lucia's getUserAttributes
+			const userAttrs = user as typeof user & LuciaUserAttributes;
 			event.locals.user = {
 				id: user.id,
-				email: user.email,
-				name: user.name,
-				avatarUrl: user.avatarUrl,
-				googleId: user.googleId
+				email: userAttrs.email,
+				name: userAttrs.name,
+				avatarUrl: userAttrs.avatarUrl,
+				googleId: userAttrs.googleId
 			};
 			event.locals.session = {
 				id: session.id,
@@ -61,5 +64,21 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.entitlementKey = entitlementKey;
 	await ensureEntitlement(entitlementKey);
 
-	return resolve(event);
+	// Request logging (non-blocking, for debugging and audit trail)
+	const startTime = Date.now();
+	const response = await resolve(event);
+	const duration = Date.now() - startTime;
+
+	// Log API requests in production (skip static assets)
+	if (!dev && event.url.pathname.startsWith('/api/')) {
+		console.log('[request]', {
+			method: event.request.method,
+			path: event.url.pathname,
+			status: response.status,
+			durationMs: duration,
+			hasUser: !!event.locals.user,
+		});
+	}
+
+	return response;
 };

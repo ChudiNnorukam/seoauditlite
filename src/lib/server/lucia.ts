@@ -72,8 +72,9 @@ export const lucia = {
 
 declare module 'lucia' {
 	interface Register {
-		Lucia: typeof lucia;
+		Lucia: ReturnType<typeof getLucia>;
 		DatabaseUserAttributes: DatabaseUserAttributes;
+		DatabaseSessionAttributes: Record<never, never>;
 	}
 }
 
@@ -82,4 +83,12 @@ interface DatabaseUserAttributes {
 	name: string | null;
 	avatar_url: string | null;
 	google_id: string | null;
+}
+
+// Export user attributes type for use in hooks
+export interface LuciaUserAttributes {
+	email: string;
+	name: string | null;
+	avatarUrl: string | null;
+	googleId: string | null;
 }

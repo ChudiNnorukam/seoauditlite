@@ -84,9 +84,19 @@ export const POST: RequestHandler = async ({ request, locals }): Promise<Respons
 			}
 		});
 	} catch (error) {
-		// Handle errors
+		// Structured error logging
+		const errorContext = {
+			timestamp: new Date().toISOString(),
+			type: error instanceof Error ? error.constructor.name : 'Unknown',
+			message: error instanceof Error ? error.message : String(error),
+			entitlementKey: locals.entitlementKey?.slice(0, 8) + '...' // Partial for privacy
+		};
+
+		// Handle known audit errors
 		if (error instanceof Error && 'code' in error) {
 			const auditErr = error as unknown as AuditError;
+			console.error('[audit] Known error:', { ...errorContext, code: auditErr.code });
+
 			const response: AuditApiResponse = {
 				success: false,
 				error: auditErr.message,
@@ -95,7 +105,13 @@ export const POST: RequestHandler = async ({ request, locals }): Promise<Respons
 			return json(response, { status: auditErr.statusCode || 500 });
 		}
 
-		// Generic error
+		// Log unexpected errors with full context
+		console.error('[audit] Unexpected error:', {
+			...errorContext,
+			stack: error instanceof Error ? error.stack : undefined
+		});
+
+		// Generic error (don't expose internal details)
 		const response: AuditApiResponse = {
 			success: false,
 			error: 'Internal server error',

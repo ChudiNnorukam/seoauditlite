@@ -35,6 +35,7 @@ async function initialize(): Promise<void> {
     );
     CREATE INDEX IF NOT EXISTS idx_audits_created_at ON audits (created_at);
     CREATE INDEX IF NOT EXISTS idx_audits_expires_at ON audits (expires_at);
+    CREATE INDEX IF NOT EXISTS idx_audits_entitlement_key ON audits (entitlement_key);
 
     CREATE TABLE IF NOT EXISTS entitlements (
       entitlement_key TEXT PRIMARY KEY,

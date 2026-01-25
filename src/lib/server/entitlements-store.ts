@@ -100,7 +100,7 @@ export async function upsertEntitlement(params: {
           ON CONFLICT(entitlement_key) DO UPDATE SET
             lemonsqueezy_customer_id = COALESCE(excluded.lemonsqueezy_customer_id, entitlements.lemonsqueezy_customer_id),
             lemonsqueezy_subscription_id = COALESCE(excluded.lemonsqueezy_subscription_id, entitlements.lemonsqueezy_subscription_id),
-            referral_id = COALESCE(entitlements.referral_id, excluded.referral_id),
+            referral_id = COALESCE(excluded.referral_id, entitlements.referral_id),
             plan = excluded.plan,
             status = excluded.status,
             updated_at = excluded.updated_at`,

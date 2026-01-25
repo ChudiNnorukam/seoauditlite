@@ -95,12 +95,26 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 			throw e; // Re-throw redirects
 		}
 
+		// Structured error logging for debugging
+		const errorContext = {
+			timestamp: new Date().toISOString(),
+			type: e instanceof Error ? e.constructor.name : 'Unknown',
+			message: e instanceof Error ? e.message : String(e),
+			hasCode: !!(code),
+			hasState: !!(state),
+			statesMatch: state === storedState,
+		};
+
 		if (e instanceof arctic.OAuth2RequestError) {
-			console.error('OAuth2 error:', e.code);
-			throw redirect(302, '/?error=oauth_failed');
+			console.error('[auth] OAuth2 request error:', {
+				...errorContext,
+				oauthCode: e.code,
+				oauthDescription: e.description,
+			});
+			throw redirect(302, '/?error=oauth_failed&code=' + encodeURIComponent(e.code));
 		}
 
-		console.error('Auth callback error:', e);
+		console.error('[auth] Callback error:', errorContext);
 		throw redirect(302, '/?error=auth_failed');
 	}
 };

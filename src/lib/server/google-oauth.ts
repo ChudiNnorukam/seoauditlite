@@ -5,11 +5,25 @@ const clientId = GOOGLE_CLIENT_ID;
 const clientSecret = GOOGLE_CLIENT_SECRET;
 const origin = ORIGIN || 'http://localhost:5173';
 
-if (!clientId || !clientSecret) {
-	console.warn('Google OAuth credentials not configured. Auth will be disabled.');
+// Validate credentials at module load time
+// If partially configured, fail fast to prevent silent auth failures
+const hasClientId = !!clientId;
+const hasClientSecret = !!clientSecret;
+
+if (hasClientId !== hasClientSecret) {
+	// Partial configuration is an error - someone likely misconfigured
+	throw new Error(
+		`Google OAuth partially configured. ` +
+		`GOOGLE_CLIENT_ID: ${hasClientId ? 'set' : 'missing'}, ` +
+		`GOOGLE_CLIENT_SECRET: ${hasClientSecret ? 'set' : 'missing'}. ` +
+		`Either set both or neither.`
+	);
 }
 
-export const google = clientId && clientSecret
+// If neither is set, auth is intentionally disabled (valid for dev/testing)
+export const googleAuthEnabled = hasClientId && hasClientSecret;
+
+export const google = googleAuthEnabled
 	? new Google(clientId, clientSecret, `${origin}/api/auth/callback/google`)
 	: null;
 

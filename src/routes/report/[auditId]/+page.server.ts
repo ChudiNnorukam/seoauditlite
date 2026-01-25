@@ -4,7 +4,7 @@ import { resolveEntitlementsForRequest } from '$lib/server/entitlements-resolver
 import { env as publicEnv } from '$env/dynamic/public';
 
 export const load: PageServerLoad = async ({ fetch, params, locals }) => {
-	const entitlements = resolveEntitlementsForRequest({
+	const entitlements = await resolveEntitlementsForRequest({
 		entitlementKey: locals.entitlementKey,
 		isShareLink: true,
 		isOwner: false
