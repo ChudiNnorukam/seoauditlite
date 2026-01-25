@@ -11,8 +11,8 @@
 
 	let shareUrl = $state('');
 	let copied = $state(false);
-	let audit = $state<AuditResult | null>(data.audit);
-	let entitlements = $state<EntitlementContext>(data.entitlements);
+	let audit = $derived<AuditResult | null>(data.audit);
+	let entitlements = $derived<EntitlementContext>(data.entitlements);
 	let viewAudit = $derived(audit ? redactAudit(audit, entitlements) : null);
 	let domain = $derived(viewAudit ? extractDomain(viewAudit.audited_url) : '');
 	let upgrading = $state(false);
