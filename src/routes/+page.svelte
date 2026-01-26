@@ -490,6 +490,20 @@
 			</table>
 		</div>
 		<p class="comparison-note">Good news: AEO and SEO aren't mutually exclusive. Improving your structured data and content format benefits both traditional search engines and AI answer engines.</p>
+
+		<dl class="aeo-glossary">
+			<dt>Answer Engine</dt>
+			<dd>AI systems like ChatGPT, Perplexity, and Claude that provide direct answers instead of search result links</dd>
+
+			<dt>Structured Data</dt>
+			<dd>Machine-readable markup (JSON-LD schemas) that helps AI engines understand your content's meaning and relationships</dd>
+
+			<dt>Extractability</dt>
+			<dd>How easily AI crawlers can parse and extract information from your HTML, influenced by semantic tags and text ratio</dd>
+
+			<dt>llms.txt</dt>
+			<dd>A robots.txt-style file that declares your AI crawling policy and content preferences for language models</dd>
+		</dl>
 	</section>
 
 	<!-- FAQ -->
@@ -1242,6 +1256,33 @@
 		font-style: italic;
 		max-width: 700px;
 		margin: 0 auto;
+	}
+
+	.aeo-glossary {
+		max-width: 700px;
+		margin: 32px auto 0 auto;
+		padding: 24px;
+		background: var(--color-bg-muted);
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-md);
+	}
+
+	.aeo-glossary dt {
+		font-weight: 600;
+		font-size: 15px;
+		color: var(--color-text);
+		margin-bottom: 4px;
+	}
+
+	.aeo-glossary dd {
+		margin: 0 0 16px 0;
+		color: var(--color-text-secondary);
+		font-size: 14px;
+		line-height: 1.5;
+	}
+
+	.aeo-glossary dd:last-child {
+		margin-bottom: 0;
 	}
 
 	@media (max-width: 768px) {
