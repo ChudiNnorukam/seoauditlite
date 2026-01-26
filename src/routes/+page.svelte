@@ -323,7 +323,7 @@
 
 	/* Hero */
 	.hero {
-		background: #fefcf9;
+		background: var(--color-bg-subtle);
 		padding: 64px 24px;
 		text-align: center;
 		position: relative;
@@ -419,7 +419,7 @@
 		box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 	}
 
-	button {
+	.input-group button {
 		display: inline-flex;
 		align-items: center;
 		gap: 8px;
@@ -436,16 +436,16 @@
 		box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
 	}
 
-	button:hover:not(:disabled) {
+	.input-group button:hover:not(:disabled) {
 		transform: translateY(-1px);
 		box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
 	}
 
-	button:active:not(:disabled) {
+	.input-group button:active:not(:disabled) {
 		transform: translateY(0);
 	}
 
-	button:disabled {
+	.input-group button:disabled {
 		opacity: 0.6;
 		cursor: not-allowed;
 	}
@@ -658,15 +658,21 @@
 	}
 
 	.faq-item {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
 		width: 100%;
 		text-align: left;
 		background: var(--color-bg);
 		border: 1px solid var(--color-border-light);
 		border-radius: var(--radius-md);
-		padding: 16px 20px;
+		padding: 16px;
 		cursor: pointer;
 		transition: border-color 150ms ease;
 		font-family: inherit;
+		box-shadow: none;
+		font-size: inherit;
+		font-weight: inherit;
 	}
 
 	.faq-item:hover {
@@ -699,9 +705,12 @@
 
 	.faq-answer {
 		margin: 12px 0 0 0;
+		padding-top: 12px;
 		font-size: 13px;
 		color: var(--color-text-secondary);
 		line-height: 1.6;
+		overflow-wrap: break-word;
+		word-break: break-word;
 	}
 
 	/* Pricing */
