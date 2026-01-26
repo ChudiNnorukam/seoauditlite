@@ -202,7 +202,7 @@
 
 		<div class="checks-grid">
 			<div class="check-card">
-				<div class="check-icon primary"><Robot size={20} weight="duotone" /></div>
+				<div class="check-icon"><Robot size={20} weight="duotone" /></div>
 				<h3>AI Crawler Access</h3>
 				<p>Does your robots.txt allow GPTBot, ClaudeBot, and PerplexityBot to crawl your content?</p>
 			</div>
@@ -489,13 +489,14 @@
 	/* Checks Section (6 cards grid) */
 	.checks-section {
 		padding: 64px 24px;
+		border-top: 1px solid var(--color-border-light);
 	}
 
 	.checks-section h2 {
 		text-align: center;
 		margin-bottom: 8px;
 		font-size: 24px;
-		font-weight: 700;
+		font-weight: 600;
 		letter-spacing: -0.02em;
 	}
 
@@ -539,11 +540,6 @@
 		margin-bottom: 16px;
 	}
 
-	.check-icon.primary {
-		background: var(--color-primary);
-		color: white;
-	}
-
 	.check-card h3 {
 		margin: 0 0 8px 0;
 		font-size: 14px;
@@ -565,9 +561,9 @@
 	}
 
 	.micro-apps h2 {
-		font-size: 20px;
+		font-size: 24px;
 		font-weight: 600;
-		letter-spacing: -0.01em;
+		letter-spacing: -0.02em;
 		margin-bottom: 8px;
 	}
 
@@ -628,9 +624,9 @@
 
 	.faq-section h2 {
 		text-align: center;
-		font-size: 20px;
+		font-size: 24px;
 		font-weight: 600;
-		letter-spacing: -0.01em;
+		letter-spacing: -0.02em;
 		margin-bottom: 24px;
 	}
 
@@ -708,9 +704,9 @@
 	.pricing h2 {
 		text-align: center;
 		margin-bottom: 28px;
-		font-size: 20px;
+		font-size: 24px;
 		font-weight: 600;
-		letter-spacing: -0.01em;
+		letter-spacing: -0.02em;
 	}
 
 	.pricing-grid {

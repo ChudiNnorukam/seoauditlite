@@ -152,7 +152,7 @@
 		gap: 8px;
 		color: var(--color-text, #0f172a);
 		text-decoration: none;
-		font-size: 15px;
+		font-size: 14px;
 		font-weight: 600;
 		letter-spacing: -0.01em;
 	}
@@ -271,7 +271,7 @@
 		text-transform: uppercase;
 		letter-spacing: 0.02em;
 		padding: 2px 6px;
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 	}
 
 	.plan-badge.pro {

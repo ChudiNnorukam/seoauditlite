@@ -368,7 +368,7 @@
 		color: var(--color-text);
 		text-decoration: none;
 		padding: 10px 16px;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		border: 1px solid var(--color-border-light);
 		background: rgba(255, 255, 255, 0.6);
 		font-weight: 600;
@@ -504,7 +504,7 @@
 	.task-board__controls button {
 		border: 1px solid var(--color-border-light);
 		background: var(--color-bg);
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		padding: 8px 12px;
 		font-size: 12px;
 		cursor: pointer;
@@ -557,11 +557,11 @@
 	}
 
 	.tag {
-		font-size: 11px;
+		font-size: 12px;
 		font-weight: 600;
 		background: rgba(17, 98, 212, 0.1);
 		padding: 4px 8px;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		color: var(--color-primary-hover);
 	}
 
@@ -591,7 +591,7 @@
 	.meter {
 		height: 8px;
 		background: rgba(255, 255, 255, 0.2);
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		overflow: hidden;
 		margin-bottom: 16px;
 	}
@@ -603,7 +603,7 @@
 	.meter__fill {
 		height: 100%;
 		background: var(--color-primary);
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		transition: width 200ms ease;
 	}
 
