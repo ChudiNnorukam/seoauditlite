@@ -41,7 +41,7 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 
 		// Check if user exists by Google ID or email
 		const existingUserResult = await db.execute({
-			sql: `SELECT user_id, email, google_id, name, avatar_url FROM users
+			sql: `SELECT id, email, google_id, name, avatar_url FROM users
 			      WHERE google_id = ? OR email = ?`,
 			args: [googleUser.sub, googleUser.email]
 		});
@@ -50,21 +50,21 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 
 		if (existingUserResult.rows.length > 0) {
 			// User exists - update their info
-			userId = existingUserResult.rows[0].user_id as string;
+			userId = existingUserResult.rows[0].id as string;
 			await db.execute({
 				sql: `UPDATE users SET
 				        google_id = ?,
 				        name = COALESCE(?, name),
 				        avatar_url = COALESCE(?, avatar_url),
 				        updated_at = ?
-				      WHERE user_id = ?`,
+				      WHERE id = ?`,
 				args: [googleUser.sub, googleUser.name || null, googleUser.picture || null, now, userId]
 			});
 		} else {
 			// Create new user
 			userId = randomUUID();
 			await db.execute({
-				sql: `INSERT INTO users (user_id, email, google_id, name, avatar_url, created_at, updated_at)
+				sql: `INSERT INTO users (id, email, google_id, name, avatar_url, created_at, updated_at)
 				      VALUES (?, ?, ?, ?, ?, ?, ?)`,
 				args: [userId, googleUser.email, googleUser.sub, googleUser.name || null, googleUser.picture || null, now, now]
 			});
@@ -73,9 +73,9 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 		// Link anonymous entitlement to user account
 		if (locals.entitlementKey) {
 			await db.execute({
-				sql: `INSERT INTO entitlements_user_map (entitlement_key, user_id, created_at)
+				sql: `INSERT INTO entitlements_user_map (entitlement_key, id, created_at)
 				      VALUES (?, ?, ?)
-				      ON CONFLICT(entitlement_key) DO UPDATE SET user_id = excluded.user_id`,
+				      ON CONFLICT(entitlement_key) DO UPDATE SET id = excluded.id`,
 				args: [locals.entitlementKey, userId, now]
 			});
 		}

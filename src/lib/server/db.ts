@@ -64,7 +64,7 @@ async function initialize(): Promise<void> {
 
     -- Auth tables
     CREATE TABLE IF NOT EXISTS users (
-      user_id TEXT PRIMARY KEY,
+      id TEXT PRIMARY KEY,
       email TEXT NOT NULL UNIQUE,
       google_id TEXT UNIQUE,
       name TEXT,
@@ -75,13 +75,13 @@ async function initialize(): Promise<void> {
 
     CREATE TABLE IF NOT EXISTS sessions (
       id TEXT PRIMARY KEY,
-      user_id TEXT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       expires_at TEXT NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS entitlements_user_map (
       entitlement_key TEXT PRIMARY KEY REFERENCES entitlements(entitlement_key),
-      user_id TEXT REFERENCES users(user_id) ON DELETE SET NULL,
+      user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
       created_at TEXT NOT NULL
     );
 
