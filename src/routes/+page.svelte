@@ -24,6 +24,26 @@
 		{
 			question: 'Is my data stored?',
 			answer: 'Free audits are stored for 7 days. Pro audits are retained for 30 days. We never sell your data or share it with third parties beyond our infrastructure providers.'
+		},
+		{
+			question: 'How often should I run an audit?',
+			answer: 'Run an audit whenever you make significant content changes, publish new pages, or update your site structure. For actively maintained sites, monthly audits help track your AI search readiness over time.'
+		},
+		{
+			question: 'What\'s the difference between SEO and AEO?',
+			answer: 'Traditional SEO optimizes for search engine result pages (Google, Bing). AEO optimizes for AI-powered answer engines (ChatGPT, Perplexity, Claude) that generate answers directly. AEO focuses on structured data, semantic HTML, and content extractability rather than keyword density and backlinks.'
+		},
+		{
+			question: 'Do I need technical knowledge to fix issues?',
+			answer: 'Most fixes are straightforward. Adding llms.txt is as simple as creating a text file. Structured data can be generated with free tools. Our audit report provides specific, actionable recommendations with priority rankings to guide your improvements.'
+		},
+		{
+			question: 'How long does it take to see results?',
+			answer: 'AI crawlers typically re-index sites within 1-2 weeks after changes. However, improving your AEO score happens immediately once fixes are deployed. Run another audit after making changes to verify improvements.'
+		},
+		{
+			question: 'Can AEO hurt my traditional SEO?',
+			answer: 'No. AEO improvements like structured data, semantic HTML, and clear content hierarchy actually benefit traditional SEO as well. Search engines and AI engines both reward well-structured, accessible content.'
 		}
 	];
 
@@ -80,6 +100,11 @@
 	<meta name="twitter:title" content="SEOAuditLite - Know Your AI Search Readiness" />
 	<meta name="twitter:description" content="Check your site's AEO readiness for Perplexity, ChatGPT, and Claude. Free audit in 2 minutes." />
 
+	<!-- Article metadata for AI engines -->
+	<meta property="article:published_time" content="2025-12-15T00:00:00Z" />
+	<meta property="article:modified_time" content="2026-01-26T00:00:00Z" />
+	<meta property="article:author" content="Chudi Nnorukam" />
+
 	<!-- JSON-LD SoftwareApplication Schema -->
 	{@html `<script type="application/ld+json">
 	{
@@ -132,6 +157,115 @@
 					"@type": "Answer",
 					"text": "Free audits are stored for 7 days. Pro audits are retained for 30 days. We never sell your data or share it with third parties beyond our infrastructure providers."
 				}
+			},
+			{
+				"@type": "Question",
+				"name": "How often should I run an audit?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "Run an audit whenever you make significant content changes, publish new pages, or update your site structure. For actively maintained sites, monthly audits help track your AI search readiness over time."
+				}
+			},
+			{
+				"@type": "Question",
+				"name": "What's the difference between SEO and AEO?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "Traditional SEO optimizes for search engine result pages (Google, Bing). AEO optimizes for AI-powered answer engines (ChatGPT, Perplexity, Claude) that generate answers directly. AEO focuses on structured data, semantic HTML, and content extractability rather than keyword density and backlinks."
+				}
+			},
+			{
+				"@type": "Question",
+				"name": "Do I need technical knowledge to fix issues?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "Most fixes are straightforward. Adding llms.txt is as simple as creating a text file. Structured data can be generated with free tools. Our audit report provides specific, actionable recommendations with priority rankings to guide your improvements."
+				}
+			},
+			{
+				"@type": "Question",
+				"name": "How long does it take to see results?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "AI crawlers typically re-index sites within 1-2 weeks after changes. However, improving your AEO score happens immediately once fixes are deployed. Run another audit after making changes to verify improvements."
+				}
+			},
+			{
+				"@type": "Question",
+				"name": "Can AEO hurt my traditional SEO?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "No. AEO improvements like structured data, semantic HTML, and clear content hierarchy actually benefit traditional SEO as well. Search engines and AI engines both reward well-structured, accessible content."
+				}
+			}
+		]
+	}
+	</script>`}
+
+	<!-- JSON-LD Organization Schema -->
+	{@html `<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "Organization",
+		"name": "SEOAuditLite",
+		"url": "https://seoauditlite.com",
+		"logo": "https://seoauditlite.com/logo.png",
+		"description": "AI Search Readiness Audit Tool - Check your site's AEO (Answer Engine Optimization) for Perplexity, ChatGPT, and Claude",
+		"founder": {
+			"@type": "Person",
+			"name": "Chudi Nnorukam",
+			"url": "https://chudi.dev"
+		},
+		"sameAs": [
+			"https://twitter.com/chudinnorukam",
+			"https://github.com/anthropics/seoauditlite"
+		]
+	}
+	</script>`}
+
+	<!-- JSON-LD HowTo Schema -->
+	{@html `<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "HowTo",
+		"name": "How to Improve Your AI Search Readiness",
+		"description": "Step-by-step guide to optimize your website for AI search engines like ChatGPT, Perplexity, and Claude",
+		"step": [
+			{
+				"@type": "HowToStep",
+				"name": "Check AI Crawler Access",
+				"text": "Verify your robots.txt allows GPTBot, ClaudeBot, and PerplexityBot to crawl your content. Add explicit allow directives if missing.",
+				"url": "https://seoauditlite.com/#ai-crawler-access"
+			},
+			{
+				"@type": "HowToStep",
+				"name": "Create llms.txt File",
+				"text": "Publish an llms.txt file at your domain root declaring your AI crawling policy and listing your most important content pages.",
+				"url": "https://seoauditlite.com/#llms-txt"
+			},
+			{
+				"@type": "HowToStep",
+				"name": "Add Structured Data",
+				"text": "Implement JSON-LD schema markup for your content types: Organization, Person, FAQPage, HowTo, and BlogPosting schemas help AI engines understand your content.",
+				"url": "https://seoauditlite.com/#structured-data"
+			},
+			{
+				"@type": "HowToStep",
+				"name": "Improve Content Extractability",
+				"text": "Use semantic HTML tags (article, section, header), maintain proper heading hierarchy, add alt text to all images, and increase text-to-code ratio.",
+				"url": "https://seoauditlite.com/#extractability"
+			},
+			{
+				"@type": "HowToStep",
+				"name": "Optimize AI Metadata",
+				"text": "Add canonical URLs, OpenGraph tags, Twitter Card metadata, and article publication dates to help AI engines trust and cite your content.",
+				"url": "https://seoauditlite.com/#ai-metadata"
+			},
+			{
+				"@type": "HowToStep",
+				"name": "Format Content for AI Extraction",
+				"text": "Structure content with FAQ sections, bulleted lists, numbered lists, tables, and step-by-step guides that AI engines can easily parse and quote.",
+				"url": "https://seoauditlite.com/#answer-format"
 			}
 		]
 	}
@@ -145,7 +279,7 @@
 	<section class="hero">
 		<div class="hero-content">
 			<div class="social-proof">
-				<Lightning size={14} weight="fill" />
+				<Lightning size={14} weight="fill" aria-label="Lightning bolt icon" />
 				<span><strong>{auditCount.toLocaleString()}</strong> audits run this month</span>
 			</div>
 
@@ -170,7 +304,7 @@
 							Analyzing...
 						{:else}
 							Analyze Site
-							<ArrowRight size={16} weight="bold" />
+							<ArrowRight size={16} weight="bold" aria-label="Arrow right icon" />
 						{/if}
 					</button>
 				</div>
@@ -202,34 +336,34 @@
 
 		<div class="checks-grid">
 			<div class="check-card">
-				<div class="check-icon"><Robot size={20} weight="duotone" /></div>
+				<div class="check-icon"><Robot size={20} weight="duotone" aria-label="AI robot icon" /></div>
 				<h3>AI Crawler Access</h3>
-				<p>Does your robots.txt allow GPTBot, ClaudeBot, and PerplexityBot to crawl your content?</p>
+				<p>Does your robots.txt allow GPTBot, ClaudeBot, and PerplexityBot to crawl your content? Without explicit permission in your robots.txt file, AI search engines won't index your site, making your content invisible to ChatGPT, Perplexity, and Claude users searching for information in your domain.</p>
 			</div>
 			<div class="check-card">
-				<div class="check-icon"><FileText size={20} weight="duotone" /></div>
+				<div class="check-icon"><FileText size={20} weight="duotone" aria-label="File text icon" /></div>
 				<h3>llms.txt</h3>
-				<p>The new robots.txt for AI — tells engines what content matters most</p>
+				<p>The new robots.txt for AI — tells engines what content matters most. This emerging standard lets you declare which pages should be prioritized when AI crawlers visit your site, helping ensure your most important content gets discovered and cited by AI answer engines.</p>
 			</div>
 			<div class="check-card">
-				<div class="check-icon"><Code size={20} weight="duotone" /></div>
+				<div class="check-icon"><Code size={20} weight="duotone" aria-label="Code icon" /></div>
 				<h3>Structured Data</h3>
-				<p>JSON-LD schema quality and completeness for rich AI answers</p>
+				<p>JSON-LD schema quality and completeness for rich AI answers. Structured data helps AI engines understand your content relationships, author information, publication dates, and content types, making your site more quotable and increasing citation confidence.</p>
 			</div>
 			<div class="check-card">
-				<div class="check-icon"><TextAlignLeft size={20} weight="duotone" /></div>
+				<div class="check-icon"><TextAlignLeft size={20} weight="duotone" aria-label="Text alignment icon" /></div>
 				<h3>Extractability</h3>
-				<p>Semantic HTML structure that AI can parse and quote</p>
+				<p>Semantic HTML structure that AI can parse and quote. AI engines rely on clean HTML, proper heading hierarchy, descriptive alt text, and high text-to-code ratios to extract and understand your content. Poor HTML structure makes your content harder for AI to interpret accurately.</p>
 			</div>
 			<div class="check-card">
-				<div class="check-icon"><Tag size={20} weight="duotone" /></div>
+				<div class="check-icon"><Tag size={20} weight="duotone" aria-label="Tag icon" /></div>
 				<h3>AI Metadata</h3>
-				<p>Canonical URLs, OG tags, publish dates AI engines trust</p>
+				<p>Canonical URLs, OG tags, publish dates AI engines trust. Proper metadata signals help AI determine content freshness, authoritativeness, and canonical versions, increasing the likelihood your content will be cited with accurate attribution and timestamps.</p>
 			</div>
 			<div class="check-card">
-				<div class="check-icon"><ListChecks size={20} weight="duotone" /></div>
+				<div class="check-icon"><ListChecks size={20} weight="duotone" aria-label="Checklist icon" /></div>
 				<h3>Answer Format</h3>
-				<p>FAQ/HowTo schema + bulleted lists AI loves to cite</p>
+				<p>FAQ/HowTo schema + bulleted lists AI loves to cite. AI engines prefer structured Q&A formats, step-by-step guides, tables, and bulleted lists because they're easier to parse and quote directly in conversational responses to user queries.</p>
 			</div>
 		</div>
 	</section>
@@ -242,7 +376,7 @@
 			<div class="micro-card">
 				<h3>AEO Quick Wins Planner</h3>
 				<p>Build a prioritized plan, score impact vs effort, and export your sprint list.</p>
-				<a class="micro-link" href="/planner">Open planner <ArrowRight size={12} weight="bold" /></a>
+				<a class="micro-link" href="/planner">Open planner <ArrowRight size={12} weight="bold" aria-label="Arrow right icon" /></a>
 			</div>
 		</div>
 	</section>
@@ -255,7 +389,7 @@
 				<button class="faq-item" class:open={openFaq === i} onclick={() => toggleFaq(i)} type="button">
 					<div class="faq-question">
 						<span>{faq.question}</span>
-						<CaretDown size={16} weight="bold" class="faq-caret" />
+						<CaretDown size={16} weight="bold" class="faq-caret" aria-label="Expand or collapse icon" />
 					</div>
 					{#if openFaq === i}
 						<p class="faq-answer">{faq.answer}</p>
@@ -288,7 +422,7 @@
 					<li>30-day history</li>
 					<li>PDF export</li>
 				</ul>
-				<a href="/account" class="pricing-cta primary">Go Pro <ArrowRight size={14} weight="bold" /></a>
+				<a href="/account" class="pricing-cta primary">Go Pro <ArrowRight size={14} weight="bold" aria-label="Arrow right icon" /></a>
 			</div>
 		</div>
 	</section>
