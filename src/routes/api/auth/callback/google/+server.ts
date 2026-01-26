@@ -73,9 +73,9 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 		// Link anonymous entitlement to user account
 		if (locals.entitlementKey) {
 			await db.execute({
-				sql: `INSERT INTO entitlements_user_map (entitlement_key, id, created_at)
+				sql: `INSERT INTO entitlements_user_map (entitlement_key, user_id, created_at)
 				      VALUES (?, ?, ?)
-				      ON CONFLICT(entitlement_key) DO UPDATE SET id = excluded.id`,
+				      ON CONFLICT(entitlement_key) DO UPDATE SET user_id = excluded.user_id`,
 				args: [locals.entitlementKey, userId, now]
 			});
 		}
