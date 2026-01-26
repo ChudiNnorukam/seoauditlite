@@ -102,6 +102,40 @@
 		}
 	}
 	</script>`}
+
+	<!-- JSON-LD FAQPage Schema -->
+	{@html `<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "FAQPage",
+		"mainEntity": [
+			{
+				"@type": "Question",
+				"name": "How accurate is the audit?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "We check the same signals AI crawlers use — robots.txt directives, structured data, llms.txt, semantic HTML, and metadata. Results reflect real crawl behavior, not guesswork."
+				}
+			},
+			{
+				"@type": "Question",
+				"name": "What is AEO?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "Answer Engine Optimization (AEO) is the practice of making your site visible and quotable by AI search engines like Perplexity, ChatGPT, and Claude — the next generation of search."
+				}
+			},
+			{
+				"@type": "Question",
+				"name": "Is my data stored?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "Free audits are stored for 7 days. Pro audits are retained for 30 days. We never sell your data or share it with third parties beyond our infrastructure providers."
+				}
+			}
+		]
+	}
+	</script>`}
 </svelte:head>
 
 <Header user={data.user} plan={data.plan} />
