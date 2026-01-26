@@ -158,7 +158,7 @@
 	}
 
 	.logo:hover {
-		color: var(--color-primary, #f97316);
+		color: var(--color-primary);
 	}
 
 	.back-link {
@@ -173,7 +173,7 @@
 	}
 
 	.back-link:hover {
-		color: var(--color-primary, #f97316);
+		color: var(--color-primary);
 	}
 
 	.header-nav {
@@ -194,9 +194,9 @@
 		color: var(--color-text, #0f172a);
 	}
 
-	/* Sign in button — orange accent for CTA consistency */
+	/* Sign in button — blue accent for professional credibility */
 	.sign-in-button {
-		background: var(--color-primary, #f97316);
+		background: var(--color-primary);
 		color: #fff;
 		border: none;
 		border-radius: var(--radius-sm, 6px);
@@ -208,7 +208,7 @@
 	}
 
 	.sign-in-button:hover:not(:disabled) {
-		background: var(--color-primary-hover, #ea580c);
+		background: var(--color-primary-hover);
 	}
 
 	.sign-in-button:disabled {
@@ -275,7 +275,7 @@
 	}
 
 	.plan-badge.pro {
-		background: linear-gradient(135deg, var(--color-primary, #f97316) 0%, var(--color-primary-hover, #ea580c) 100%);
+		background: var(--color-primary);
 		color: #fff;
 	}
 

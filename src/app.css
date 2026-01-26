@@ -3,9 +3,9 @@
    ============================================ */
 
 :root {
-	/* Brand */
-	--color-primary: #f97316;
-	--color-primary-hover: #ea580c;
+	/* Brand - Professional Blue (matches chudi.dev) */
+	--color-primary: #1162d4;
+	--color-primary-hover: #0d4fa3;
 
 	/* Text */
 	--color-text: #0f172a;
@@ -17,9 +17,9 @@
 	--color-border: #e2e8f0;
 	--color-border-light: rgba(15, 23, 42, 0.06);
 
-	/* Backgrounds */
+	/* Backgrounds - Subtle blue tint like chudi.dev */
 	--color-bg: #ffffff;
-	--color-bg-subtle: #f8fafc;
+	--color-bg-subtle: #f8fafb;
 	--color-bg-muted: #f1f5f9;
 
 	/* Status */

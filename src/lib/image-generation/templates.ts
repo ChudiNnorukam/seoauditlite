@@ -86,7 +86,7 @@ export function extractAuditImageData(audit: AuditResult): AuditImageData {
 
 export function generateLinkedInThumbnailPrompt(config: TemplateConfig): string {
   const colorMap = {
-    blue: 'deep blue (#1E40AF)',
+    blue: 'professional blue (#1162d4)',
     orange: 'vibrant orange (#EA580C)',
     purple: 'rich purple (#7C3AED)',
     green: 'emerald green (#059669)',

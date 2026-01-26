@@ -353,11 +353,11 @@
 		align-items: center;
 		gap: 6px;
 		padding: 6px 12px;
-		background: rgba(249, 115, 22, 0.08);
-		border: 1px solid rgba(249, 115, 22, 0.15);
+		background: rgba(17, 98, 212, 0.08);
+		border: 1px solid rgba(17, 98, 212, 0.15);
 		border-radius: 20px;
 		font-size: 12px;
-		color: var(--color-primary-hover, #ea580c);
+		color: var(--color-primary-hover);
 		margin-bottom: 24px;
 	}
 
@@ -555,7 +555,7 @@
 	}
 
 	.check-icon.orange {
-		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+		background: var(--color-primary);
 		color: white;
 	}
 

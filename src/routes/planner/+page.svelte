@@ -364,7 +364,7 @@
 		letter-spacing: 0.2em;
 		font-size: 12px;
 		font-weight: 600;
-		color: var(--color-primary-hover, #ea580c);
+		color: var(--color-primary-hover);
 	}
 
 	.lede {
