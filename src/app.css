@@ -1,0 +1,54 @@
+/* ============================================
+   SEOAuditLite — Global Design Tokens & Reset
+   ============================================ */
+
+:root {
+	/* Brand */
+	--color-primary: #f97316;
+	--color-primary-hover: #ea580c;
+
+	/* Text */
+	--color-text: #0f172a;
+	--color-text-secondary: #475569;
+	--color-text-muted: #64748b;
+	--color-text-faint: #94a3b8;
+
+	/* Borders */
+	--color-border: #e2e8f0;
+	--color-border-light: rgba(15, 23, 42, 0.06);
+
+	/* Backgrounds */
+	--color-bg: #ffffff;
+	--color-bg-subtle: #f8fafc;
+	--color-bg-muted: #f1f5f9;
+
+	/* Status */
+	--color-success: #22c55e;
+	--color-warning: #eab308;
+	--color-danger: #ef4444;
+
+	/* Radius */
+	--radius-sm: 6px;
+	--radius-md: 10px;
+	--radius-lg: 14px;
+
+	/* Typography */
+	--font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	--font-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+}
+
+/* Minimal reset */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: var(--font-sans);
+	background: var(--color-bg);
+	color: var(--color-text);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}

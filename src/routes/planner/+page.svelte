@@ -323,14 +323,8 @@
 
 <style>
 	:global(body.planner-body) {
-		margin: 0;
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-		background: radial-gradient(circle at top, rgba(255, 243, 222, 0.8), #f5f5f7 40%, #fefefe 100%);
-		color: #1b1b1f;
-	}
-
-	:global(body.planner-body *) {
-		box-sizing: border-box;
+		background: radial-gradient(circle at top, rgba(249, 115, 22, 0.06), var(--color-bg-subtle, #f8fafc) 40%, var(--color-bg, #fefefe) 100%);
+		color: var(--color-text);
 	}
 
 	.planner {
@@ -346,8 +340,7 @@
 		inset: 0 0 auto auto;
 		width: 320px;
 		height: 320px;
-		background: radial-gradient(circle, rgba(255, 156, 88, 0.25), rgba(255, 156, 88, 0));
-		filter: blur(0px);
+		background: radial-gradient(circle, rgba(249, 115, 22, 0.15), rgba(249, 115, 22, 0));
 		pointer-events: none;
 	}
 
@@ -360,9 +353,10 @@
 	}
 
 	.planner__header h1 {
-		font-family: 'Space Grotesk', sans-serif;
 		font-size: 40px;
 		margin: 6px 0 12px;
+		letter-spacing: -0.02em;
+		font-weight: 700;
 	}
 
 	.eyebrow {
@@ -370,23 +364,24 @@
 		letter-spacing: 0.2em;
 		font-size: 12px;
 		font-weight: 600;
-		color: #8a4f00;
+		color: var(--color-primary-hover, #ea580c);
 	}
 
 	.lede {
 		font-size: 18px;
-		color: #4b4b52;
+		color: var(--color-text-secondary);
 		max-width: 520px;
 	}
 
 	.back-link {
-		color: #1b1b1f;
+		color: var(--color-text);
 		text-decoration: none;
 		padding: 10px 16px;
 		border-radius: 999px;
-		border: 1px solid rgba(27, 27, 31, 0.12);
+		border: 1px solid var(--color-border-light);
 		background: rgba(255, 255, 255, 0.6);
 		font-weight: 600;
+		font-size: 14px;
 		transition: all 150ms ease;
 	}
 
@@ -396,19 +391,21 @@
 	}
 
 	.planner__panel {
-		background: white;
-		border-radius: 20px;
+		background: var(--color-bg);
+		border-radius: var(--radius-lg);
 		padding: 28px;
-		box-shadow: 0 20px 60px rgba(30, 30, 40, 0.08);
+		border: 1px solid var(--color-border-light);
+		box-shadow: 0 20px 60px rgba(30, 30, 40, 0.06);
 		margin-bottom: 28px;
 		display: grid;
 		gap: 24px;
 	}
 
 	.panel__intro h2 {
-		font-family: 'Space Grotesk', sans-serif;
 		margin: 0 0 8px;
 		font-size: 22px;
+		font-weight: 700;
+		letter-spacing: -0.02em;
 	}
 
 	.panel__inputs {
@@ -421,10 +418,10 @@
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
-		background: #f9f7f3;
-		border-radius: 16px;
+		background: var(--color-bg-subtle);
+		border-radius: var(--radius-md);
 		padding: 16px;
-		border: 1px solid rgba(27, 27, 31, 0.08);
+		border: 1px solid var(--color-border-light);
 	}
 
 	.input-card span {
@@ -434,17 +431,17 @@
 
 	.input-card input {
 		border: none;
-		background: white;
+		background: var(--color-bg);
 		padding: 12px 14px;
-		border-radius: 12px;
+		border-radius: var(--radius-md);
 		font-size: 14px;
 		font-family: inherit;
-		box-shadow: inset 0 0 0 1px rgba(27, 27, 31, 0.12);
+		box-shadow: inset 0 0 0 1px var(--color-border-light);
 	}
 
 	.input-card em {
 		font-size: 12px;
-		color: #6a6a72;
+		color: var(--color-text-muted);
 	}
 
 	.focus-picker span {
@@ -460,10 +457,10 @@
 	}
 
 	.focus-grid button {
-		border: 1px solid rgba(27, 27, 31, 0.1);
-		border-radius: 16px;
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-md);
 		padding: 12px;
-		background: white;
+		background: var(--color-bg);
 		text-align: left;
 		cursor: pointer;
 		transition: all 150ms ease;
@@ -474,18 +471,18 @@
 	}
 
 	.focus-grid button.active {
-		background: #ffedd6;
-		border-color: rgba(255, 156, 88, 0.6);
-		box-shadow: 0 12px 24px rgba(255, 156, 88, 0.2);
+		background: rgba(249, 115, 22, 0.08);
+		border-color: rgba(249, 115, 22, 0.4);
+		box-shadow: 0 8px 20px rgba(249, 115, 22, 0.12);
 	}
 
 	.focus-grid button strong {
 		font-size: 14px;
-		font-family: 'Space Grotesk', sans-serif;
+		font-weight: 600;
 	}
 
 	.focus-grid button small {
-		color: #6a6a72;
+		color: var(--color-text-muted);
 		font-size: 12px;
 	}
 
@@ -498,10 +495,10 @@
 
 	.task-board {
 		background: rgba(255, 255, 255, 0.8);
-		border-radius: 20px;
+		border-radius: var(--radius-lg);
 		padding: 24px;
-		border: 1px solid rgba(27, 27, 31, 0.08);
-		box-shadow: 0 20px 50px rgba(20, 20, 30, 0.08);
+		border: 1px solid var(--color-border-light);
+		box-shadow: 0 20px 50px rgba(20, 20, 30, 0.06);
 	}
 
 	.task-board__header {
@@ -517,12 +514,13 @@
 	}
 
 	.task-board__controls button {
-		border: 1px solid rgba(27, 27, 31, 0.1);
-		background: white;
+		border: 1px solid var(--color-border-light);
+		background: var(--color-bg);
 		border-radius: 999px;
 		padding: 6px 12px;
 		font-size: 12px;
 		cursor: pointer;
+		font-weight: 500;
 	}
 
 	.task-board__list {
@@ -531,11 +529,11 @@
 	}
 
 	.task-card {
-		border-radius: 16px;
+		border-radius: var(--radius-md);
 		padding: 16px;
-		border: 1px solid rgba(27, 27, 31, 0.08);
-		background: white;
-		box-shadow: 0 10px 30px rgba(30, 30, 40, 0.08);
+		border: 1px solid var(--color-border-light);
+		background: var(--color-bg);
+		box-shadow: 0 4px 12px rgba(30, 30, 40, 0.04);
 		display: grid;
 		gap: 10px;
 		animation: rise 450ms ease forwards;
@@ -549,18 +547,18 @@
 	}
 
 	.task-card input {
-		accent-color: #f26d3d;
+		accent-color: var(--color-primary);
 	}
 
 	.task-card h4 {
 		margin: 0;
-		font-family: 'Space Grotesk', sans-serif;
-		font-size: 18px;
+		font-size: 16px;
+		font-weight: 600;
 	}
 
 	.task-card p {
 		margin: 0;
-		color: #5c5c64;
+		color: var(--color-text-muted);
 		font-size: 14px;
 	}
 
@@ -568,16 +566,16 @@
 		display: flex;
 		gap: 12px;
 		font-size: 12px;
-		color: #7c7c86;
+		color: var(--color-text-faint);
 	}
 
 	.tag {
 		font-size: 11px;
 		font-weight: 600;
-		background: #ffe6cc;
+		background: rgba(249, 115, 22, 0.1);
 		padding: 4px 8px;
 		border-radius: 999px;
-		color: #8a4f00;
+		color: var(--color-primary-hover);
 	}
 
 	.summary {
@@ -586,23 +584,23 @@
 	}
 
 	.summary__card {
-		background: #1b1b1f;
+		background: var(--color-text);
 		color: white;
-		border-radius: 18px;
+		border-radius: var(--radius-lg);
 		padding: 20px;
 		box-shadow: 0 20px 60px rgba(20, 20, 30, 0.2);
 	}
 
 	.summary__card:nth-child(2) {
-		background: white;
-		color: #1b1b1f;
-		border: 1px solid rgba(27, 27, 31, 0.08);
-		box-shadow: 0 20px 40px rgba(20, 20, 30, 0.08);
+		background: var(--color-bg);
+		color: var(--color-text);
+		border: 1px solid var(--color-border-light);
+		box-shadow: 0 20px 40px rgba(20, 20, 30, 0.06);
 	}
 
 	.summary__card h3 {
 		margin: 0 0 12px;
-		font-family: 'Space Grotesk', sans-serif;
+		font-weight: 600;
 	}
 
 	.meter {
@@ -614,12 +612,12 @@
 	}
 
 	.summary__card:nth-child(2) .meter {
-		background: rgba(27, 27, 31, 0.08);
+		background: var(--color-bg-muted);
 	}
 
 	.meter__fill {
 		height: 100%;
-		background: linear-gradient(90deg, #ff9c58, #ff5d5d);
+		background: linear-gradient(90deg, var(--color-primary), var(--color-danger));
 		border-radius: 999px;
 		transition: width 200ms ease;
 	}
@@ -634,7 +632,7 @@
 	.summary__stats strong {
 		display: block;
 		font-size: 20px;
-		font-family: 'Space Grotesk', sans-serif;
+		font-family: var(--font-mono);
 	}
 
 	.summary__stats span {
@@ -643,7 +641,7 @@
 	}
 
 	.summary__card:nth-child(2) .summary__stats span {
-		color: #5c5c64;
+		color: var(--color-text-muted);
 	}
 
 	.summary__note {
@@ -659,17 +657,21 @@
 
 	.summary__actions button {
 		border: none;
-		border-radius: 999px;
+		border-radius: var(--radius-sm);
 		padding: 10px 16px;
 		font-size: 14px;
 		font-weight: 600;
 		cursor: pointer;
-		background: #f1f1f4;
+		background: var(--color-bg-muted);
 	}
 
 	.summary__actions button.primary {
-		background: #1b1b1f;
+		background: var(--color-primary);
 		color: white;
+	}
+
+	.summary__actions button.primary:hover {
+		background: var(--color-primary-hover);
 	}
 
 	@keyframes rise {

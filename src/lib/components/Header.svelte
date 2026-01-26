@@ -121,20 +121,24 @@
 
 <style>
 	.header {
-		border-bottom: 0.5px solid rgba(15, 23, 42, 0.08);
-		background: #fff;
+		border-bottom: 1px solid var(--color-border-light, rgba(15, 23, 42, 0.06));
+		background: var(--color-bg, #fff);
 		position: sticky;
 		top: 0;
 		z-index: 100;
+		height: 56px;
+		display: flex;
+		align-items: center;
 	}
 
 	.header-content {
 		max-width: 1200px;
 		margin: 0 auto;
-		padding: 12px 20px;
+		padding: 0 20px;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		width: 100%;
 	}
 
 	.header-left {
@@ -146,7 +150,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 8px;
-		color: #0f172a;
+		color: var(--color-text, #0f172a);
 		text-decoration: none;
 		font-size: 15px;
 		font-weight: 600;
@@ -154,14 +158,14 @@
 	}
 
 	.logo:hover {
-		color: #1162d4;
+		color: var(--color-primary, #f97316);
 	}
 
 	.back-link {
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
-		color: #64748b;
+		color: var(--color-text-muted, #64748b);
 		text-decoration: none;
 		font-size: 13px;
 		font-weight: 500;
@@ -169,7 +173,7 @@
 	}
 
 	.back-link:hover {
-		color: #1162d4;
+		color: var(--color-primary, #f97316);
 	}
 
 	.header-nav {
@@ -179,7 +183,7 @@
 	}
 
 	.nav-link {
-		color: #64748b;
+		color: var(--color-text-muted, #64748b);
 		text-decoration: none;
 		font-size: 13px;
 		font-weight: 500;
@@ -187,16 +191,16 @@
 	}
 
 	.nav-link:hover {
-		color: #0f172a;
+		color: var(--color-text, #0f172a);
 	}
 
-	/* Sign in button */
+	/* Sign in button — orange accent for CTA consistency */
 	.sign-in-button {
-		background: #0f172a;
+		background: var(--color-primary, #f97316);
 		color: #fff;
 		border: none;
-		border-radius: 6px;
-		padding: 6px 12px;
+		border-radius: var(--radius-sm, 6px);
+		padding: 8px 16px;
 		font-size: 13px;
 		font-weight: 500;
 		cursor: pointer;
@@ -204,7 +208,7 @@
 	}
 
 	.sign-in-button:hover:not(:disabled) {
-		background: #1e293b;
+		background: var(--color-primary-hover, #ea580c);
 	}
 
 	.sign-in-button:disabled {
@@ -222,15 +226,15 @@
 		align-items: center;
 		gap: 8px;
 		background: none;
-		border: 1px solid rgba(15, 23, 42, 0.1);
-		border-radius: 6px;
-		padding: 4px 10px 4px 4px;
+		border: 1px solid var(--color-border-light, rgba(15, 23, 42, 0.06));
+		border-radius: var(--radius-sm, 6px);
+		padding: 4px 12px 4px 4px;
 		cursor: pointer;
 		transition: border-color 150ms ease;
 	}
 
 	.user-button:hover {
-		border-color: rgba(15, 23, 42, 0.2);
+		border-color: var(--color-border, #e2e8f0);
 	}
 
 	.avatar {
@@ -244,17 +248,17 @@
 		width: 24px;
 		height: 24px;
 		border-radius: 50%;
-		background: #e2e8f0;
+		background: var(--color-bg-muted, #f1f5f9);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: #64748b;
+		color: var(--color-text-muted, #64748b);
 	}
 
 	.user-name {
 		font-size: 13px;
 		font-weight: 500;
-		color: #0f172a;
+		color: var(--color-text, #0f172a);
 		max-width: 120px;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -271,12 +275,12 @@
 	}
 
 	.plan-badge.pro {
-		background: linear-gradient(135deg, #1162d4 0%, #0891b2 100%);
+		background: linear-gradient(135deg, var(--color-primary, #f97316) 0%, var(--color-primary-hover, #ea580c) 100%);
 		color: #fff;
 	}
 
 	:global(.caret) {
-		color: #64748b;
+		color: var(--color-text-muted, #64748b);
 	}
 
 	/* Dropdown */
@@ -284,9 +288,9 @@
 		position: absolute;
 		top: calc(100% + 4px);
 		right: 0;
-		background: #fff;
-		border: 1px solid rgba(15, 23, 42, 0.1);
-		border-radius: 8px;
+		background: var(--color-bg, #fff);
+		border: 1px solid var(--color-border-light, rgba(15, 23, 42, 0.06));
+		border-radius: var(--radius-md, 10px);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 		min-width: 160px;
 		padding: 4px;
@@ -297,12 +301,12 @@
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		padding: 8px 10px;
+		padding: 8px 12px;
 		font-size: 13px;
 		font-weight: 500;
-		color: #0f172a;
+		color: var(--color-text, #0f172a);
 		text-decoration: none;
-		border-radius: 4px;
+		border-radius: var(--radius-sm, 6px);
 		border: none;
 		background: none;
 		width: 100%;
@@ -311,12 +315,12 @@
 	}
 
 	.dropdown-item:hover {
-		background: #f1f5f9;
+		background: var(--color-bg-muted, #f1f5f9);
 	}
 
 	.dropdown-divider {
 		height: 1px;
-		background: rgba(15, 23, 42, 0.08);
+		background: var(--color-border-light, rgba(15, 23, 42, 0.06));
 		margin: 4px 0;
 	}
 </style>

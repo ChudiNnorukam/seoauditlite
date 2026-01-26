@@ -124,7 +124,7 @@
 <style>
 	.page {
 		min-height: 100vh;
-		background: #f8fafc;
+		background: var(--color-bg-subtle);
 	}
 
 	.legal-page {
@@ -134,23 +134,23 @@
 	}
 
 	.legal-card {
-		background: white;
-		border: 0.5px solid rgba(15, 23, 42, 0.08);
-		border-radius: 12px;
+		background: var(--color-bg);
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-lg);
 		padding: 40px;
 	}
 
 	h1 {
 		font-size: 28px;
 		font-weight: 700;
-		color: #0f172a;
+		color: var(--color-text);
 		margin: 0 0 4px 0;
 		letter-spacing: -0.02em;
 	}
 
 	.updated {
 		font-size: 13px;
-		color: #94a3b8;
+		color: var(--color-text-faint);
 		margin: 0 0 32px 0;
 	}
 
@@ -161,7 +161,7 @@
 	h2 {
 		font-size: 17px;
 		font-weight: 600;
-		color: #0f172a;
+		color: var(--color-text);
 		margin: 0 0 12px 0;
 		letter-spacing: -0.01em;
 	}
@@ -169,13 +169,13 @@
 	h3 {
 		font-size: 15px;
 		font-weight: 600;
-		color: #334155;
+		color: var(--color-text-secondary);
 		margin: 16px 0 8px 0;
 	}
 
 	p {
 		font-size: 14px;
-		color: #475569;
+		color: var(--color-text-secondary);
 		line-height: 1.7;
 		margin: 0 0 12px 0;
 	}
@@ -188,13 +188,13 @@
 
 	li {
 		font-size: 14px;
-		color: #475569;
+		color: var(--color-text-secondary);
 		line-height: 1.7;
 		padding: 3px 0;
 	}
 
 	li strong {
-		color: #0f172a;
+		color: var(--color-text);
 	}
 
 	.back-link {
@@ -203,14 +203,14 @@
 	}
 
 	.back-link a {
-		color: #f97316;
+		color: var(--color-primary);
 		font-weight: 500;
 		font-size: 14px;
 		text-decoration: none;
 	}
 
 	.back-link a:hover {
-		color: #ea580c;
+		color: var(--color-primary-hover);
 	}
 
 	@media (max-width: 640px) {

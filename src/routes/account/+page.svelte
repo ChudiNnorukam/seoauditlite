@@ -127,8 +127,8 @@
 
 <style>
 	.page {
-		min-height: calc(100vh - 48px);
-		background: #fafbfc;
+		min-height: calc(100vh - 56px);
+		background: var(--color-bg-subtle);
 	}
 
 	.container {
@@ -146,20 +146,20 @@
 		font-size: 24px;
 		font-weight: 700;
 		letter-spacing: -0.02em;
-		color: #0f172a;
+		color: var(--color-text);
 	}
 
 	.subtitle {
 		margin: 0;
 		font-size: 14px;
-		color: #64748b;
+		color: var(--color-text-muted);
 	}
 
 	/* Card */
 	.card {
-		background: #fff;
-		border: 1px solid rgba(15, 23, 42, 0.08);
-		border-radius: 12px;
+		background: var(--color-bg);
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-md);
 		padding: 20px;
 		margin-bottom: 16px;
 	}
@@ -169,14 +169,14 @@
 		align-items: center;
 		gap: 10px;
 		margin-bottom: 16px;
-		color: #64748b;
+		color: var(--color-text-muted);
 	}
 
 	.card-header h2 {
 		margin: 0;
 		font-size: 14px;
 		font-weight: 600;
-		color: #0f172a;
+		color: var(--color-text);
 	}
 
 	/* Profile */
@@ -197,8 +197,8 @@
 		width: 56px;
 		height: 56px;
 		border-radius: 50%;
-		background: #f1f5f9;
-		color: #64748b;
+		background: var(--color-bg-muted);
+		color: var(--color-text-muted);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -212,13 +212,13 @@
 		margin: 0 0 4px 0;
 		font-size: 16px;
 		font-weight: 600;
-		color: #0f172a;
+		color: var(--color-text);
 	}
 
 	.profile-email {
 		margin: 0;
 		font-size: 14px;
-		color: #64748b;
+		color: var(--color-text-muted);
 	}
 
 	/* Plan Info */
@@ -229,7 +229,7 @@
 	.plan-badge {
 		display: inline-block;
 		padding: 4px 10px;
-		border-radius: 6px;
+		border-radius: var(--radius-sm);
 		font-size: 12px;
 		font-weight: 600;
 		text-transform: uppercase;
@@ -238,19 +238,19 @@
 	}
 
 	.plan-badge.free {
-		background: #f1f5f9;
-		color: #64748b;
+		background: var(--color-bg-muted);
+		color: var(--color-text-muted);
 	}
 
 	.plan-badge.pro {
-		background: linear-gradient(135deg, #1162d4 0%, #0891b2 100%);
+		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
 		color: #fff;
 	}
 
 	.plan-description {
 		margin: 0;
 		font-size: 14px;
-		color: #64748b;
+		color: var(--color-text-muted);
 		line-height: 1.5;
 	}
 
@@ -267,7 +267,7 @@
 		justify-content: center;
 		gap: 8px;
 		padding: 10px 18px;
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		font-size: 14px;
 		font-weight: 600;
 		cursor: pointer;
@@ -281,7 +281,7 @@
 	}
 
 	.button.primary {
-		background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
 		color: #fff;
 	}
 
@@ -291,19 +291,19 @@
 	}
 
 	.button.secondary {
-		background: #fff;
-		border: 1px solid rgba(15, 23, 42, 0.15);
-		color: #0f172a;
+		background: var(--color-bg);
+		border: 1px solid var(--color-border);
+		color: var(--color-text);
 	}
 
 	.button.secondary:hover:not(:disabled) {
-		border-color: rgba(15, 23, 42, 0.25);
-		background: #f8fafc;
+		border-color: var(--color-text-muted);
+		background: var(--color-bg-subtle);
 	}
 
 	.error {
 		margin: 0;
 		font-size: 13px;
-		color: #dc2626;
+		color: var(--color-danger);
 	}
 </style>

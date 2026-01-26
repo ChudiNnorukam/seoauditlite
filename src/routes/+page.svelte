@@ -1,15 +1,35 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
-	import { MagnifyingGlass, Robot, FileText, Code, TextAlignLeft, Tag, ListChecks, Lightning, ArrowRight } from 'phosphor-svelte';
+	import { MagnifyingGlass, Robot, FileText, Code, TextAlignLeft, Tag, ListChecks, Lightning, ArrowRight, CaretDown } from 'phosphor-svelte';
 
 	let { data } = $props();
 
 	let domain = $state('');
 	let loading = $state(false);
 	let error = $state('');
+	let openFaq = $state<number | null>(null);
 
 	// Animated counter for social proof
 	let auditCount = 2847;
+
+	const faqs = [
+		{
+			question: 'How accurate is the audit?',
+			answer: 'We check the same signals AI crawlers use — robots.txt directives, structured data, llms.txt, semantic HTML, and metadata. Results reflect real crawl behavior, not guesswork.'
+		},
+		{
+			question: 'What is AEO?',
+			answer: 'Answer Engine Optimization (AEO) is the practice of making your site visible and quotable by AI search engines like Perplexity, ChatGPT, and Claude — the next generation of search.'
+		},
+		{
+			question: 'Is my data stored?',
+			answer: 'Free audits are stored for 7 days. Pro audits are retained for 30 days. We never sell your data or share it with third parties beyond our infrastructure providers.'
+		}
+	];
+
+	function toggleFaq(index: number) {
+		openFaq = openFaq === index ? null : index;
+	}
 
 	async function handleAudit(e: Event) {
 		e.preventDefault();
@@ -87,7 +107,7 @@
 <Header user={data.user} plan={data.plan} />
 
 <div class="page">
-	<!-- Hero Section with Gradient -->
+	<!-- Hero Section -->
 	<section class="hero">
 		<div class="hero-content">
 			<div class="social-proof">
@@ -97,7 +117,7 @@
 
 			<h1 class="headline">
 				Know your<br />
-				<span class="gradient-text">AI search readiness.</span>
+				<span class="accent-text">AI search readiness.</span>
 			</h1>
 			<p class="subheadline">Free AEO audit in 2 minutes. See how Perplexity, ChatGPT, and Claude see your site.</p>
 
@@ -129,55 +149,51 @@
 			<div class="stats">
 				<div class="stat">
 					<span class="number">60%</span>
-					<span class="label">of sites invisible to AI</span>
+					<span class="stat-label">of sites invisible to AI</span>
 				</div>
 				<div class="stat-divider"></div>
 				<div class="stat">
 					<span class="number">30%</span>
-					<span class="label">of searches now AI-first</span>
+					<span class="stat-label">of searches now AI-first</span>
 				</div>
 			</div>
 			<p class="stats-source">Based on Gartner & Sparktoro 2024 research</p>
 		</div>
 	</section>
 
-	<!-- How It Works -->
-	<section class="how-it-works">
+	<!-- The 6 AEO Checks -->
+	<section class="checks-section">
 		<h2>The 6 AEO Checks</h2>
 		<p class="section-subtitle">What we analyze to score your AI readiness</p>
 
-		<!-- Hero Card -->
-		<div class="hero-card">
-			<div class="hero-card-icon"><Robot size={28} weight="duotone" /></div>
-			<div class="hero-card-content">
+		<div class="checks-grid">
+			<div class="check-card">
+				<div class="check-icon orange"><Robot size={20} weight="duotone" /></div>
 				<h3>AI Crawler Access</h3>
-				<p>Does your robots.txt allow GPTBot, ClaudeBot, and PerplexityBot to crawl your content? This is the #1 reason sites are invisible to AI search.</p>
+				<p>Does your robots.txt allow GPTBot, ClaudeBot, and PerplexityBot to crawl your content?</p>
 			</div>
-		</div>
-
-		<div class="grid">
-			<div class="card">
-				<div class="card-icon"><FileText size={20} weight="duotone" /></div>
+			<div class="check-card">
+				<div class="check-icon"><FileText size={20} weight="duotone" /></div>
 				<h3>llms.txt</h3>
 				<p>The new robots.txt for AI — tells engines what content matters most</p>
 			</div>
-			<div class="card">
-				<div class="card-icon"><Code size={20} weight="duotone" /></div>
+			<div class="check-card">
+				<div class="check-icon"><Code size={20} weight="duotone" /></div>
 				<h3>Structured Data</h3>
 				<p>JSON-LD schema quality and completeness for rich AI answers</p>
 			</div>
-			<div class="card">
-				<div class="card-icon"><TextAlignLeft size={20} weight="duotone" /></div>
+			<div class="check-card">
+				<div class="check-icon"><TextAlignLeft size={20} weight="duotone" /></div>
 				<h3>Extractability</h3>
 				<p>Semantic HTML structure that AI can parse and quote</p>
 			</div>
-			<div class="card">
-				<div class="card-icon"><Tag size={20} weight="duotone" /></div>
+			<div class="check-card">
+				<div class="check-icon"><Tag size={20} weight="duotone" /></div>
 				<h3>AI Metadata</h3>
 				<p>Canonical URLs, OG tags, publish dates AI engines trust</p>
 			</div>
-			<div class="card">
-				<div class="card-icon"><ListChecks size={20} weight="duotone" /></div>
+			<div class="check-card">
+				<div class="check-icon"><ListChecks size={20} weight="duotone" /></div>
 				<h3>Answer Format</h3>
 				<p>FAQ/HowTo schema + bulleted lists AI loves to cite</p>
 			</div>
@@ -192,8 +208,26 @@
 			<div class="micro-card">
 				<h3>AEO Quick Wins Planner</h3>
 				<p>Build a prioritized plan, score impact vs effort, and export your sprint list.</p>
-				<a class="micro-link" href="/planner">Open planner</a>
+				<a class="micro-link" href="/planner">Open planner <ArrowRight size={12} weight="bold" /></a>
 			</div>
+		</div>
+	</section>
+
+	<!-- FAQ -->
+	<section class="faq-section">
+		<h2>Frequently Asked Questions</h2>
+		<div class="faq-list">
+			{#each faqs as faq, i}
+				<button class="faq-item" class:open={openFaq === i} onclick={() => toggleFaq(i)} type="button">
+					<div class="faq-question">
+						<span>{faq.question}</span>
+						<CaretDown size={16} weight="bold" class="faq-caret" />
+					</div>
+					{#if openFaq === i}
+						<p class="faq-answer">{faq.answer}</p>
+					{/if}
+				</button>
+			{/each}
 		</div>
 	</section>
 
@@ -209,6 +243,7 @@
 					<li>Full AEO score</li>
 					<li>No signup</li>
 				</ul>
+				<a href="/#" class="pricing-cta secondary" onclick={(e) => { e.preventDefault(); (document.querySelector('.audit-form input') as HTMLInputElement | null)?.focus(); }}>Start Free</a>
 			</div>
 			<div class="pricing-card featured">
 				<span class="badge">Popular</span>
@@ -219,16 +254,22 @@
 					<li>30-day history</li>
 					<li>PDF export</li>
 				</ul>
+				<a href="/account" class="pricing-cta primary">Go Pro <ArrowRight size={14} weight="bold" /></a>
 			</div>
 		</div>
 	</section>
 
 	<!-- Footer -->
 	<footer class="footer">
+		<hr class="footer-rule" />
 		<div class="footer-content">
 			<p class="footer-brand">SEOAuditLite</p>
 			<p class="footer-tagline">Know your AI search readiness</p>
 			<div class="footer-links">
+				<a href="/privacy">Privacy</a>
+				<span class="divider">|</span>
+				<a href="/terms">Terms</a>
+				<span class="divider">|</span>
 				<a href="/llms.txt">llms.txt</a>
 				<span class="divider">|</span>
 				<a href="/sitemap.xml">Sitemap</a>
@@ -241,23 +282,15 @@
 </div>
 
 <style>
-	:global(body) {
-		margin: 0;
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-		background: #fff;
-		color: #0f172a;
-		-webkit-font-smoothing: antialiased;
-	}
-
 	.page {
 		max-width: 1200px;
 		margin: 0 auto;
 	}
 
-	/* Hero with Gradient */
+	/* Hero */
 	.hero {
-		background: linear-gradient(135deg, #fef3f2 0%, #fef9f0 25%, #f0f9ff 50%, #f5f3ff 100%);
-		padding: 56px 20px 64px;
+		background: #fefcf9;
+		padding: 64px 24px;
 		text-align: center;
 		position: relative;
 		overflow: hidden;
@@ -266,11 +299,12 @@
 	.hero::before {
 		content: '';
 		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(251, 146, 60, 0.12) 0%, transparent 50%);
+		top: -40%;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 600px;
+		height: 600px;
+		background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 70%);
 		pointer-events: none;
 	}
 
@@ -285,17 +319,17 @@
 		align-items: center;
 		gap: 6px;
 		padding: 6px 12px;
-		background: rgba(251, 146, 60, 0.1);
-		border: 1px solid rgba(251, 146, 60, 0.2);
+		background: rgba(249, 115, 22, 0.08);
+		border: 1px solid rgba(249, 115, 22, 0.15);
 		border-radius: 20px;
 		font-size: 12px;
-		color: #c2410c;
+		color: var(--color-primary-hover, #ea580c);
 		margin-bottom: 24px;
 	}
 
 	.social-proof strong {
 		font-weight: 600;
-		font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+		font-family: var(--font-mono);
 	}
 
 	.headline {
@@ -304,19 +338,16 @@
 		line-height: 1.1;
 		letter-spacing: -0.03em;
 		font-weight: 700;
-		color: #0f172a;
+		color: var(--color-text);
 	}
 
-	.gradient-text {
-		background: linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
+	.accent-text {
+		color: var(--color-primary);
 	}
 
 	.subheadline {
 		font-size: 17px;
-		color: #64748b;
+		color: var(--color-text-muted);
 		margin: 0 0 36px 0;
 		max-width: 480px;
 		margin-left: auto;
@@ -339,18 +370,18 @@
 	input {
 		flex: 1;
 		padding: 14px 18px;
-		border: 1px solid rgba(15, 23, 42, 0.1);
-		border-radius: 8px;
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-md);
 		font-size: 15px;
 		min-width: 200px;
-		background: #fff;
+		background: var(--color-bg);
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 		transition: border-color 150ms ease, box-shadow 150ms ease;
 	}
 
 	input:focus {
 		outline: none;
-		border-color: #f97316;
+		border-color: var(--color-primary);
 		box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 	}
 
@@ -359,10 +390,10 @@
 		align-items: center;
 		gap: 8px;
 		padding: 14px 24px;
-		background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
 		color: white;
 		border: none;
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		font-size: 15px;
 		font-weight: 600;
 		cursor: pointer;
@@ -386,7 +417,7 @@
 	}
 
 	.error {
-		color: #dc2626;
+		color: var(--color-danger);
 		font-size: 13px;
 		margin: 12px 0 0 0;
 	}
@@ -398,8 +429,8 @@
 		gap: 20px;
 		padding: 12px 24px;
 		background: rgba(255, 255, 255, 0.8);
-		border: 1px solid rgba(15, 23, 42, 0.06);
-		border-radius: 8px;
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-md);
 		backdrop-filter: blur(8px);
 	}
 
@@ -417,30 +448,30 @@
 		display: block;
 		font-size: 28px;
 		font-weight: 700;
-		color: #0f172a;
+		color: var(--color-text);
 		margin-bottom: 2px;
-		font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+		font-family: var(--font-mono);
 		font-variant-numeric: tabular-nums;
 	}
 
-	.label {
+	.stat-label {
 		display: block;
 		font-size: 12px;
-		color: #64748b;
+		color: var(--color-text-muted);
 	}
 
 	.stats-source {
 		margin: 12px 0 0 0;
 		font-size: 11px;
-		color: #94a3b8;
+		color: var(--color-text-faint);
 	}
 
-	/* Section Styling */
-	.how-it-works {
-		padding: 64px 20px;
+	/* Checks Section (6 cards grid) */
+	.checks-section {
+		padding: 64px 24px;
 	}
 
-	.how-it-works h2 {
+	.checks-section h2 {
 		text-align: center;
 		margin-bottom: 8px;
 		font-size: 24px;
@@ -450,117 +481,67 @@
 
 	.section-subtitle {
 		text-align: center;
-		color: #64748b;
+		color: var(--color-text-muted);
 		font-size: 14px;
 		margin: 0 0 32px 0;
 	}
 
-	/* Hero Feature Card */
-	.hero-card {
-		display: flex;
-		align-items: flex-start;
-		gap: 16px;
-		padding: 20px 24px;
-		background: linear-gradient(135deg, #fef3f2 0%, #fff7ed 100%);
-		border: 1px solid rgba(249, 115, 22, 0.15);
-		border-radius: 12px;
-		margin-bottom: 16px;
-		text-align: left;
-		max-width: 640px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	.hero-card-icon {
-		width: 48px;
-		height: 48px;
-		border-radius: 10px;
-		background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-		color: white;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-	}
-
-	.hero-card-content h3 {
-		margin: 0 0 6px 0;
-		font-size: 16px;
-		font-weight: 600;
-		color: #0f172a;
-	}
-
-	.hero-card-content p {
-		margin: 0;
-		font-size: 14px;
-		color: #64748b;
-		line-height: 1.5;
-	}
-
-	.grid {
+	.checks-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-		gap: 12px;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 16px;
 		max-width: 900px;
 		margin: 0 auto;
 	}
 
-	.card {
+	.check-card {
 		padding: 20px;
-		border: 1px solid rgba(15, 23, 42, 0.06);
-		border-radius: 10px;
-		background: #fff;
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-md);
+		background: var(--color-bg);
 		transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
 	}
 
-	.card:hover {
+	.check-card:hover {
 		transform: translateY(-2px);
-		border-color: rgba(15, 23, 42, 0.1);
+		border-color: var(--color-border);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 	}
 
-	.card-icon {
+	.check-icon {
 		width: 36px;
 		height: 36px;
-		border-radius: 8px;
-		background: #f8fafc;
-		color: #64748b;
+		border-radius: var(--radius-sm);
+		background: var(--color-bg-subtle);
+		color: var(--color-text-muted);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		margin-bottom: 14px;
 	}
 
-	.card h3 {
+	.check-icon.orange {
+		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+		color: white;
+	}
+
+	.check-card h3 {
 		margin: 0 0 8px 0;
 		font-size: 14px;
 		font-weight: 600;
 	}
 
-	.card p {
+	.check-card p {
 		margin: 0;
 		font-size: 13px;
-		color: #64748b;
+		color: var(--color-text-muted);
 		line-height: 1.5;
 	}
 
-	.pricing {
-		padding: 48px 20px;
-		background: #f8fafc;
-		border-top: 0.5px solid rgba(15, 23, 42, 0.08);
-	}
-
-	.pricing h2 {
-		text-align: center;
-		margin-bottom: 28px;
-		font-size: 20px;
-		font-weight: 600;
-		letter-spacing: -0.01em;
-	}
-
+	/* Micro Apps */
 	.micro-apps {
-		padding: 48px 20px;
-		border-top: 0.5px solid rgba(15, 23, 42, 0.08);
+		padding: 64px 24px;
+		border-top: 1px solid var(--color-border-light);
 		text-align: center;
 	}
 
@@ -573,7 +554,7 @@
 
 	.section-lede {
 		margin: 0 0 24px 0;
-		color: #64748b;
+		color: var(--color-text-muted);
 		font-size: 14px;
 	}
 
@@ -586,9 +567,9 @@
 	}
 
 	.micro-card {
-		background: white;
-		border: 0.5px solid rgba(15, 23, 42, 0.08);
-		border-radius: 6px;
+		background: var(--color-bg);
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-md);
 		padding: 20px;
 		text-align: left;
 	}
@@ -601,20 +582,107 @@
 
 	.micro-card p {
 		margin: 0 0 16px 0;
-		color: #64748b;
+		color: var(--color-text-muted);
 		font-size: 13px;
 		line-height: 1.5;
 	}
 
 	.micro-link {
-		color: #1162d4;
+		color: var(--color-primary);
 		font-weight: 500;
 		text-decoration: none;
 		font-size: 13px;
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
 	}
 
 	.micro-link:hover {
-		text-decoration: underline;
+		color: var(--color-primary-hover);
+	}
+
+	/* FAQ Section */
+	.faq-section {
+		padding: 64px 24px;
+		border-top: 1px solid var(--color-border-light);
+	}
+
+	.faq-section h2 {
+		text-align: center;
+		font-size: 20px;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		margin-bottom: 24px;
+	}
+
+	.faq-list {
+		max-width: 640px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.faq-item {
+		width: 100%;
+		text-align: left;
+		background: var(--color-bg);
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-md);
+		padding: 16px 20px;
+		cursor: pointer;
+		transition: border-color 150ms ease;
+		font-family: inherit;
+	}
+
+	.faq-item:hover {
+		border-color: var(--color-border);
+	}
+
+	.faq-item.open {
+		border-color: rgba(249, 115, 22, 0.2);
+	}
+
+	.faq-question {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 12px;
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--color-text);
+	}
+
+	:global(.faq-caret) {
+		color: var(--color-text-muted);
+		flex-shrink: 0;
+		transition: transform 200ms ease;
+	}
+
+	.faq-item.open :global(.faq-caret) {
+		transform: rotate(180deg);
+	}
+
+	.faq-answer {
+		margin: 12px 0 0 0;
+		font-size: 13px;
+		color: var(--color-text-secondary);
+		line-height: 1.6;
+	}
+
+	/* Pricing */
+	.pricing {
+		padding: 64px 24px;
+		background: var(--color-bg-subtle);
+		border-top: 1px solid var(--color-border-light);
+	}
+
+	.pricing h2 {
+		text-align: center;
+		margin-bottom: 28px;
+		font-size: 20px;
+		font-weight: 600;
+		letter-spacing: -0.01em;
 	}
 
 	.pricing-grid {
@@ -626,26 +694,28 @@
 	}
 
 	.pricing-card {
-		padding: 20px;
-		border: 0.5px solid rgba(15, 23, 42, 0.08);
-		border-radius: 6px;
-		background: white;
+		padding: 24px;
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-md);
+		background: var(--color-bg);
 		position: relative;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.pricing-card.featured {
-		border-color: rgba(17, 98, 212, 0.3);
-		background: rgba(17, 98, 212, 0.02);
+		border-color: rgba(249, 115, 22, 0.3);
+		background: rgba(249, 115, 22, 0.02);
 	}
 
 	.badge {
 		position: absolute;
 		top: -10px;
 		right: 20px;
-		background: #1162d4;
+		background: var(--color-primary);
 		color: white;
 		padding: 4px 10px;
-		border-radius: 6px;
+		border-radius: var(--radius-sm);
 		font-size: 11px;
 		font-weight: 600;
 		letter-spacing: 0.02em;
@@ -661,38 +731,90 @@
 		margin: 0 0 16px 0;
 		font-size: 28px;
 		font-weight: 600;
-		color: #0f172a;
-		font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+		color: var(--color-text);
+		font-family: var(--font-mono);
 	}
 
 	.price span {
 		font-size: 13px;
 		font-weight: 400;
-		color: #64748b;
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		color: var(--color-text-muted);
+		font-family: var(--font-sans);
 	}
 
 	.pricing-card ul {
 		list-style: none;
-		margin: 0;
+		margin: 0 0 20px 0;
 		padding: 0;
+		flex: 1;
 	}
 
 	.pricing-card li {
 		padding: 8px 0;
 		font-size: 13px;
-		color: #475569;
-		border-bottom: 0.5px solid rgba(15, 23, 42, 0.06);
+		color: var(--color-text-secondary);
+		border-bottom: 1px solid var(--color-border-light);
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.pricing-card li::before {
+		content: '\2713';
+		color: var(--color-success);
+		font-weight: 700;
+		font-size: 12px;
 	}
 
 	.pricing-card li:last-child {
 		border-bottom: none;
 	}
 
+	.pricing-cta {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		padding: 10px 20px;
+		border-radius: var(--radius-sm);
+		font-size: 14px;
+		font-weight: 600;
+		text-decoration: none;
+		transition: transform 150ms ease, box-shadow 150ms ease;
+		cursor: pointer;
+	}
+
+	.pricing-cta.primary {
+		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+		color: white;
+		box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
+	}
+
+	.pricing-cta.primary:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+	}
+
+	.pricing-cta.secondary {
+		background: var(--color-bg);
+		color: var(--color-text);
+		border: 1px solid var(--color-border);
+	}
+
+	.pricing-cta.secondary:hover {
+		border-color: var(--color-text-muted);
+	}
+
+	/* Footer */
 	.footer {
-		padding: 32px 20px;
-		border-top: 0.5px solid rgba(15, 23, 42, 0.08);
-		background: #fafbfc;
+		padding: 40px 24px;
+		background: var(--color-bg-subtle);
+	}
+
+	.footer-rule {
+		border: none;
+		border-top: 1px solid var(--color-border);
+		margin: 0 0 32px 0;
 	}
 
 	.footer-content {
@@ -703,12 +825,12 @@
 		font-size: 14px;
 		font-weight: 600;
 		margin: 0 0 4px 0;
-		color: #0f172a;
+		color: var(--color-text);
 	}
 
 	.footer-tagline {
 		font-size: 12px;
-		color: #64748b;
+		color: var(--color-text-muted);
 		margin: 0 0 16px 0;
 	}
 
@@ -721,23 +843,23 @@
 	}
 
 	.footer-links a {
-		color: #64748b;
+		color: var(--color-text-muted);
 		text-decoration: none;
 		font-size: 12px;
 		transition: color 150ms ease;
 	}
 
 	.footer-links a:hover {
-		color: #1162d4;
+		color: var(--color-primary);
 	}
 
 	.footer-links .divider {
-		color: #e2e8f0;
+		color: var(--color-border);
 	}
 
 	.footer-copyright {
 		font-size: 11px;
-		color: #94a3b8;
+		color: var(--color-text-faint);
 		margin: 0;
 	}
 
@@ -775,13 +897,14 @@
 			margin: 12px 0;
 		}
 
-		.hero-card {
-			flex-direction: column;
-			text-align: center;
+		.checks-grid {
+			grid-template-columns: 1fr;
 		}
+	}
 
-		.hero-card-icon {
-			margin: 0 auto;
+	@media (min-width: 641px) and (max-width: 900px) {
+		.checks-grid {
+			grid-template-columns: repeat(2, 1fr);
 		}
 	}
 </style>
