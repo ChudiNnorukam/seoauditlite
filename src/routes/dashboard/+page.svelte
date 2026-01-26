@@ -148,18 +148,18 @@
 		align-items: center;
 		gap: 8px;
 		padding: 10px 18px;
-		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+		background: var(--color-primary);
 		color: #fff;
 		text-decoration: none;
 		border-radius: var(--radius-md);
 		font-size: 14px;
 		font-weight: 600;
-		transition: transform 150ms ease, box-shadow 150ms ease;
+		transition: transform 150ms ease, background 150ms ease;
 	}
 
 	.cta-button:hover {
 		transform: translateY(-1px);
-		box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+		background: var(--color-primary-hover);
 	}
 
 	/* Audits list */

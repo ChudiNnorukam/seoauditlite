@@ -243,7 +243,7 @@
 	}
 
 	.plan-badge.pro {
-		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+		background: var(--color-primary);
 		color: #fff;
 	}
 
@@ -281,13 +281,13 @@
 	}
 
 	.button.primary {
-		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+		background: var(--color-primary);
 		color: #fff;
 	}
 
 	.button.primary:hover:not(:disabled) {
 		transform: translateY(-1px);
-		box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+		background: var(--color-primary-hover);
 	}
 
 	.button.secondary {

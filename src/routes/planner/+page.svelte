@@ -323,7 +323,7 @@
 
 <style>
 	:global(body.planner-body) {
-		background: radial-gradient(circle at top, rgba(249, 115, 22, 0.06), var(--color-bg-subtle, #f8fafc) 40%, var(--color-bg, #fefefe) 100%);
+		background: var(--color-bg-subtle);
 		color: var(--color-text);
 	}
 
@@ -334,15 +334,6 @@
 		position: relative;
 	}
 
-	.planner::before {
-		content: '';
-		position: absolute;
-		inset: 0 0 auto auto;
-		width: 320px;
-		height: 320px;
-		background: radial-gradient(circle, rgba(249, 115, 22, 0.15), rgba(249, 115, 22, 0));
-		pointer-events: none;
-	}
 
 	.planner__header {
 		display: flex;
@@ -471,9 +462,9 @@
 	}
 
 	.focus-grid button.active {
-		background: rgba(249, 115, 22, 0.08);
-		border-color: rgba(249, 115, 22, 0.4);
-		box-shadow: 0 8px 20px rgba(249, 115, 22, 0.12);
+		background: rgba(17, 98, 212, 0.08);
+		border-color: rgba(17, 98, 212, 0.4);
+		box-shadow: 0 8px 20px rgba(17, 98, 212, 0.12);
 	}
 
 	.focus-grid button strong {
@@ -572,7 +563,7 @@
 	.tag {
 		font-size: 11px;
 		font-weight: 600;
-		background: rgba(249, 115, 22, 0.1);
+		background: rgba(17, 98, 212, 0.1);
 		padding: 4px 8px;
 		border-radius: 999px;
 		color: var(--color-primary-hover);
@@ -617,7 +608,7 @@
 
 	.meter__fill {
 		height: 100%;
-		background: linear-gradient(90deg, var(--color-primary), var(--color-danger));
+		background: var(--color-primary);
 		border-radius: 999px;
 		transition: width 200ms ease;
 	}

@@ -392,9 +392,9 @@
 		gap: 16px;
 		align-items: center;
 		padding: 16px;
-		border: 1px solid rgba(249, 115, 22, 0.2);
+		border: 1px solid rgba(17, 98, 212, 0.2);
 		border-radius: var(--radius-md);
-		background: rgba(249, 115, 22, 0.03);
+		background: rgba(17, 98, 212, 0.03);
 		margin-bottom: 24px;
 		flex-wrap: wrap;
 	}
@@ -419,12 +419,12 @@
 		padding: 10px 16px;
 		border: none;
 		border-radius: var(--radius-sm);
-		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+		background: var(--color-primary);
 		color: #fff;
 		font-size: 13px;
 		font-weight: 500;
 		cursor: pointer;
-		transition: transform 150ms ease, box-shadow 150ms ease;
+		transition: transform 150ms ease, background 150ms ease;
 	}
 
 	.upgrade-button:disabled {
@@ -434,7 +434,7 @@
 
 	.upgrade-button:hover:not(:disabled) {
 		transform: translateY(-1px);
-		box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+		background: var(--color-primary-hover);
 	}
 
 	.upgrade-error {
@@ -559,7 +559,7 @@
 		border-radius: var(--radius-sm);
 		font-size: 10px;
 		font-weight: 600;
-		background: rgba(249, 115, 22, 0.1);
+		background: rgba(17, 98, 212, 0.1);
 		color: var(--color-primary);
 		letter-spacing: 0.02em;
 	}

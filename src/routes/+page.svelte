@@ -202,7 +202,7 @@
 
 		<div class="checks-grid">
 			<div class="check-card">
-				<div class="check-icon orange"><Robot size={20} weight="duotone" /></div>
+				<div class="check-icon primary"><Robot size={20} weight="duotone" /></div>
 				<h3>AI Crawler Access</h3>
 				<p>Does your robots.txt allow GPTBot, ClaudeBot, and PerplexityBot to crawl your content?</p>
 			</div>
@@ -330,17 +330,6 @@
 		overflow: hidden;
 	}
 
-	.hero::before {
-		content: '';
-		position: absolute;
-		top: -40%;
-		left: 50%;
-		transform: translateX(-50%);
-		width: 600px;
-		height: 600px;
-		background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 70%);
-		pointer-events: none;
-	}
 
 	.hero-content {
 		position: relative;
@@ -416,7 +405,7 @@
 	input:focus {
 		outline: none;
 		border-color: var(--color-primary);
-		box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+		box-shadow: 0 0 0 3px rgba(17, 98, 212, 0.1);
 	}
 
 	.input-group button {
@@ -424,7 +413,7 @@
 		align-items: center;
 		gap: 8px;
 		padding: 14px 24px;
-		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+		background: var(--color-primary);
 		color: white;
 		border: none;
 		border-radius: var(--radius-md);
@@ -432,13 +421,12 @@
 		font-weight: 600;
 		cursor: pointer;
 		white-space: nowrap;
-		transition: transform 150ms ease, box-shadow 150ms ease;
-		box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
+		transition: transform 150ms ease, background 150ms ease;
 	}
 
 	.input-group button:hover:not(:disabled) {
 		transform: translateY(-1px);
-		box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+		background: var(--color-primary-hover);
 	}
 
 	.input-group button:active:not(:disabled) {
@@ -554,7 +542,7 @@
 		margin-bottom: 14px;
 	}
 
-	.check-icon.orange {
+	.check-icon.primary {
 		background: var(--color-primary);
 		color: white;
 	}
@@ -680,7 +668,7 @@
 	}
 
 	.faq-item.open {
-		border-color: rgba(249, 115, 22, 0.2);
+		border-color: rgba(17, 98, 212, 0.2);
 	}
 
 	.faq-question {
@@ -747,8 +735,8 @@
 	}
 
 	.pricing-card.featured {
-		border-color: rgba(249, 115, 22, 0.3);
-		background: rgba(249, 115, 22, 0.02);
+		border-color: rgba(17, 98, 212, 0.3);
+		background: rgba(17, 98, 212, 0.02);
 	}
 
 	.badge {
@@ -828,14 +816,13 @@
 	}
 
 	.pricing-cta.primary {
-		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+		background: var(--color-primary);
 		color: white;
-		box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
 	}
 
 	.pricing-cta.primary:hover {
 		transform: translateY(-1px);
-		box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+		background: var(--color-primary-hover);
 	}
 
 	.pricing-cta.secondary {
