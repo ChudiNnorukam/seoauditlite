@@ -312,7 +312,8 @@ async function checkExtractability(domain: string): Promise<AEOCheckType> {
     score += hasSemanticTags ? 5 : 0;
     score += headingHierarchyValid ? 5 : 0;
     score += textToHTMLRatio > 0.3 ? 5 : 0;
-    score += imagesWithAlt === imagesTotal && imagesTotal > 0 ? 5 : imagesWithAlt > 0 ? 2 : 0;
+    // Give full points if no images (nothing to fail on) or all images have alt text
+    score += imagesTotal === 0 ? 5 : (imagesWithAlt === imagesTotal ? 5 : imagesWithAlt > 0 ? 2 : 0);
 
     const status = score >= 15 ? 'pass' : score >= 10 ? 'warning' : 'fail';
 
