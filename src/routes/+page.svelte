@@ -800,7 +800,7 @@
 		justify-content: center;
 		gap: 6px;
 		padding: 12px 24px;
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius-md);
 		font-size: 14px;
 		font-weight: 600;
 		text-decoration: none;

@@ -459,6 +459,10 @@
 		font-family: inherit;
 	}
 
+	.focus-grid button:hover:not(.active) {
+		background: var(--color-bg-muted);
+	}
+
 	.focus-grid button.active {
 		background: rgba(17, 98, 212, 0.08);
 		border-color: rgba(17, 98, 212, 0.4);
@@ -509,6 +513,11 @@
 		font-size: 12px;
 		cursor: pointer;
 		font-weight: 500;
+		transition: background 150ms ease;
+	}
+
+	.task-board__controls button:hover {
+		background: var(--color-bg-muted);
 	}
 
 	.task-board__list {
@@ -525,6 +534,12 @@
 		gap: 10px;
 		animation: rise 450ms ease forwards;
 		opacity: 0;
+		transition: border-color 150ms ease;
+		cursor: pointer;
+	}
+
+	.task-card:hover {
+		border-color: var(--color-border);
 	}
 
 	.task-card__header {
@@ -648,6 +663,11 @@
 		font-weight: 600;
 		cursor: pointer;
 		background: var(--color-bg-muted);
+		transition: background 150ms ease;
+	}
+
+	.summary__actions button:hover:not(.primary) {
+		background: var(--color-bg-subtle);
 	}
 
 	.summary__actions button.primary {
