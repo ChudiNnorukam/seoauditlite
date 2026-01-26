@@ -345,7 +345,7 @@
 
 	.planner__header h1 {
 		font-size: 40px;
-		margin: 6px 0 12px;
+		margin: 8px 0 12px;
 		letter-spacing: -0.02em;
 		font-weight: 700;
 	}
@@ -378,7 +378,6 @@
 
 	.back-link:hover {
 		transform: translateY(-1px);
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 	}
 
 	.planner__panel {
@@ -386,7 +385,6 @@
 		border-radius: var(--radius-lg);
 		padding: 28px;
 		border: 1px solid var(--color-border-light);
-		box-shadow: 0 20px 60px rgba(30, 30, 40, 0.06);
 		margin-bottom: 28px;
 		display: grid;
 		gap: 24px;
@@ -423,7 +421,7 @@
 	.input-card input {
 		border: none;
 		background: var(--color-bg);
-		padding: 12px 14px;
+		padding: 12px 16px;
 		border-radius: var(--radius-md);
 		font-size: 14px;
 		font-family: inherit;
@@ -457,7 +455,7 @@
 		transition: all 150ms ease;
 		display: flex;
 		flex-direction: column;
-		gap: 6px;
+		gap: 8px;
 		font-family: inherit;
 	}
 
@@ -485,11 +483,10 @@
 	}
 
 	.task-board {
-		background: rgba(255, 255, 255, 0.8);
+		background: var(--color-bg);
 		border-radius: var(--radius-lg);
 		padding: 24px;
 		border: 1px solid var(--color-border-light);
-		box-shadow: 0 20px 50px rgba(20, 20, 30, 0.06);
 	}
 
 	.task-board__header {
@@ -508,7 +505,7 @@
 		border: 1px solid var(--color-border-light);
 		background: var(--color-bg);
 		border-radius: 999px;
-		padding: 6px 12px;
+		padding: 8px 12px;
 		font-size: 12px;
 		cursor: pointer;
 		font-weight: 500;
@@ -516,7 +513,7 @@
 
 	.task-board__list {
 		display: grid;
-		gap: 14px;
+		gap: 16px;
 	}
 
 	.task-card {
@@ -524,7 +521,6 @@
 		padding: 16px;
 		border: 1px solid var(--color-border-light);
 		background: var(--color-bg);
-		box-shadow: 0 4px 12px rgba(30, 30, 40, 0.04);
 		display: grid;
 		gap: 10px;
 		animation: rise 450ms ease forwards;
@@ -579,14 +575,12 @@
 		color: white;
 		border-radius: var(--radius-lg);
 		padding: 20px;
-		box-shadow: 0 20px 60px rgba(20, 20, 30, 0.2);
 	}
 
 	.summary__card:nth-child(2) {
 		background: var(--color-bg);
 		color: var(--color-text);
 		border: 1px solid var(--color-border-light);
-		box-shadow: 0 20px 40px rgba(20, 20, 30, 0.06);
 	}
 
 	.summary__card h3 {
@@ -595,7 +589,7 @@
 	}
 
 	.meter {
-		height: 10px;
+		height: 8px;
 		background: rgba(255, 255, 255, 0.2);
 		border-radius: 999px;
 		overflow: hidden;
