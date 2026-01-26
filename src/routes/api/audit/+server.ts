@@ -11,51 +11,44 @@ import { queueOgImageGeneration } from '$lib/server/og-image-generator';
 
 export const POST: RequestHandler = async ({ request, locals }): Promise<Response> => {
 	try {
-		// Parse request body
-		const body = await request.json() as AuditRequest;
+		// 1. Rate limit check (per IP)
+		const clientIP = getClientIP(request);
+		const rateCheck = checkRateLimit(clientIP, 'audit');
 
-		// Get entitlement first (needed for metadata)
+		if (!rateCheck.allowed) {
+			const response: AuditApiResponse = {
+				success: false,
+				error: `Rate limit exceeded. Try again in ${Math.ceil(rateCheck.resetIn / 1000)} seconds.`,
+				code: 'RATE_LIMITED'
+			};
+			return json(response, {
+				status: 429,
+				headers: {
+					'Retry-After': String(Math.ceil(rateCheck.resetIn / 1000)),
+					'X-RateLimit-Remaining': '0',
+					'X-RateLimit-Reset': String(Math.ceil(rateCheck.resetIn / 1000))
+				}
+			});
+		}
+
+		// 2. Get entitlement and check subscription limits
 		const entitlement = locals.entitlementKey
 			? await getEntitlementByKey(locals.entitlementKey)
 			: null;
 		const plan = entitlement?.plan ?? 'free';
+		const auditLimit = await canCreateAudit(locals.entitlementKey ?? null, plan);
 
-		// TEMPORARY: Skip rate limiting for seoauditlite.com dogfooding
-		const isDogfooding = body.domain === 'seoauditlite.com' || body.domain === 'www.seoauditlite.com';
-
-		if (!isDogfooding) {
-			// 1. Rate limit check (per IP)
-			const clientIP = getClientIP(request);
-			const rateCheck = checkRateLimit(clientIP, 'audit');
-
-			if (!rateCheck.allowed) {
-				const response: AuditApiResponse = {
-					success: false,
-					error: `Rate limit exceeded. Try again in ${Math.ceil(rateCheck.resetIn / 1000)} seconds.`,
-					code: 'RATE_LIMITED'
-				};
-				return json(response, {
-					status: 429,
-					headers: {
-						'Retry-After': String(Math.ceil(rateCheck.resetIn / 1000)),
-						'X-RateLimit-Remaining': '0',
-						'X-RateLimit-Reset': String(Math.ceil(rateCheck.resetIn / 1000))
-					}
-				});
-			}
-
-			// 2. Check subscription limits
-			const auditLimit = await canCreateAudit(locals.entitlementKey ?? null, plan);
-
-			if (!auditLimit.allowed) {
-				const response: AuditApiResponse = {
-					success: false,
-					error: `Audit limit reached (${auditLimit.limit} per week). Upgrade to Pro for unlimited audits.`,
-					code: 'LIMIT_REACHED'
-				};
-				return json(response, { status: 403 });
-			}
+		if (!auditLimit.allowed) {
+			const response: AuditApiResponse = {
+				success: false,
+				error: `Audit limit reached (${auditLimit.limit} per week). Upgrade to Pro for unlimited audits.`,
+				code: 'LIMIT_REACHED'
+			};
+			return json(response, { status: 403 });
 		}
+
+		// Parse request body
+		const body = await request.json() as AuditRequest;
 
 		// Run audit
 		const result = await auditDomain(body);
