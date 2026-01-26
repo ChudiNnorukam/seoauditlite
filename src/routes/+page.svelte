@@ -223,6 +223,57 @@
 	}
 	</script>`}
 
+	<!-- JSON-LD Person Schema (Standalone) -->
+	{@html `<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "Person",
+		"name": "Chudi Nnorukam",
+		"url": "https://chudi.dev",
+		"jobTitle": "Founder & Developer",
+		"worksFor": {
+			"@type": "Organization",
+			"name": "SEOAuditLite"
+		},
+		"sameAs": [
+			"https://twitter.com/chudinnorukam",
+			"https://github.com/chudinnorukam",
+			"https://linkedin.com/in/chudinnorukam"
+		]
+	}
+	</script>`}
+
+	<!-- JSON-LD BlogPosting Schema -->
+	{@html `<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "BlogPosting",
+		"headline": "AI Search Readiness: The Complete AEO Guide for 2026",
+		"description": "Learn how to optimize your website for AI search engines like ChatGPT, Perplexity, and Claude. Comprehensive guide covering the 6 critical AEO checks.",
+		"author": {
+			"@type": "Person",
+			"name": "Chudi Nnorukam",
+			"url": "https://chudi.dev"
+		},
+		"publisher": {
+			"@type": "Organization",
+			"name": "SEOAuditLite",
+			"logo": {
+				"@type": "ImageObject",
+				"url": "https://seoauditlite.com/logo.png"
+			}
+		},
+		"datePublished": "2025-12-15T00:00:00Z",
+		"dateModified": "2026-01-26T00:00:00Z",
+		"mainEntityOfPage": {
+			"@type": "WebPage",
+			"@id": "https://seoauditlite.com/"
+		},
+		"keywords": ["AEO", "Answer Engine Optimization", "AI Search", "ChatGPT SEO", "Perplexity Optimization", "Claude AI", "AI Crawler"],
+		"articleBody": "Answer Engine Optimization (AEO) is the practice of making your site visible and quotable by AI search engines. The 6 critical checks include: AI Crawler Access, llms.txt, Structured Data, Extractability, AI Metadata, and Answer Format."
+	}
+	</script>`}
+
 	<!-- JSON-LD HowTo Schema -->
 	{@html `<script type="application/ld+json">
 	{
@@ -379,6 +430,66 @@
 				<a class="micro-link" href="/planner">Open planner <ArrowRight size={12} weight="bold" aria-label="Arrow right icon" /></a>
 			</div>
 		</div>
+	</section>
+
+	<!-- SEO vs AEO Comparison -->
+	<section class="comparison-section">
+		<h2>SEO vs AEO: What's the Difference?</h2>
+		<p class="section-subtitle">Traditional SEO and Answer Engine Optimization target different platforms with different strategies</p>
+		<div class="comparison-table-wrapper">
+			<table class="comparison-table">
+				<thead>
+					<tr>
+						<th>Aspect</th>
+						<th>Traditional SEO</th>
+						<th>AEO (Answer Engine Optimization)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><strong>Target Platform</strong></td>
+						<td>Google, Bing search results pages</td>
+						<td>ChatGPT, Perplexity, Claude AI answers</td>
+					</tr>
+					<tr>
+						<td><strong>Goal</strong></td>
+						<td>Rank in top 10 search results</td>
+						<td>Get cited and quoted in AI responses</td>
+					</tr>
+					<tr>
+						<td><strong>Key Signals</strong></td>
+						<td>Keywords, backlinks, domain authority</td>
+						<td>Structured data, extractability, semantic HTML</td>
+					</tr>
+					<tr>
+						<td><strong>Content Format</strong></td>
+						<td>Long-form SEO articles, keyword density</td>
+						<td>FAQ format, bulleted lists, step-by-step guides</td>
+					</tr>
+					<tr>
+						<td><strong>Technical Requirements</strong></td>
+						<td>Sitemap, robots.txt, meta descriptions</td>
+						<td>llms.txt, AI crawler access, publication dates</td>
+					</tr>
+					<tr>
+						<td><strong>Crawlers</strong></td>
+						<td>Googlebot, Bingbot</td>
+						<td>GPTBot, ClaudeBot, PerplexityBot</td>
+					</tr>
+					<tr>
+						<td><strong>User Behavior</strong></td>
+						<td>Click through to website</td>
+						<td>Get answer without clicking</td>
+					</tr>
+					<tr>
+						<td><strong>Measurement</strong></td>
+						<td>Rankings, organic traffic, CTR</td>
+						<td>Citation frequency, AI visibility score</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<p class="comparison-note">Good news: AEO and SEO aren't mutually exclusive. Improving your structured data and content format benefits both traditional search engines and AI answer engines.</p>
 	</section>
 
 	<!-- FAQ -->
@@ -1062,6 +1173,85 @@
 	@media (min-width: 641px) and (max-width: 900px) {
 		.checks-grid {
 			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	/* Comparison Section */
+	.comparison-section {
+		padding: 64px 24px;
+		border-top: 1px solid var(--color-border-light);
+	}
+
+	.comparison-section h2 {
+		font-size: var(--text-2xl);
+		font-weight: 600;
+		text-align: center;
+		margin-bottom: 8px;
+		letter-spacing: -0.02em;
+	}
+
+	.comparison-section .section-subtitle {
+		text-align: center;
+		color: var(--color-text-secondary);
+		max-width: 600px;
+		margin: 0 auto 32px auto;
+	}
+
+	.comparison-table-wrapper {
+		overflow-x: auto;
+		margin-bottom: 24px;
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-md);
+	}
+
+	.comparison-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 14px;
+	}
+
+	.comparison-table th {
+		background: var(--color-bg-muted);
+		padding: 12px 16px;
+		text-align: left;
+		font-weight: 600;
+		border-bottom: 1px solid var(--color-border-light);
+		color: var(--color-text);
+	}
+
+	.comparison-table td {
+		padding: 12px 16px;
+		border-bottom: 1px solid var(--color-border-light);
+		color: var(--color-text-secondary);
+		vertical-align: top;
+	}
+
+	.comparison-table tbody tr:last-child td {
+		border-bottom: none;
+	}
+
+	.comparison-table td:first-child {
+		font-weight: 500;
+		color: var(--color-text);
+	}
+
+	.comparison-note {
+		text-align: center;
+		font-size: 14px;
+		color: var(--color-text-muted);
+		font-style: italic;
+		max-width: 700px;
+		margin: 0 auto;
+	}
+
+	@media (max-width: 768px) {
+		.comparison-table {
+			font-size: 12px;
+		}
+
+		.comparison-table th,
+		.comparison-table td {
+			padding: 8px 12px;
 		}
 	}
 </style>
