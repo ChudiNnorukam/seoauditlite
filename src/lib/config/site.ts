@@ -27,6 +27,10 @@ export const SITE_PAGES = [
 	{ path: '/', changefreq: 'daily' as const, priority: 1.0 },
 	{ path: '/report', changefreq: 'weekly' as const, priority: 0.8 },
 	{ path: '/planner', changefreq: 'weekly' as const, priority: 0.7 },
+	{ path: '/about', changefreq: 'monthly' as const, priority: 0.6 },
+	{ path: '/contact', changefreq: 'monthly' as const, priority: 0.5 },
+	{ path: '/privacy', changefreq: 'monthly' as const, priority: 0.3 },
+	{ path: '/terms', changefreq: 'monthly' as const, priority: 0.3 },
 	{ path: '/llms.txt', changefreq: 'weekly' as const, priority: 0.4 }
 ];
 

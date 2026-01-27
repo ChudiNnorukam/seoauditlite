@@ -559,6 +559,10 @@
 			<p class="footer-brand">SEOAuditLite</p>
 			<p class="footer-tagline">Know your AI search readiness</p>
 			<div class="footer-links">
+				<a href="/about">About</a>
+				<span class="divider">|</span>
+				<a href="/contact">Contact</a>
+				<span class="divider">|</span>
 				<a href="/privacy">Privacy</a>
 				<span class="divider">|</span>
 				<a href="/terms">Terms</a>
