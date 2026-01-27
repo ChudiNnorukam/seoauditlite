@@ -102,8 +102,30 @@
 		name="description"
 		content="AEO audit results showing AI search readiness score for {domain || 'your site'}."
 	/>
-	<link rel="canonical" href="https://seoauditlite.com/report" />
+	<link rel="canonical" href={`https://seoauditlite.com/report/${viewAudit?.audit_id ?? ''}`} />
 	<meta name="robots" content="noindex" />
+
+	<!-- JSON-LD BreadcrumbList Schema -->
+	{@html `<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "BreadcrumbList",
+		"itemListElement": [
+			{
+				"@type": "ListItem",
+				"position": 1,
+				"name": "Home",
+				"item": "https://seoauditlite.com/"
+			},
+			{
+				"@type": "ListItem",
+				"position": 2,
+				"name": "Report",
+				"item": "https://seoauditlite.com/report/${viewAudit?.audit_id ?? ''}"
+			}
+		]
+	}
+	</script>`}
 
 	<!-- Open Graph -->
 	<meta property="og:title" content="AEO Audit Report - {domain || 'Report'}" />

@@ -223,6 +223,25 @@
 	}
 	</script>`}
 
+	<!-- JSON-LD WebSite Schema with SearchAction -->
+	{@html `<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "WebSite",
+		"name": "SEOAuditLite",
+		"url": "https://seoauditlite.com",
+		"description": "AI Search Readiness Audit - Check your AEO score for ChatGPT, Perplexity, and Claude",
+		"potentialAction": {
+			"@type": "SearchAction",
+			"target": {
+				"@type": "EntryPoint",
+				"urlTemplate": "https://seoauditlite.com/?q={search_term_string}"
+			},
+			"query-input": "required name=search_term_string"
+		}
+	}
+	</script>`}
+
 	<!-- JSON-LD Person Schema (Standalone) -->
 	{@html `<script type="application/ld+json">
 	{
