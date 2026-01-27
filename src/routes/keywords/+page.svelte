@@ -4,10 +4,13 @@
 
 	let seedKeyword = $state('');
 	let loading = $state(false);
+	let loadingStage = $state<string>('');
 	let error = $state<string | null>(null);
 	let results = $state<KeywordResult[]>([]);
 	let sortColumn = $state<'keyword' | 'interest' | 'intent'>('interest');
 	let sortDirection = $state<'asc' | 'desc'>('desc');
+	let displayLimit = $state(50);
+	let trendsFailureCount = $state(0);
 
 	async function handleSearch() {
 		if (!seedKeyword.trim()) {
@@ -16,8 +19,11 @@
 		}
 
 		loading = true;
+		loadingStage = 'Fetching suggestions...';
 		error = null;
 		results = [];
+		trendsFailureCount = 0;
+		displayLimit = 50;
 
 		try {
 			// Fetch autocomplete suggestions
@@ -42,9 +48,13 @@
 
 			// Fetch trends for all suggestions (batch in groups of 5)
 			const trendsMap = new Map<string, { interest: number; direction: string; sparkline: number[] }>();
+			const totalBatches = Math.ceil(suggestions.length / 5);
+			let failedBatches = 0;
 
 			for (let i = 0; i < suggestions.length; i += 5) {
 				const batch = suggestions.slice(i, i + 5);
+				const currentBatch = Math.floor(i / 5) + 1;
+				loadingStage = `Analyzing trends... (${currentBatch}/${totalBatches})`;
 
 				const trendsResponse = await fetch('/api/keywords/trends', {
 					method: 'POST',
@@ -61,6 +71,10 @@
 							sparkline: trend.sparkline
 						});
 					});
+				} else {
+					failedBatches++;
+					// Track which keywords failed for warning message
+					trendsFailureCount += batch.length;
 				}
 			}
 
@@ -80,11 +94,21 @@
 
 			// Sort by interest (default)
 			sortResults('interest', 'desc');
+
+			// Show warning if some trends failed
+			if (failedBatches > 0) {
+				error = `Trends data unavailable for ${trendsFailureCount} keywords. Showing available data.`;
+			}
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'An error occurred';
 		} finally {
 			loading = false;
+			loadingStage = '';
 		}
+	}
+
+	function loadMore() {
+		displayLimit += 50;
 	}
 
 	function classifyIntent(keyword: string): 'informational' | 'navigational' | 'transactional' | 'unknown' {
@@ -235,7 +259,7 @@
 					<button type="submit" class="search-button" disabled={loading}>
 						{#if loading}
 							<ArrowsClockwise size={16} weight="bold" class="spin" />
-							<span>Searching...</span>
+							<span>{loadingStage || 'Searching...'}</span>
 						{:else}
 							<span>Search</span>
 						{/if}
@@ -284,7 +308,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each results as result}
+							{#each results.slice(0, displayLimit) as result}
 								<tr>
 									<td class="keyword-cell">{result.keyword}</td>
 									<td class="interest-cell">
@@ -314,6 +338,14 @@
 						</tbody>
 					</table>
 				</div>
+
+				{#if results.length > displayLimit}
+					<div class="load-more-section">
+						<button class="load-more-button" onclick={loadMore}>
+							Load more ({results.length - displayLimit} remaining)
+						</button>
+					</div>
+				{/if}
 			</div>
 		{/if}
 	</div>
@@ -579,6 +611,30 @@
 		to {
 			transform: rotate(360deg);
 		}
+	}
+
+	.load-more-section {
+		display: flex;
+		justify-content: center;
+		margin-top: 24px;
+	}
+
+	.load-more-button {
+		background: var(--color-bg, #fff);
+		border: 1px solid var(--color-border, #e2e8f0);
+		border-radius: var(--radius-md, 10px);
+		padding: 12px 24px;
+		font-size: 14px;
+		font-weight: 500;
+		color: var(--color-text, #0f172a);
+		cursor: pointer;
+		transition: all 150ms ease;
+	}
+
+	.load-more-button:hover {
+		background: var(--color-bg-muted, #f1f5f9);
+		border-color: var(--color-primary);
+		color: var(--color-primary);
 	}
 
 	@media (max-width: 720px) {

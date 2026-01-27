@@ -113,6 +113,11 @@ function calculateTrendDirection(values: number[]): 'rising' | 'stable' | 'falli
 	const recentAvg = recentWindow.reduce((a, b) => a + b, 0) / recentWindow.length;
 	const previousAvg = previousWindow.reduce((a, b) => a + b, 0) / previousWindow.length;
 
+	// Avoid division by zero for new/emerging keywords with zero historical data
+	if (previousAvg === 0) {
+		return recentAvg > 0 ? 'rising' : 'unknown';
+	}
+
 	const change = ((recentAvg - previousAvg) / previousAvg) * 100;
 
 	if (change > 10) return 'rising';
