@@ -26,6 +26,9 @@ export interface KeywordResult {
 	trendDirection: 'rising' | 'stable' | 'falling' | 'unknown';
 	sparkline: number[];
 	intent: 'informational' | 'navigational' | 'transactional' | 'unknown';
+	difficulty: number; // 0-100 scale (0 = easy, 100 = very hard)
+	searchVolume?: number; // Monthly search volume from DataForSEO (optional)
+	cpc?: number; // Cost per click from DataForSEO (optional)
 }
 
 export interface CacheEntry {

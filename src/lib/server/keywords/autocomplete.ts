@@ -105,34 +105,88 @@ export async function expandKeyword(
 }
 
 /**
- * Classify keyword intent using heuristics
+ * Classify keyword intent using weighted scoring heuristics
+ *
+ * Improved accuracy by:
+ * - Using weighted scores instead of binary matching
+ * - Checking informational signals first (more specific)
+ * - Considering word position (start/end matters)
+ * - Context-aware matching ("free guide" vs "seo tool free")
  */
 export function classifyIntent(keyword: string): 'informational' | 'navigational' | 'transactional' | 'unknown' {
 	const lower = keyword.toLowerCase();
 
+	// Weighted scoring: higher score = stronger signal
+	let informationalScore = 0;
+	let transactionalScore = 0;
+	let navigationalScore = 0;
+
+	// Informational signals (check first - more specific)
+	const informational = {
+		strong: ['how to', 'what is', 'what are', 'why', 'when to', 'guide', 'tutorial', 'meaning', 'definition'],
+		medium: ['learn', 'example', 'tips', 'ideas', 'explained', 'understand', 'basics', 'beginner'],
+		weak: ['help', 'info', 'about']
+	};
+
+	informational.strong.forEach(phrase => {
+		if (lower.includes(phrase)) {
+			informationalScore += lower.startsWith(phrase) ? 3 : 2.5;
+		}
+	});
+	informational.medium.forEach(phrase => {
+		if (lower.includes(phrase)) informationalScore += 1.5;
+	});
+	informational.weak.forEach(word => {
+		if (lower.includes(word)) informationalScore += 0.5;
+	});
+
 	// Transactional signals
-	const transactional = [
-		'buy', 'price', 'cost', 'cheap', 'deal', 'discount', 'coupon',
-		'free', 'download', 'trial', 'review', 'best', 'top', 'vs'
-	];
-	if (transactional.some((word) => lower.includes(word))) {
-		return 'transactional';
-	}
+	const transactional = {
+		strong: ['buy', 'purchase', 'price', 'pricing', 'cost', 'cheap', 'discount', 'coupon', 'deal', 'order'],
+		medium: ['best', 'top', 'review', 'comparison', 'vs', 'versus', 'alternative'],
+		weak: ['free', 'trial', 'download'] // Weak because "free guide" is informational
+	};
 
-	// Informational signals
-	const informational = [
-		'how to', 'what is', 'why', 'guide', 'tutorial', 'learn',
-		'meaning', 'definition', 'example', 'tips', 'ideas'
-	];
-	if (informational.some((phrase) => lower.includes(phrase))) {
-		return 'informational';
-	}
+	transactional.strong.forEach(word => {
+		if (lower.includes(word)) {
+			transactionalScore += lower.startsWith(word) ? 3 : 2.5;
+		}
+	});
+	transactional.medium.forEach(word => {
+		if (lower.includes(word)) transactionalScore += 1.5;
+	});
+	transactional.weak.forEach(word => {
+		// Only count if at end (e.g., "seo tool free" not "free seo guide")
+		if (lower.endsWith(word) || lower.includes(` ${word} `)) {
+			transactionalScore += 0.5;
+		}
+	});
 
-	// Navigational signals (brand names, specific domains)
-	const navigational = ['login', 'sign in', 'official', 'website', 'app'];
-	if (navigational.some((word) => lower.includes(word))) {
-		return 'navigational';
-	}
+	// Navigational signals
+	const navigational = {
+		strong: ['login', 'sign in', 'sign up', 'register', 'dashboard', 'account', 'portal'],
+		medium: ['official', 'website', 'site', 'app', 'platform'],
+		weak: ['online', 'web']
+	};
+
+	navigational.strong.forEach(phrase => {
+		if (lower.includes(phrase)) navigationalScore += 2.5;
+	});
+	navigational.medium.forEach(word => {
+		if (lower.includes(word)) navigationalScore += 1.5;
+	});
+	navigational.weak.forEach(word => {
+		if (lower.includes(word)) navigationalScore += 0.5;
+	});
+
+	// Determine intent by highest score (with minimum threshold)
+	const maxScore = Math.max(informationalScore, transactionalScore, navigationalScore);
+
+	if (maxScore < 1) return 'unknown'; // No strong signals
+
+	if (informationalScore === maxScore) return 'informational';
+	if (transactionalScore === maxScore) return 'transactional';
+	if (navigationalScore === maxScore) return 'navigational';
 
 	return 'unknown';
 }
