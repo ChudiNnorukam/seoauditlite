@@ -68,6 +68,7 @@
 		</div>
 		<nav class="header-nav">
 			{#if !showBack}
+				<a href="/keywords" class="nav-link">Keywords</a>
 				<a href="/planner" class="nav-link">Planner</a>
 			{/if}
 

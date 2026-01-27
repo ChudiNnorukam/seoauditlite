@@ -88,6 +88,16 @@ async function initialize(): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id);
     CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
     CREATE INDEX IF NOT EXISTS idx_entitlements_map_user ON entitlements_user_map(user_id);
+
+    -- Keyword cache table
+    CREATE TABLE IF NOT EXISTS keyword_cache (
+      cache_key TEXT PRIMARY KEY,
+      data_json TEXT NOT NULL,
+      source TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      expires_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_keyword_cache_expires ON keyword_cache(expires_at);
   `);
 
   // Migration: Add og_image_url column to existing audits table if it doesn't exist

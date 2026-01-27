@@ -26,6 +26,7 @@ export const SITE_CONFIG = {
 export const SITE_PAGES = [
 	{ path: '/', changefreq: 'daily' as const, priority: 1.0 },
 	{ path: '/report', changefreq: 'weekly' as const, priority: 0.8 },
+	{ path: '/keywords', changefreq: 'weekly' as const, priority: 0.7 },
 	{ path: '/planner', changefreq: 'weekly' as const, priority: 0.7 },
 	{ path: '/about', changefreq: 'monthly' as const, priority: 0.6 },
 	{ path: '/contact', changefreq: 'monthly' as const, priority: 0.5 },

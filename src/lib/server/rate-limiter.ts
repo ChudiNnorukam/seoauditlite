@@ -35,7 +35,11 @@ export const RATE_LIMITS = {
   // Checkout: 5 per minute per IP
   checkout: { maxRequests: 5, windowMs: 60 * 1000 },
   // API reads: 60 per minute per IP
-  read: { maxRequests: 60, windowMs: 60 * 1000 }
+  read: { maxRequests: 60, windowMs: 60 * 1000 },
+  // Keyword suggest: 20 per minute per IP
+  keywords_suggest: { maxRequests: 20, windowMs: 60 * 1000 },
+  // Keyword trends: 10 per minute per IP
+  keywords_trends: { maxRequests: 10, windowMs: 60 * 1000 }
 } as const;
 
 type RateLimitType = keyof typeof RATE_LIMITS;
