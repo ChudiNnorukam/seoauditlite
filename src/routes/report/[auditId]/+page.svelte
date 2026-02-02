@@ -344,6 +344,7 @@
 	.page {
 		min-height: 100vh;
 		background: var(--color-bg);
+		color: var(--color-text);
 	}
 
 	.container {
