@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Dashboard - SEOAuditLite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f4259d",
+                        "primary-hover": "#d91f88",
+                        "background-light": "#f8f5f7",
+                        "background-dark": "#12080e",
+                        "glass": "rgba(255, 255, 255, 0.03)",
+                        "glass-border": "rgba(255, 255, 255, 0.1)",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #12080e;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .aurora-blur {
+            position: fixed;
+            z-index: -1;
+            filter: blur(100px);
+            border-radius: 100%;
+            opacity: 0.15;
+        }
+        .aurora-1 {
+            width: 600px;
+            height: 600px;
+            background: #f4259d;
+            top: -200px;
+            left: -200px;
+        }
+        .aurora-2 {
+            width: 500px;
+            height: 500px;
+            background: #8b5cf6;
+            bottom: -150px;
+            right: -150px;
+        }
+        .aurora-3 {
+            width: 400px;
+            height: 400px;
+            background: #f4259d;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.08;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .score-gauge {
+            background: conic-gradient(
+                from 180deg,
+                #f4259d 0deg,
+                #f4259d calc(var(--score) * 3.6deg),
+                rgba(255,255,255,0.1) calc(var(--score) * 3.6deg),
+                rgba(255,255,255,0.1) 360deg
+            );
+        }
+        .trend-up { color: #22c55e; }
+        .trend-down { color: #ef4444; }
+        .status-pass { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .status-warn { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .status-fail { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="p-6 lg:p-8">
+    <!-- Aurora Background -->
+    <div class="aurora-blur aurora-1"></div>
+    <div class="aurora-blur aurora-2"></div>
+    <div class="aurora-blur aurora-3"></div>
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white">insights</span>
+                </div>
+                <span class="text-xl font-semibold">SEOAuditLite</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-6 text-sm text-white/60">
+                <a href="#" class="hover:text-white transition">Dashboard</a>
+                <a href="#" class="hover:text-white transition">History</a>
+                <a href="#" class="hover:text-white transition">Settings</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <button class="glass-card px-4 py-2 rounded-lg text-sm hover:bg-white/5 transition">
+                    New Audit
+                </button>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-purple-500"></div>
+            </div>
+        </header>
+
+        <!-- Domain Header -->
+        <div class="glass-card rounded-2xl p-6 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-white/40 text-sm">Audit Report</span>
+                        <span class="text-white/20">|</span>
+                        <span class="text-white/40 text-sm">Jan 31, 2026</span>
+                    </div>
+                    <h1 class="text-2xl font-semibold">example.com</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button class="glass-card px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-white/5 transition">
+                        <span class="material-symbols-outlined text-lg">download</span>
+                        Export PDF
+                    </button>
+                    <button class="bg-primary hover:bg-primary-hover px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">refresh</span>
+                        Re-audit
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-12 gap-6">
+            <!-- Score Card -->
+            <div class="col-span-12 lg:col-span-4">
+                <div class="glass-card rounded-2xl p-6">
+                    <h2 class="text-white/60 text-sm font-medium mb-4">AEO Score</h2>
+                    <div class="flex items-center justify-center mb-6">
+                        <div class="relative w-40 h-40">
+                            <div class="score-gauge w-full h-full rounded-full" style="--score: 78"></div>
+                            <div class="absolute inset-3 bg-background-dark rounded-full flex items-center justify-center">
+                                <div class="text-center">
+                                    <span class="text-4xl font-bold">78</span>
+                                    <span class="text-white/40 text-sm block">/ 100</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-center gap-2 text-sm">
+                        <span class="material-symbols-outlined text-lg trend-up">trending_up</span>
+                        <span class="trend-up">+12 pts</span>
+                        <span class="text-white/40">vs last audit</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Cards -->
+            <div class="col-span-12 lg:col-span-8">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="glass-card rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="material-symbols-outlined text-white/40">smart_toy</span>
+                            <span class="status-pass px-2 py-1 rounded text-xs font-medium">Pass</span>
+                        </div>
+                        <h3 class="text-sm font-medium mb-1">AI Crawlers</h3>
+                        <p class="text-white/40 text-xs">All bots allowed</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="material-symbols-outlined text-white/40">description</span>
+                            <span class="status-pass px-2 py-1 rounded text-xs font-medium">Pass</span>
+                        </div>
+                        <h3 class="text-sm font-medium mb-1">llms.txt</h3>
+                        <p class="text-white/40 text-xs">Found & valid</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="material-symbols-outlined text-white/40">code</span>
+                            <span class="status-warn px-2 py-1 rounded text-xs font-medium">Warn</span>
+                        </div>
+                        <h3 class="text-sm font-medium mb-1">Structured Data</h3>
+                        <p class="text-white/40 text-xs">Missing FAQPage</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="material-symbols-outlined text-white/40">article</span>
+                            <span class="status-pass px-2 py-1 rounded text-xs font-medium">Pass</span>
+                        </div>
+                        <h3 class="text-sm font-medium mb-1">Extractability</h3>
+                        <p class="text-white/40 text-xs">92% score</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="material-symbols-outlined text-white/40">tag</span>
+                            <span class="status-fail px-2 py-1 rounded text-xs font-medium">Fail</span>
+                        </div>
+                        <h3 class="text-sm font-medium mb-1">AI Metadata</h3>
+                        <p class="text-white/40 text-xs">Missing OG tags</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="material-symbols-outlined text-white/40">format_list_bulleted</span>
+                            <span class="status-pass px-2 py-1 rounded text-xs font-medium">Pass</span>
+                        </div>
+                        <h3 class="text-sm font-medium mb-1">Answer Format</h3>
+                        <p class="text-white/40 text-xs">Good structure</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trend Chart -->
+            <div class="col-span-12 lg:col-span-8">
+                <div class="glass-card rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-white/60 text-sm font-medium">Score Trend</h2>
+                        <div class="flex items-center gap-2">
+                            <button class="text-xs text-white/40 hover:text-white px-3 py-1 rounded-lg hover:bg-white/5 transition">7D</button>
+                            <button class="text-xs text-white bg-white/10 px-3 py-1 rounded-lg">30D</button>
+                            <button class="text-xs text-white/40 hover:text-white px-3 py-1 rounded-lg hover:bg-white/5 transition">90D</button>
+                        </div>
+                    </div>
+                    <div class="h-48 flex items-end justify-between gap-2">
+                        <div class="flex-1 bg-primary/20 rounded-t" style="height: 45%"></div>
+                        <div class="flex-1 bg-primary/20 rounded-t" style="height: 52%"></div>
+                        <div class="flex-1 bg-primary/20 rounded-t" style="height: 48%"></div>
+                        <div class="flex-1 bg-primary/20 rounded-t" style="height: 55%"></div>
+                        <div class="flex-1 bg-primary/20 rounded-t" style="height: 60%"></div>
+                        <div class="flex-1 bg-primary/20 rounded-t" style="height: 58%"></div>
+                        <div class="flex-1 bg-primary/20 rounded-t" style="height: 65%"></div>
+                        <div class="flex-1 bg-primary/20 rounded-t" style="height: 68%"></div>
+                        <div class="flex-1 bg-primary/20 rounded-t" style="height: 72%"></div>
+                        <div class="flex-1 bg-primary/40 rounded-t" style="height: 78%"></div>
+                    </div>
+                    <div class="flex justify-between mt-3 text-xs text-white/40">
+                        <span>Jan 1</span>
+                        <span>Jan 31</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="col-span-12 lg:col-span-4">
+                <div class="glass-card rounded-2xl p-6">
+                    <h2 class="text-white/60 text-sm font-medium mb-4">Top Recommendations</h2>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition cursor-pointer">
+                            <span class="status-fail w-6 h-6 rounded flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-sm">priority_high</span>
+                            </span>
+                            <div>
+                                <h3 class="text-sm font-medium mb-1">Add OG Meta Tags</h3>
+                                <p class="text-white/40 text-xs">High impact for AI citations</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition cursor-pointer">
+                            <span class="status-warn w-6 h-6 rounded flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-sm">warning</span>
+                            </span>
+                            <div>
+                                <h3 class="text-sm font-medium mb-1">Add FAQPage Schema</h3>
+                                <p class="text-white/40 text-xs">Improves answer extraction</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition cursor-pointer">
+                            <span class="status-pass w-6 h-6 rounded flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-sm">check</span>
+                            </span>
+                            <div>
+                                <h3 class="text-sm font-medium mb-1">Add Article Dates</h3>
+                                <p class="text-white/40 text-xs">Helps AI trust content</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Results Table -->
+            <div class="col-span-12">
+                <div class="glass-card rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-white/60 text-sm font-medium">Detailed Results</h2>
+                        <div class="flex items-center gap-2">
+                            <button class="glass-card px-3 py-1.5 rounded-lg text-xs flex items-center gap-2 hover:bg-white/5 transition">
+                                <span class="material-symbols-outlined text-sm">filter_list</span>
+                                Filter
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-white/40 text-xs border-b border-white/10">
+                                    <th class="text-left py-3 font-medium">Check</th>
+                                    <th class="text-left py-3 font-medium">Status</th>
+                                    <th class="text-left py-3 font-medium">Details</th>
+                                    <th class="text-left py-3 font-medium">Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="py-4 flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-white/40">smart_toy</span>
+                                        <span>GPTBot Access</span>
+                                    </td>
+                                    <td class="py-4"><span class="status-pass px-2 py-1 rounded text-xs">Allowed</span></td>
+                                    <td class="py-4 text-white/60">robots.txt permits crawling</td>
+                                    <td class="py-4"><span class="text-primary">High</span></td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="py-4 flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-white/40">smart_toy</span>
+                                        <span>ClaudeBot Access</span>
+                                    </td>
+                                    <td class="py-4"><span class="status-pass px-2 py-1 rounded text-xs">Allowed</span></td>
+                                    <td class="py-4 text-white/60">robots.txt permits crawling</td>
+                                    <td class="py-4"><span class="text-primary">High</span></td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="py-4 flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-white/40">tag</span>
+                                        <span>OG Title</span>
+                                    </td>
+                                    <td class="py-4"><span class="status-fail px-2 py-1 rounded text-xs">Missing</span></td>
+                                    <td class="py-4 text-white/60">Add og:title meta tag</td>
+                                    <td class="py-4"><span class="text-primary">High</span></td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="py-4 flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-white/40">code</span>
+                                        <span>FAQPage Schema</span>
+                                    </td>
+                                    <td class="py-4"><span class="status-warn px-2 py-1 rounded text-xs">Missing</span></td>
+                                    <td class="py-4 text-white/60">Add FAQ structured data</td>
+                                    <td class="py-4"><span class="text-yellow-500">Medium</span></td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="py-4 flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-white/40">description</span>
+                                        <span>llms.txt</span>
+                                    </td>
+                                    <td class="py-4"><span class="status-pass px-2 py-1 rounded text-xs">Found</span></td>
+                                    <td class="py-4 text-white/60">Valid format detected</td>
+                                    <td class="py-4"><span class="text-primary">High</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-12 py-6 border-t border-white/10 text-center text-white/40 text-sm">
+            <p>&copy; 2026 SEOAuditLite. Know your AI search readiness.</p>
+        </footer>
+    </div>
+</body>
+</html>

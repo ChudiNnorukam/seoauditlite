@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - SEOAuditLite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f4259d",
+                        "primary-hover": "#d91f88",
+                        "background-light": "#f8f5f7",
+                        "background-dark": "#12080e",
+                        "glass": "rgba(255, 255, 255, 0.03)",
+                        "glass-border": "rgba(255, 255, 255, 0.1)",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #12080e;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .aurora-blur {
+            position: fixed;
+            z-index: -1;
+            filter: blur(120px);
+            border-radius: 100%;
+            opacity: 0.15;
+        }
+        .aurora-1 {
+            width: 600px;
+            height: 600px;
+            background: #f4259d;
+            top: -200px;
+            right: -200px;
+        }
+        .aurora-2 {
+            width: 500px;
+            height: 500px;
+            background: #8b5cf6;
+            bottom: -150px;
+            left: -150px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .featured-card {
+            background: rgba(244, 37, 157, 0.05);
+            border: 2px solid rgba(244, 37, 157, 0.3);
+            box-shadow: 0 0 60px rgba(244, 37, 157, 0.15);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f4259d 0%, #d91f88 100%);
+            box-shadow: 0 4px 20px rgba(244, 37, 157, 0.4);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(244, 37, 157, 0.5);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .check-item::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: rgba(34, 197, 94, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Aurora Background -->
+    <div class="aurora-blur aurora-1"></div>
+    <div class="aurora-blur aurora-2"></div>
+
+    <!-- Navigation -->
+    <nav class="glass-card border-0 border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white">insights</span>
+                </div>
+                <span class="text-xl font-semibold">SEOAuditLite</span>
+            </div>
+            <div class="hidden md:flex items-center gap-8 text-sm text-white/60">
+                <a href="#" class="hover:text-white transition">Features</a>
+                <a href="#" class="text-white">Pricing</a>
+                <a href="#" class="hover:text-white transition">FAQ</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="#" class="text-sm text-white/60 hover:text-white transition">Sign in</a>
+                <button class="btn-primary px-5 py-2.5 rounded-xl text-sm font-medium">
+                    Get Started
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Pricing Header -->
+    <section class="pt-20 pb-12 text-center">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="glass-card inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6">
+                <span class="material-symbols-outlined text-primary text-sm">bolt</span>
+                <span class="text-sm text-white/70">Simple, transparent pricing</span>
+            </div>
+            <h1 class="text-5xl font-bold mb-6">
+                Choose your plan
+            </h1>
+            <p class="text-xl text-white/60 max-w-2xl mx-auto">
+                Start free, upgrade when you need more. All plans include our complete 6-point AEO analysis.
+            </p>
+        </div>
+    </section>
+
+    <!-- Pricing Cards -->
+    <section class="py-12">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Free Plan -->
+                <div class="glass-card rounded-3xl p-8 flex flex-col">
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold mb-2">Free</h3>
+                        <p class="text-white/50 text-sm">Perfect for trying it out</p>
+                    </div>
+
+                    <div class="mb-8">
+                        <span class="text-5xl font-bold">$0</span>
+                        <span class="text-white/40">/month</span>
+                    </div>
+
+                    <ul class="space-y-4 mb-8 flex-1">
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-green-400 text-xs">check</span>
+                            </span>
+                            <span class="text-white/70">3 audits per month</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-green-400 text-xs">check</span>
+                            </span>
+                            <span class="text-white/70">Full 6-point AEO score</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-green-400 text-xs">check</span>
+                            </span>
+                            <span class="text-white/70">No signup required</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-green-400 text-xs">check</span>
+                            </span>
+                            <span class="text-white/70">7-day report retention</span>
+                        </li>
+                    </ul>
+
+                    <button class="btn-secondary w-full py-4 rounded-xl font-semibold">
+                        Start Free
+                    </button>
+                </div>
+
+                <!-- Pro Plan (Featured) -->
+                <div class="featured-card rounded-3xl p-8 flex flex-col relative">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+                        <span class="bg-primary px-4 py-1.5 rounded-full text-sm font-semibold">
+                            Most Popular
+                        </span>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold mb-2">Pro</h3>
+                        <p class="text-white/50 text-sm">For serious site owners</p>
+                    </div>
+
+                    <div class="mb-8">
+                        <span class="text-5xl font-bold">$29</span>
+                        <span class="text-white/40">/month</span>
+                    </div>
+
+                    <ul class="space-y-4 mb-8 flex-1">
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-primary/30 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xs">check</span>
+                            </span>
+                            <span class="text-white/90 font-medium">Unlimited audits</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-primary/30 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xs">check</span>
+                            </span>
+                            <span class="text-white/90 font-medium">30-day history</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-primary/30 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xs">check</span>
+                            </span>
+                            <span class="text-white/90 font-medium">PDF export</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-primary/30 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xs">check</span>
+                            </span>
+                            <span class="text-white/90 font-medium">Score trend tracking</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-primary/30 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xs">check</span>
+                            </span>
+                            <span class="text-white/90 font-medium">Priority support</span>
+                        </li>
+                    </ul>
+
+                    <button class="btn-primary w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2">
+                        Go Pro
+                        <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                    </button>
+                </div>
+
+                <!-- Team Plan -->
+                <div class="glass-card rounded-3xl p-8 flex flex-col">
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold mb-2">Team</h3>
+                        <p class="text-white/50 text-sm">For agencies & teams</p>
+                    </div>
+
+                    <div class="mb-8">
+                        <span class="text-5xl font-bold">$99</span>
+                        <span class="text-white/40">/month</span>
+                    </div>
+
+                    <ul class="space-y-4 mb-8 flex-1">
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-green-400 text-xs">check</span>
+                            </span>
+                            <span class="text-white/70">Everything in Pro</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-green-400 text-xs">check</span>
+                            </span>
+                            <span class="text-white/70">5 team members</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-green-400 text-xs">check</span>
+                            </span>
+                            <span class="text-white/70">White-label reports</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-green-400 text-xs">check</span>
+                            </span>
+                            <span class="text-white/70">API access</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-green-400 text-xs">check</span>
+                            </span>
+                            <span class="text-white/70">90-day history</span>
+                        </li>
+                    </ul>
+
+                    <button class="btn-secondary w-full py-4 rounded-xl font-semibold">
+                        Contact Sales
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Comparison -->
+    <section class="py-20">
+        <div class="max-w-5xl mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12">Compare Plans</h2>
+
+            <div class="glass-card rounded-3xl overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-white/10">
+                            <th class="text-left py-5 px-6 font-medium text-white/60">Feature</th>
+                            <th class="text-center py-5 px-6 font-medium">Free</th>
+                            <th class="text-center py-5 px-6 font-medium text-primary">Pro</th>
+                            <th class="text-center py-5 px-6 font-medium">Team</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="py-4 px-6 text-white/70">Audits per month</td>
+                            <td class="py-4 px-6 text-center">3</td>
+                            <td class="py-4 px-6 text-center text-primary font-medium">Unlimited</td>
+                            <td class="py-4 px-6 text-center">Unlimited</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="py-4 px-6 text-white/70">Report retention</td>
+                            <td class="py-4 px-6 text-center">7 days</td>
+                            <td class="py-4 px-6 text-center text-primary font-medium">30 days</td>
+                            <td class="py-4 px-6 text-center">90 days</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="py-4 px-6 text-white/70">PDF export</td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="material-symbols-outlined text-white/20 text-lg">close</span>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="material-symbols-outlined text-primary text-lg">check</span>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="material-symbols-outlined text-green-400 text-lg">check</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="py-4 px-6 text-white/70">Score tracking</td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="material-symbols-outlined text-white/20 text-lg">close</span>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="material-symbols-outlined text-primary text-lg">check</span>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="material-symbols-outlined text-green-400 text-lg">check</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="py-4 px-6 text-white/70">Team members</td>
+                            <td class="py-4 px-6 text-center">1</td>
+                            <td class="py-4 px-6 text-center text-primary font-medium">1</td>
+                            <td class="py-4 px-6 text-center">5</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="py-4 px-6 text-white/70">White-label</td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="material-symbols-outlined text-white/20 text-lg">close</span>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="material-symbols-outlined text-white/20 text-lg">close</span>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="material-symbols-outlined text-green-400 text-lg">check</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="py-4 px-6 text-white/70">API access</td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="material-symbols-outlined text-white/20 text-lg">close</span>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="material-symbols-outlined text-white/20 text-lg">close</span>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="material-symbols-outlined text-green-400 text-lg">check</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20">
+        <div class="max-w-3xl mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+
+            <div class="space-y-4">
+                <div class="glass-card rounded-2xl p-6">
+                    <h3 class="font-semibold mb-2">Can I cancel anytime?</h3>
+                    <p class="text-white/60 text-sm leading-relaxed">
+                        Yes! No long-term contracts. Cancel your subscription anytime from your account settings. You'll keep access until the end of your billing period.
+                    </p>
+                </div>
+                <div class="glass-card rounded-2xl p-6">
+                    <h3 class="font-semibold mb-2">What payment methods do you accept?</h3>
+                    <p class="text-white/60 text-sm leading-relaxed">
+                        We accept all major credit cards through Stripe. Team plans can also pay via invoice.
+                    </p>
+                </div>
+                <div class="glass-card rounded-2xl p-6">
+                    <h3 class="font-semibold mb-2">Do you offer refunds?</h3>
+                    <p class="text-white/60 text-sm leading-relaxed">
+                        Yes, we offer a 14-day money-back guarantee on all paid plans. No questions asked.
+                    </p>
+                </div>
+                <div class="glass-card rounded-2xl p-6">
+                    <h3 class="font-semibold mb-2">Can I upgrade or downgrade?</h3>
+                    <p class="text-white/60 text-sm leading-relaxed">
+                        Absolutely. Upgrade anytime and we'll prorate the difference. Downgrade takes effect at the next billing cycle.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white text-sm">insights</span>
+                    </div>
+                    <span class="font-semibold">SEOAuditLite</span>
+                </div>
+                <div class="flex items-center gap-6 text-sm text-white/40">
+                    <a href="#" class="hover:text-white transition">About</a>
+                    <a href="#" class="hover:text-white transition">Privacy</a>
+                    <a href="#" class="hover:text-white transition">Terms</a>
+                    <a href="#" class="hover:text-white transition">Contact</a>
+                </div>
+                <p class="text-sm text-white/40">&copy; 2026 SEOAuditLite</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

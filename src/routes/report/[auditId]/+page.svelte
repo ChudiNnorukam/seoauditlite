@@ -4,8 +4,11 @@
 	import type { EntitlementContext } from '$lib/auditing/entitlements';
 	import { resolveEntitlements } from '$lib/auditing/resolve-entitlements';
 	import { redactAudit } from '$lib/auditing/redact';
-	import Header from '$lib/components/Header.svelte';
-	import { CheckCircle, XCircle, Warning, Copy, ArrowSquareOut, Crown } from 'phosphor-svelte';
+	import HeaderDark from '$lib/components/HeaderDark.svelte';
+	import AuroraBackground from '$lib/components/AuroraBackground.svelte';
+	import GlassCard from '$lib/components/GlassCard.svelte';
+	import ScoreGauge from '$lib/components/ScoreGauge.svelte';
+	import { CheckCircle, XCircle, Warning, Copy, Crown, ArrowLeft, Download, ArrowClockwise, TrendUp } from 'phosphor-svelte';
 
 	let { data } = $props();
 
@@ -94,6 +97,12 @@
 		if (status === 'warning') return 'Needs work';
 		return 'Fail';
 	}
+
+	function getStatusIcon(status: string) {
+		if (status === 'pass') return CheckCircle;
+		if (status === 'warning') return Warning;
+		return XCircle;
+	}
 </script>
 
 <svelte:head>
@@ -105,7 +114,6 @@
 	<link rel="canonical" href={`https://seoauditlite.com/report/${viewAudit?.audit_id ?? ''}`} />
 	<meta name="robots" content="noindex" />
 
-	<!-- JSON-LD BreadcrumbList Schema -->
 	{@html `<script type="application/ld+json">
 	{
 		"@context": "https://schema.org",
@@ -127,7 +135,6 @@
 	}
 	</script>`}
 
-	<!-- Open Graph -->
 	<meta property="og:title" content="AEO Audit Report - {domain || 'Report'}" />
 	<meta
 		property="og:description"
@@ -141,7 +148,6 @@
 		<meta property="og:image:height" content="630" />
 	{/if}
 
-	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="AEO Audit Report - {domain || 'Report'}" />
 	<meta
@@ -153,278 +159,425 @@
 	{/if}
 </svelte:head>
 
-<Header showBack={true} user={data.user} plan={data.plan} />
+<div class="page dark">
+	<AuroraBackground animate={false} />
+	<HeaderDark user={data.user} plan={data.plan} />
 
-{#if !viewAudit}
-	<div class="container">
-		<p>{data.error ?? 'No audit data found.'}</p>
-		<a class="link" href="/">Run a new audit</a>
-	</div>
-{:else}
-	<div class="container">
-		<header class="report-header">
-			<div>
-				<h1>{domain}</h1>
-				<p class="date">{new Date(viewAudit.audited_at).toLocaleDateString()}</p>
-			</div>
-		</header>
+	{#if !viewAudit}
+		<div class="container">
+			<GlassCard class="error-card" padding="lg">
+				<p>{data.error ?? 'No audit data found.'}</p>
+				<a class="btn-primary" href="/">Run a new audit</a>
+			</GlassCard>
+		</div>
+	{:else}
+		<div class="container">
+			<!-- Back Link -->
+			<a href="/" class="back-link">
+				<ArrowLeft size={16} weight="bold" />
+				<span>New audit</span>
+			</a>
 
-		<section class="score-card">
-			<div class="score-ring" style={`--score:${viewAudit.overall_score}`}>
-				<span class="score-number">{viewAudit.overall_score}</span>
-				<span class="score-label">Overall</span>
-			</div>
-			<div class="score-details">
-				<h2>AI Search Readiness</h2>
-				<p>
-					{viewAudit.visibility_summary.ai_visible_percentage}% visible to AI ·
-					{viewAudit.visibility_summary.ai_invisible_percentage}% invisible
-				</p>
-			</div>
-		</section>
-
-		<section class="share-card">
-			<div>
-				<h3>Share this audit</h3>
-				<p class="muted">Read-only link for clients, teammates, or affiliates.</p>
-			</div>
-			<div class="share-input">
-				<input type="text" readonly value={shareUrl} />
-				<button type="button" onclick={copyShareLink}>
-					{#if copied}
-						Copied
-					{:else}
-						<Copy size={14} weight="bold" />
-						Copy
-					{/if}
-				</button>
-			</div>
-		</section>
-
-		{#if !entitlements.isShareLink && entitlements.plan === 'free'}
-			<section class="upgrade-card">
-				<div>
-					<h3>Unlock Pro insights</h3>
-					<p class="muted">See full recommendations and deeper analysis.</p>
+			<!-- Domain Header -->
+			<GlassCard class="domain-header" padding="lg">
+				<div class="domain-info">
+					<div class="domain-meta">
+						<span class="meta-label">Audit Report</span>
+						<span class="meta-divider">|</span>
+						<span class="meta-date">{new Date(viewAudit.audited_at).toLocaleDateString()}</span>
+					</div>
+					<h1>{domain}</h1>
 				</div>
-				<div class="upgrade-actions">
-					<button class="upgrade-button" type="button" onclick={startUpgrade} disabled={upgrading}>
-						{#if upgrading}
-							Redirecting…
-						{:else}
-							<Crown size={16} weight="fill" />
-							Upgrade to Pro
-						{/if}
+				<div class="domain-actions">
+					<button class="btn-secondary" type="button" onclick={copyShareLink}>
+						<Copy size={16} weight="bold" />
+						{copied ? 'Copied!' : 'Share'}
 					</button>
-					{#if upgradeError}
-						<p class="upgrade-error">{upgradeError}</p>
-					{/if}
+					<a href="/" class="btn-primary">
+						<ArrowClockwise size={16} weight="bold" />
+						Re-audit
+					</a>
 				</div>
-			</section>
-		{/if}
+			</GlassCard>
 
-		<section class="checks">
-			<h3>Checks</h3>
-			<div class="check-list">
-				{#each viewAudit.checks as check}
-					<article class="check-card">
-						<div class="check-header">
-							<div class="check-title">
-								<h4>{check.label}</h4>
-								<p class="muted">{check.summary}</p>
-							</div>
-							<div class="check-score">
-								<span class="status-badge" data-status={check.status}>
+			<!-- Main Grid -->
+			<div class="main-grid">
+				<!-- Score Card -->
+				<GlassCard class="score-card" glow padding="lg">
+					<h2 class="card-title">AEO Score</h2>
+					<div class="score-gauge-wrapper">
+						<ScoreGauge score={viewAudit.overall_score} size="lg" />
+					</div>
+					<div class="score-trend">
+						<TrendUp size={18} weight="bold" class="trend-icon" />
+						<span class="trend-text">
+							{viewAudit.visibility_summary.ai_visible_percentage}% visible to AI
+						</span>
+					</div>
+				</GlassCard>
+
+				<!-- Status Cards Grid -->
+				<div class="status-grid">
+					{#each viewAudit.checks.slice(0, 6) as check}
+						<GlassCard class="status-card" padding="md">
+							<div class="status-header">
+								<span class="status-icon" data-status={check.status}>
 									{#if check.status === 'pass'}
-										<CheckCircle size={14} weight="fill" />
+										<CheckCircle size={18} weight="fill" />
 									{:else if check.status === 'warning'}
-										<Warning size={14} weight="fill" />
+										<Warning size={18} weight="fill" />
 									{:else}
-										<XCircle size={14} weight="fill" />
+										<XCircle size={18} weight="fill" />
 									{/if}
+								</span>
+								<span class="status-badge" data-status={check.status}>
 									{statusLabel(check.status)}
 								</span>
-								{#if check.metadata.is_pro_only}
-									<span class="pro-badge">Pro</span>
-								{/if}
-								<span class="score">{check.score}</span>
 							</div>
-						</div>
-						<p class="explanation">{check.details.explanation}</p>
-						<p class="recommendation">
-							<strong>Next step:</strong> {check.details.recommendation}
-						</p>
-						{#if check.details.evidence.length > 0}
-							<ul class="evidence">
-								{#each check.details.evidence as item}
-									<li>{item}</li>
-								{/each}
-							</ul>
-						{/if}
-					</article>
-				{/each}
-			</div>
-		</section>
-
-		{#if viewAudit.notes.length > 0}
-			<section class="notes">
-				<h3>Notes</h3>
-				<ul>
-					{#each viewAudit.notes as note}
-						<li>{note.message}</li>
+							<h3 class="status-title">{check.label}</h3>
+							<p class="status-summary">{check.summary}</p>
+						</GlassCard>
 					{/each}
-				</ul>
-			</section>
-		{/if}
-
-		<section class="limits">
-			<h3>Plan limits</h3>
-			<div class="limits-grid">
-				<div>
-					<span class="label">Plan</span>
-					<span class="value">{viewAudit.limits.plan}</span>
-				</div>
-				<div>
-					<span class="label">Audits remaining</span>
-					<span class="value">{viewAudit.limits.audits_remaining}</span>
-				</div>
-				<div>
-					<span class="label">Export</span>
-					<span class="value">{viewAudit.limits.export_available ? 'Available' : 'Locked'}</span>
-				</div>
-				<div>
-					<span class="label">History</span>
-					<span class="value">{viewAudit.limits.history_days} days</span>
 				</div>
 			</div>
-		</section>
-	</div>
-{/if}
+
+			<!-- Upgrade Card -->
+			{#if !entitlements.isShareLink && entitlements.plan === 'free'}
+				<GlassCard class="upgrade-card" glow padding="lg">
+					<div class="upgrade-content">
+						<Crown size={24} weight="fill" class="upgrade-icon" />
+						<div>
+							<h3>Unlock Pro insights</h3>
+							<p>See full recommendations, deeper analysis, and export to PDF.</p>
+						</div>
+					</div>
+					<div class="upgrade-actions">
+						<button class="btn-primary" type="button" onclick={startUpgrade} disabled={upgrading}>
+							{#if upgrading}
+								Redirecting...
+							{:else}
+								Upgrade to Pro
+							{/if}
+						</button>
+						{#if upgradeError}
+							<p class="upgrade-error">{upgradeError}</p>
+						{/if}
+					</div>
+				</GlassCard>
+			{/if}
+
+			<!-- Detailed Checks -->
+			<section class="checks-section">
+				<h2 class="section-title">Detailed Results</h2>
+				<div class="checks-list">
+					{#each viewAudit.checks as check}
+						<GlassCard class="check-card" padding="lg">
+							<div class="check-header">
+								<div class="check-title-row">
+									<h3>{check.label}</h3>
+									{#if check.metadata.is_pro_only}
+										<span class="pro-badge">Pro</span>
+									{/if}
+								</div>
+								<div class="check-status">
+									<span class="status-badge large" data-status={check.status}>
+										{#if check.status === 'pass'}
+											<CheckCircle size={14} weight="fill" />
+										{:else if check.status === 'warning'}
+											<Warning size={14} weight="fill" />
+										{:else}
+											<XCircle size={14} weight="fill" />
+										{/if}
+										{statusLabel(check.status)}
+									</span>
+									<span class="check-score">{check.score}</span>
+								</div>
+							</div>
+							<p class="check-explanation">{check.details.explanation}</p>
+							<div class="check-recommendation">
+								<strong>Next step:</strong> {check.details.recommendation}
+							</div>
+							{#if check.details.evidence.length > 0}
+								<ul class="check-evidence">
+									{#each check.details.evidence as item}
+										<li>{item}</li>
+									{/each}
+								</ul>
+							{/if}
+						</GlassCard>
+					{/each}
+				</div>
+			</section>
+
+			<!-- Plan Limits -->
+			<section class="limits-section">
+				<h2 class="section-title">Plan Limits</h2>
+				<div class="limits-grid">
+					<GlassCard class="limit-card" padding="md">
+						<span class="limit-label">Plan</span>
+						<span class="limit-value">{viewAudit.limits.plan}</span>
+					</GlassCard>
+					<GlassCard class="limit-card" padding="md">
+						<span class="limit-label">Audits Remaining</span>
+						<span class="limit-value">{viewAudit.limits.audits_remaining}</span>
+					</GlassCard>
+					<GlassCard class="limit-card" padding="md">
+						<span class="limit-label">Export</span>
+						<span class="limit-value">{viewAudit.limits.export_available ? 'Available' : 'Locked'}</span>
+					</GlassCard>
+					<GlassCard class="limit-card" padding="md">
+						<span class="limit-label">History</span>
+						<span class="limit-value">{viewAudit.limits.history_days} days</span>
+					</GlassCard>
+				</div>
+			</section>
+
+			<!-- Footer -->
+			<footer class="report-footer">
+				<p>&copy; {new Date().getFullYear()} SEOAuditLite. Know your AI search readiness.</p>
+			</footer>
+		</div>
+	{/if}
+</div>
 
 <style>
-	.container {
-		max-width: 800px;
-		margin: 0 auto;
-		padding: 32px 20px 80px;
-	}
-
-	.report-header {
-		margin-bottom: 24px;
-		border-bottom: 1px solid var(--color-border-light);
-		padding-bottom: 16px;
-	}
-
-	.report-header h1 {
-		margin: 0;
-		font-size: 22px;
-		font-weight: 600;
-		letter-spacing: -0.01em;
-		word-break: break-word;
-	}
-
-	.date {
-		margin: 6px 0 0;
-		font-size: 12px;
-		color: var(--color-text-faint);
-	}
-
-	.link {
-		color: var(--color-primary);
-		text-decoration: none;
-		font-size: 13px;
-	}
-
-	.link:hover {
-		color: var(--color-primary-hover);
-	}
-
-	.score-card {
-		display: flex;
-		gap: 24px;
-		align-items: center;
-		padding: 20px;
-		border: 1px solid var(--color-border-light);
-		border-radius: var(--radius-md);
-		margin-bottom: 16px;
+	.page {
+		min-height: 100vh;
 		background: var(--color-bg);
 	}
 
-	.score-ring {
-		width: 100px;
-		height: 100px;
-		border-radius: 50%;
+	.container {
+		max-width: var(--width-wide);
+		margin: 0 auto;
+		padding: 100px 24px 80px;
+	}
+
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		color: var(--color-text-muted);
+		text-decoration: none;
+		font-size: var(--text-sm);
+		font-weight: 500;
+		margin-bottom: 24px;
+		transition: color 150ms ease;
+	}
+
+	.back-link:hover {
+		color: var(--color-primary);
+	}
+
+	/* Domain Header */
+	:global(.domain-header) {
 		display: flex;
 		flex-direction: column;
+		gap: 20px;
+		margin-bottom: 24px;
+	}
+
+	@media (min-width: 640px) {
+		:global(.domain-header) {
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+		}
+	}
+
+	.domain-meta {
+		display: flex;
 		align-items: center;
-		justify-content: center;
-		background: conic-gradient(var(--color-primary) calc(var(--score) * 1%), var(--color-border-light) 0);
+		gap: 8px;
+		margin-bottom: 8px;
+	}
+
+	.meta-label, .meta-date {
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
+	}
+
+	.meta-divider {
+		color: var(--color-text-faint);
+	}
+
+	.domain-info h1 {
+		margin: 0;
+		font-size: var(--text-2xl);
+		font-weight: 600;
+		word-break: break-word;
+	}
+
+	.domain-actions {
+		display: flex;
+		gap: 12px;
 		flex-shrink: 0;
 	}
 
-	.score-number {
-		font-size: 32px;
-		font-weight: 600;
-		color: var(--color-text);
-		font-family: var(--font-mono);
-		font-variant-numeric: tabular-nums;
-	}
-
-	.score-label {
-		font-size: 10px;
-		font-weight: 600;
-		color: var(--color-text-faint);
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
-	}
-
-	.score-details h2 {
-		margin: 0 0 4px;
-		font-size: 16px;
-		font-weight: 600;
-	}
-
-	.score-details p {
-		margin: 0;
-		color: var(--color-text-muted);
-		font-size: 13px;
-	}
-
-	.share-card {
-		display: flex;
-		justify-content: space-between;
-		gap: 16px;
-		align-items: center;
-		padding: 16px;
-		border: 1px solid var(--color-border-light);
-		border-radius: var(--radius-md);
-		background: var(--color-bg-subtle);
-		margin-bottom: 16px;
-		flex-wrap: wrap;
-	}
-
-	.share-card h3 {
-		margin: 0 0 2px;
-		font-size: 14px;
-		font-weight: 600;
-	}
-
-	.upgrade-card {
-		display: flex;
-		justify-content: space-between;
-		gap: 16px;
-		align-items: center;
-		padding: 16px;
-		border: 1px solid rgba(17, 98, 212, 0.2);
-		border-radius: var(--radius-md);
-		background: rgba(17, 98, 212, 0.03);
+	/* Main Grid */
+	.main-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 24px;
 		margin-bottom: 24px;
-		flex-wrap: wrap;
 	}
 
-	.upgrade-card h3 {
-		margin: 0 0 2px;
-		font-size: 14px;
+	@media (min-width: 768px) {
+		.main-grid {
+			grid-template-columns: 280px 1fr;
+		}
+	}
+
+	/* Score Card */
+	:global(.score-card) {
+		text-align: center;
+	}
+
+	.card-title {
+		font-size: var(--text-sm);
+		font-weight: 500;
+		color: var(--color-text-muted);
+		margin: 0 0 20px;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.score-gauge-wrapper {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 20px;
+	}
+
+	.score-trend {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		font-size: var(--text-sm);
+	}
+
+	:global(.trend-icon) {
+		color: var(--color-success);
+	}
+
+	.trend-text {
+		color: var(--color-text-muted);
+	}
+
+	/* Status Grid */
+	.status-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 12px;
+	}
+
+	@media (min-width: 640px) {
+		.status-grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+
+	:global(.status-card) {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.status-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.status-icon {
+		display: flex;
+	}
+
+	.status-icon[data-status='pass'] { color: var(--color-success); }
+	.status-icon[data-status='warning'] { color: var(--color-warning); }
+	.status-icon[data-status='fail'] { color: var(--color-danger); }
+
+	.status-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 4px 8px;
+		border-radius: var(--radius-sm);
+		font-size: var(--text-xs);
 		font-weight: 600;
+	}
+
+	.status-badge[data-status='pass'] {
+		background: var(--color-success-light);
+		color: var(--color-success);
+	}
+
+	.status-badge[data-status='warning'] {
+		background: var(--color-warning-light);
+		color: var(--color-warning);
+	}
+
+	.status-badge[data-status='fail'] {
+		background: var(--color-danger-light);
+		color: var(--color-danger);
+	}
+
+	.status-badge.large {
+		padding: 6px 10px;
+		font-size: var(--text-sm);
+	}
+
+	.status-title {
+		margin: 0;
+		font-size: var(--text-sm);
+		font-weight: 600;
+	}
+
+	.status-summary {
+		margin: 0;
+		font-size: var(--text-xs);
+		color: var(--color-text-faint);
+		line-height: 1.4;
+	}
+
+	/* Upgrade Card */
+	:global(.upgrade-card) {
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		margin-bottom: 40px;
+		border-color: var(--color-primary) !important;
+		background: rgba(244, 37, 157, 0.05) !important;
+	}
+
+	@media (min-width: 640px) {
+		:global(.upgrade-card) {
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+		}
+	}
+
+	.upgrade-content {
+		display: flex;
+		align-items: flex-start;
+		gap: 16px;
+	}
+
+	:global(.upgrade-icon) {
+		color: var(--color-primary);
+		flex-shrink: 0;
+	}
+
+	.upgrade-content h3 {
+		margin: 0 0 4px;
+		font-size: var(--text-md);
+		font-weight: 600;
+	}
+
+	.upgrade-content p {
+		margin: 0;
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
 	}
 
 	.upgrade-actions {
@@ -434,276 +587,225 @@
 		gap: 8px;
 	}
 
-	.upgrade-button {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		padding: 10px 16px;
-		border: none;
-		border-radius: var(--radius-sm);
-		background: var(--color-primary);
-		color: #fff;
-		font-size: 13px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: transform 150ms ease, background 150ms ease;
-	}
-
-	.upgrade-button:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
-	}
-
-	.upgrade-button:hover:not(:disabled) {
-		transform: translateY(-1px);
-		background: var(--color-primary-hover);
-	}
-
 	.upgrade-error {
 		margin: 0;
+		font-size: var(--text-sm);
 		color: var(--color-danger);
-		font-size: 12px;
 	}
 
-	.share-input {
-		display: flex;
-		gap: 8px;
-		align-items: center;
-		flex: 1;
-		min-width: 240px;
+	/* Checks Section */
+	.checks-section {
+		margin-bottom: 40px;
 	}
 
-	.share-input input {
-		flex: 1;
-		padding: 8px 12px;
-		border: 1px solid var(--color-border-light);
-		border-radius: var(--radius-sm);
-		font-size: 12px;
-		color: var(--color-text-muted);
-		background: var(--color-bg);
-		font-family: var(--font-mono);
-	}
-
-	.share-input button {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		padding: 8px 14px;
-		border: none;
-		border-radius: var(--radius-sm);
-		background: var(--color-primary);
-		color: #fff;
-		font-size: 12px;
+	.section-title {
+		font-size: var(--text-sm);
 		font-weight: 500;
-		cursor: pointer;
-		transition: background 150ms ease;
-	}
-
-	.share-input button:hover {
-		background: var(--color-primary-hover);
-	}
-
-	.checks {
-		margin-top: 8px;
-	}
-
-	.checks h3,
-	.notes h3,
-	.limits h3 {
-		margin: 0 0 12px;
-		font-size: 14px;
-		font-weight: 600;
 		color: var(--color-text-muted);
 		text-transform: uppercase;
-		letter-spacing: 0.04em;
+		letter-spacing: 0.05em;
+		margin: 0 0 16px;
 	}
 
-	.check-list {
-		display: grid;
+	.checks-list {
+		display: flex;
+		flex-direction: column;
 		gap: 12px;
 	}
 
-	.check-card {
-		padding: 16px;
-		border: 1px solid var(--color-border-light);
-		border-radius: var(--radius-md);
-		background: var(--color-bg);
+	:global(.check-card) {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
 	}
 
 	.check-header {
 		display: flex;
-		justify-content: space-between;
+		flex-direction: column;
 		gap: 12px;
-		align-items: flex-start;
-		margin-bottom: 10px;
 	}
 
-	.check-title h4 {
-		margin: 0 0 2px;
-		font-size: 14px;
-		font-weight: 600;
+	@media (min-width: 640px) {
+		.check-header {
+			flex-direction: row;
+			align-items: flex-start;
+			justify-content: space-between;
+		}
 	}
 
-	.check-score {
+	.check-title-row {
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		flex-shrink: 0;
 	}
 
-	.status-badge {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		padding: 4px 8px;
-		border-radius: var(--radius-sm);
-		font-size: 11px;
+	.check-title-row h3 {
+		margin: 0;
+		font-size: var(--text-md);
 		font-weight: 600;
-	}
-
-	.status-badge[data-status='pass'] {
-		background: rgba(34, 197, 94, 0.1);
-		color: #16a34a;
-	}
-
-	.status-badge[data-status='warning'] {
-		background: rgba(234, 179, 8, 0.12);
-		color: #ca8a04;
-	}
-
-	.status-badge[data-status='fail'] {
-		background: rgba(239, 68, 68, 0.1);
-		color: #dc2626;
 	}
 
 	.pro-badge {
 		padding: 4px 8px;
 		border-radius: var(--radius-sm);
-		font-size: 10px;
+		font-size: var(--text-xs);
 		font-weight: 600;
-		background: rgba(17, 98, 212, 0.1);
+		background: var(--color-primary-light);
 		color: var(--color-primary);
-		letter-spacing: 0.02em;
 	}
 
-	.score {
+	.check-status {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		flex-shrink: 0;
+	}
+
+	.check-score {
 		font-family: var(--font-mono);
-		font-size: 14px;
-		font-weight: 600;
+		font-size: var(--text-lg);
+		font-weight: 700;
 		color: var(--color-text);
-		font-variant-numeric: tabular-nums;
 	}
 
-	.explanation {
-		margin: 0 0 8px;
-		color: var(--color-text-muted);
-		font-size: 13px;
-		line-height: 1.5;
-	}
-
-	.recommendation {
+	.check-explanation {
 		margin: 0;
-		font-size: 13px;
-		color: var(--color-text);
-		line-height: 1.5;
-	}
-
-	.recommendation strong {
-		font-weight: 600;
-		color: var(--color-text-secondary);
-	}
-
-	.evidence {
-		margin: 10px 0 0;
-		padding-left: 16px;
+		font-size: var(--text-sm);
 		color: var(--color-text-muted);
-		font-size: 12px;
 		line-height: 1.6;
 	}
 
-	.evidence li {
-		margin-bottom: 2px;
+	.check-recommendation {
+		font-size: var(--text-sm);
+		color: var(--color-text-secondary);
+		line-height: 1.6;
 	}
 
-	.muted {
+	.check-recommendation strong {
+		color: var(--color-text);
+	}
+
+	.check-evidence {
 		margin: 0;
-		color: var(--color-text-faint);
-		font-size: 12px;
-	}
-
-	.notes {
-		margin-top: 24px;
-	}
-
-	.notes ul {
-		margin: 0;
-		padding-left: 16px;
+		padding-left: 20px;
+		font-size: var(--text-sm);
 		color: var(--color-text-muted);
-		font-size: 13px;
+		line-height: 1.6;
 	}
 
-	.limits {
-		margin-top: 24px;
+	.check-evidence li {
+		margin-bottom: 4px;
+	}
+
+	/* Limits Section */
+	.limits-section {
+		margin-bottom: 40px;
 	}
 
 	.limits-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-		gap: 10px;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 12px;
 	}
 
-	.limits-grid div {
-		padding: 12px;
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--color-border-light);
-		background: var(--color-bg-subtle);
+	@media (min-width: 640px) {
+		.limits-grid {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+
+	:global(.limit-card) {
 		display: flex;
 		flex-direction: column;
 		gap: 4px;
 	}
 
-	.label {
-		font-size: 10px;
+	.limit-label {
+		font-size: var(--text-xs);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		color: var(--color-text-faint);
-		font-weight: 500;
 	}
 
-	.value {
-		font-size: 13px;
+	.limit-value {
+		font-size: var(--text-md);
 		font-weight: 600;
 		color: var(--color-text);
+		text-transform: capitalize;
 	}
 
-	@media (max-width: 640px) {
-		.container {
-			padding: 24px 16px 60px;
-		}
+	/* Footer */
+	.report-footer {
+		text-align: center;
+		padding-top: 24px;
+		border-top: 1px solid var(--glass-border);
+	}
 
-		.score-card {
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 16px;
-		}
+	.report-footer p {
+		margin: 0;
+		font-size: var(--text-sm);
+		color: var(--color-text-faint);
+	}
 
-		.share-card,
-		.upgrade-card {
-			flex-direction: column;
-			align-items: flex-start;
-		}
+	/* Error Card */
+	:global(.error-card) {
+		text-align: center;
+	}
 
-		.share-input {
-			width: 100%;
-		}
+	:global(.error-card) p {
+		margin: 0 0 20px;
+		color: var(--color-text-muted);
+	}
 
-		.check-header {
-			flex-direction: column;
-			gap: 8px;
-		}
+	/* Buttons */
+	.btn-primary {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 12px 20px;
+		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+		color: white;
+		border: none;
+		border-radius: var(--radius-lg);
+		font-family: var(--font-sans);
+		font-size: var(--text-sm);
+		font-weight: 600;
+		text-decoration: none;
+		cursor: pointer;
+		box-shadow: 0 4px 20px var(--color-primary-glow);
+		transition: all 0.3s ease;
+	}
 
-		.check-score {
-			order: -1;
-		}
+	.btn-primary:hover:not(:disabled) {
+		transform: translateY(-2px);
+		box-shadow: 0 6px 30px var(--color-primary-glow);
+	}
+
+	.btn-primary:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.btn-secondary {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 12px 20px;
+		background: var(--glass-bg);
+		color: var(--color-text);
+		border: 1px solid var(--glass-border);
+		border-radius: var(--radius-lg);
+		font-family: var(--font-sans);
+		font-size: var(--text-sm);
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.3s ease;
+	}
+
+	.btn-secondary:hover {
+		background: var(--color-bg-muted);
+		border-color: var(--color-border);
 	}
 </style>

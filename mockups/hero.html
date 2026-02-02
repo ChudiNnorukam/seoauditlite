@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEOAuditLite - AI Search Readiness Audit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f4259d",
+                        "primary-hover": "#d91f88",
+                        "background-light": "#f8f5f7",
+                        "background-dark": "#12080e",
+                        "glass": "rgba(255, 255, 255, 0.03)",
+                        "glass-border": "rgba(255, 255, 255, 0.1)",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #12080e;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .aurora-blur {
+            position: fixed;
+            z-index: -1;
+            filter: blur(120px);
+            border-radius: 100%;
+            opacity: 0.2;
+            animation: float 20s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+        .aurora-1 {
+            width: 800px;
+            height: 800px;
+            background: #f4259d;
+            top: -300px;
+            left: -200px;
+        }
+        .aurora-2 {
+            width: 600px;
+            height: 600px;
+            background: #8b5cf6;
+            bottom: -200px;
+            right: -100px;
+            animation-delay: -7s;
+        }
+        .aurora-3 {
+            width: 500px;
+            height: 500px;
+            background: #f4259d;
+            top: 40%;
+            right: 20%;
+            opacity: 0.1;
+            animation-delay: -14s;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #fff 0%, #f4259d 50%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .floating-card {
+            animation: float-card 6s ease-in-out infinite;
+        }
+        @keyframes float-card {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .stat-glow {
+            box-shadow: 0 0 60px rgba(244, 37, 157, 0.3);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f4259d 0%, #d91f88 100%);
+            box-shadow: 0 4px 20px rgba(244, 37, 157, 0.4);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(244, 37, 157, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Aurora Background -->
+    <div class="aurora-blur aurora-1"></div>
+    <div class="aurora-blur aurora-2"></div>
+    <div class="aurora-blur aurora-3"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-card border-0 border-b">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white">insights</span>
+                </div>
+                <span class="text-xl font-semibold">SEOAuditLite</span>
+            </div>
+            <div class="hidden md:flex items-center gap-8 text-sm text-white/60">
+                <a href="#features" class="hover:text-white transition">Features</a>
+                <a href="#pricing" class="hover:text-white transition">Pricing</a>
+                <a href="#faq" class="hover:text-white transition">FAQ</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="#" class="text-sm text-white/60 hover:text-white transition">Sign in</a>
+                <button class="btn-primary px-5 py-2.5 rounded-xl text-sm font-medium">
+                    Get Started
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center pt-20">
+        <div class="max-w-7xl mx-auto px-6 py-20">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <!-- Left: Copy -->
+                <div>
+                    <!-- Badge -->
+                    <div class="glass-card inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8">
+                        <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                        <span class="text-sm text-white/70">2,847 audits run this month</span>
+                    </div>
+
+                    <h1 class="text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                        Know your<br>
+                        <span class="gradient-text">AI search readiness.</span>
+                    </h1>
+
+                    <p class="text-xl text-white/60 mb-10 max-w-lg leading-relaxed">
+                        Free AEO audit in 2 minutes. See how Perplexity, ChatGPT, and Claude see your site.
+                    </p>
+
+                    <!-- Search Form -->
+                    <form class="glass-card rounded-2xl p-2 flex flex-col sm:flex-row gap-3 max-w-lg mb-10">
+                        <input
+                            type="text"
+                            placeholder="Enter your domain (e.g., yoursite.com)"
+                            class="flex-1 bg-transparent px-5 py-4 text-white placeholder:text-white/40 focus:outline-none"
+                        >
+                        <button type="submit" class="btn-primary px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-2">
+                            Analyze Site
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                        </button>
+                    </form>
+
+                    <!-- Stats -->
+                    <div class="flex items-center gap-8">
+                        <div>
+                            <div class="text-3xl font-bold text-primary">60%</div>
+                            <div class="text-sm text-white/40">Sites invisible to AI</div>
+                        </div>
+                        <div class="w-px h-12 bg-white/10"></div>
+                        <div>
+                            <div class="text-3xl font-bold text-primary">30%</div>
+                            <div class="text-sm text-white/40">Searches now AI-first</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Visual -->
+                <div class="relative hidden lg:block">
+                    <!-- Floating Score Card -->
+                    <div class="glass-card rounded-3xl p-8 floating-card stat-glow">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary">insights</span>
+                            </div>
+                            <div>
+                                <div class="text-white/40 text-sm">AEO Score</div>
+                                <div class="text-2xl font-bold">example.com</div>
+                            </div>
+                        </div>
+
+                        <!-- Score Ring -->
+                        <div class="relative w-48 h-48 mx-auto mb-6">
+                            <svg class="w-full h-full transform -rotate-90">
+                                <circle cx="96" cy="96" r="80" stroke="rgba(255,255,255,0.1)" stroke-width="12" fill="none"/>
+                                <circle cx="96" cy="96" r="80" stroke="url(#gradient)" stroke-width="12" fill="none"
+                                    stroke-dasharray="502" stroke-dashoffset="110" stroke-linecap="round"/>
+                                <defs>
+                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#f4259d"/>
+                                        <stop offset="100%" stop-color="#8b5cf6"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center">
+                                    <span class="text-5xl font-bold">78</span>
+                                    <span class="text-white/40 block text-sm">/100</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mini Stats -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="text-center p-3 rounded-xl bg-white/5">
+                                <div class="text-green-400 text-lg font-bold">4</div>
+                                <div class="text-white/40 text-xs">Passed</div>
+                            </div>
+                            <div class="text-center p-3 rounded-xl bg-white/5">
+                                <div class="text-yellow-400 text-lg font-bold">1</div>
+                                <div class="text-white/40 text-xs">Warnings</div>
+                            </div>
+                            <div class="text-center p-3 rounded-xl bg-white/5">
+                                <div class="text-red-400 text-lg font-bold">1</div>
+                                <div class="text-white/40 text-xs">Failed</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Elements -->
+                    <div class="absolute -top-4 -right-4 glass-card rounded-2xl p-4 floating-card" style="animation-delay: -2s">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-green-400 text-sm">check</span>
+                            </span>
+                            <div>
+                                <div class="text-sm font-medium">GPTBot Access</div>
+                                <div class="text-xs text-white/40">Allowed</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="absolute -bottom-4 -left-4 glass-card rounded-2xl p-4 floating-card" style="animation-delay: -4s">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary text-sm">trending_up</span>
+                            </span>
+                            <div>
+                                <div class="text-sm font-medium">+12 pts</div>
+                                <div class="text-xs text-white/40">This month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trusted By Section -->
+    <section class="py-16 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-white/40 text-sm mb-8">Trusted by teams building for AI search</p>
+            <div class="flex items-center justify-center gap-12 opacity-40">
+                <span class="text-2xl font-bold">acme</span>
+                <span class="text-2xl font-bold">startup.io</span>
+                <span class="text-2xl font-bold">devtools</span>
+                <span class="text-2xl font-bold">saasco</span>
+                <span class="text-2xl font-bold">webpro</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- The 6 Checks -->
+    <section id="features" class="py-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">The 6 AEO Checks</h2>
+                <p class="text-white/60 text-lg max-w-2xl mx-auto">
+                    What we analyze to score your AI search readiness
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="glass-card rounded-2xl p-6 hover:bg-white/5 transition group">
+                    <div class="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <span class="material-symbols-outlined text-primary">smart_toy</span>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">AI Crawler Access</h3>
+                    <p class="text-white/50 text-sm leading-relaxed">
+                        Does your robots.txt allow GPTBot, ClaudeBot, and PerplexityBot to crawl your content?
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 hover:bg-white/5 transition group">
+                    <div class="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <span class="material-symbols-outlined text-primary">description</span>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">llms.txt</h3>
+                    <p class="text-white/50 text-sm leading-relaxed">
+                        The new robots.txt for AI - tells engines what content matters most on your site.
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 hover:bg-white/5 transition group">
+                    <div class="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <span class="material-symbols-outlined text-primary">code</span>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Structured Data</h3>
+                    <p class="text-white/50 text-sm leading-relaxed">
+                        JSON-LD schema quality and completeness for rich AI answers and citations.
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 hover:bg-white/5 transition group">
+                    <div class="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <span class="material-symbols-outlined text-primary">article</span>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Extractability</h3>
+                    <p class="text-white/50 text-sm leading-relaxed">
+                        Semantic HTML structure that AI can parse, understand, and quote accurately.
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 hover:bg-white/5 transition group">
+                    <div class="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <span class="material-symbols-outlined text-primary">tag</span>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">AI Metadata</h3>
+                    <p class="text-white/50 text-sm leading-relaxed">
+                        Canonical URLs, OG tags, and publish dates that AI engines trust and cite.
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 hover:bg-white/5 transition group">
+                    <div class="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <span class="material-symbols-outlined text-primary">format_list_bulleted</span>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Answer Format</h3>
+                    <p class="text-white/50 text-sm leading-relaxed">
+                        FAQ/HowTo schema + bulleted lists that AI engines love to cite directly.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <div class="glass-card rounded-3xl p-12 stat-glow">
+                <h2 class="text-4xl font-bold mb-4">Ready to improve your AI visibility?</h2>
+                <p class="text-white/60 text-lg mb-8 max-w-xl mx-auto">
+                    Run your free audit now and see exactly what AI search engines see when they visit your site.
+                </p>
+                <button class="btn-primary px-10 py-4 rounded-xl text-lg font-semibold inline-flex items-center gap-3">
+                    Start Free Audit
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white text-sm">insights</span>
+                    </div>
+                    <span class="font-semibold">SEOAuditLite</span>
+                </div>
+                <div class="flex items-center gap-6 text-sm text-white/40">
+                    <a href="#" class="hover:text-white transition">About</a>
+                    <a href="#" class="hover:text-white transition">Privacy</a>
+                    <a href="#" class="hover:text-white transition">Terms</a>
+                    <a href="#" class="hover:text-white transition">Contact</a>
+                </div>
+                <p class="text-sm text-white/40">&copy; 2026 SEOAuditLite</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

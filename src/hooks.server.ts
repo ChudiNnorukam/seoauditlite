@@ -1,10 +1,12 @@
 import type { Handle, HandleServerError } from '@sveltejs/kit';
+import { sequence } from '@sveltejs/kit/hooks';
 import { randomUUID } from 'node:crypto';
 import { ensureEntitlement } from '$lib/server/entitlements-store';
 import { lucia, type LuciaUserAttributes } from '$lib/server/lucia';
 import { dev } from '$app/environment';
 import * as Sentry from '@sentry/sveltekit';
 import { env } from '$env/dynamic/private';
+import { devAuthHandle } from '$lib/server/dev-auth';
 
 // Initialize Sentry for server-side error tracking
 const SENTRY_DSN = env.SENTRY_DSN;
@@ -18,7 +20,7 @@ if (SENTRY_DSN && !dev) {
 
 const ENTITLEMENT_COOKIE = 'seoauditlite_entitlement';
 
-export const handle: Handle = async ({ event, resolve }) => {
+const mainHandle: Handle = async ({ event, resolve }) => {
 	// Skip auth for webhook endpoints
 	if (event.url.pathname.startsWith('/api/lemonsqueezy/webhook')) {
 		return resolve(event);
@@ -94,6 +96,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	return response;
 };
+
+// Dev auth runs first (only active when DEV_PASSWORD is set)
+export const handle = sequence(devAuthHandle, mainHandle);
 
 // Sentry error handler for server-side errors
 export const handleError: HandleServerError = Sentry.handleErrorWithSentry(({ error, event }) => {
