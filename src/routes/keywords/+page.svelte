@@ -478,8 +478,8 @@
 
 				<div class="filters-grid">
 					<div class="filter-group">
-						<label class="filter-label">Intent</label>
-						<select bind:value={filterIntent} class="filter-select">
+						<label class="filter-label" for="filter-intent">Intent</label>
+						<select id="filter-intent" bind:value={filterIntent} class="filter-select">
 							<option value="all">All intents</option>
 							<option value="informational">Informational</option>
 							<option value="navigational">Navigational</option>
@@ -488,8 +488,8 @@
 					</div>
 
 					<div class="filter-group">
-						<label class="filter-label">Min Interest</label>
-						<select bind:value={filterInterestMin} class="filter-select">
+						<label class="filter-label" for="filter-interest-min">Min Interest</label>
+						<select id="filter-interest-min" bind:value={filterInterestMin} class="filter-select">
 							<option value={0}>Any</option>
 							<option value={25}>25+</option>
 							<option value={50}>50+</option>
@@ -498,8 +498,8 @@
 					</div>
 
 					<div class="filter-group">
-						<label class="filter-label">Trend</label>
-						<select bind:value={filterTrend} class="filter-select">
+						<label class="filter-label" for="filter-trend">Trend</label>
+						<select id="filter-trend" bind:value={filterTrend} class="filter-select">
 							<option value="all">All trends</option>
 							<option value="rising">Rising</option>
 							<option value="stable">Stable</option>
@@ -508,8 +508,8 @@
 					</div>
 
 					<div class="filter-group">
-						<label class="filter-label">Max Difficulty</label>
-						<select bind:value={filterDifficultyMax} class="filter-select">
+						<label class="filter-label" for="filter-difficulty-max">Max Difficulty</label>
+						<select id="filter-difficulty-max" bind:value={filterDifficultyMax} class="filter-select">
 							<option value={100}>Any</option>
 							<option value={30}>Easy (≤30)</option>
 							<option value={70}>Medium (≤70)</option>

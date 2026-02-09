@@ -1,38 +1,114 @@
-# sv
+# SEOAuditLite
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Free AEO (Answer Engine Optimization) audit tool that scores your website's readiness for AI-powered search engines like ChatGPT, Perplexity, and Claude.
 
-## Creating a project
+## What It Does
 
-If you're seeing this, you've probably already done this step. Congrats!
+SEOAuditLite analyzes your website against 6 critical checks that determine how visible and quotable your content is to AI search engines:
 
-```sh
-# create a new project in the current directory
-npx sv create
+- **AI Crawler Access** - Checks robots.txt for GPTBot, ClaudeBot, PerplexityBot directives
+- **llms.txt** - Detects the new AI-focused content declaration file
+- **Structured Data** - Evaluates JSON-LD schema quality and completeness
+- **Content Extractability** - Analyzes semantic HTML structure AI can parse
+- **AI Metadata** - Validates canonical URLs, OG tags, and publish dates
+- **Answer Format** - Checks for FAQ/HowTo schema and quotable content structures
 
-# create a new project in my-app
-npx sv create my-app
+Results include a 0-100 AEO score, pass/warn/fail status per check, and actionable recommendations.
+
+## Live Demo
+
+[seoauditlite.com](https://seoauditlite.com)
+
+## Tech Stack
+
+- **Frontend:** SvelteKit 2 + Svelte 5
+- **Database:** Turso (LibSQL)
+- **Auth:** Google OAuth 2.0 (Arctic + Lucia v3)
+- **Payments:** LemonSqueezy
+- **Deployment:** Vercel
+- **Monitoring:** Sentry
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- pnpm
+
+### Installation
+
+```bash
+git clone <repo-url>
+cd seoauditlite
+pnpm install
 ```
 
-## Developing
+### Environment Variables
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Copy `.env.example` to `.env` and configure:
 
-```sh
-npm run dev
+```bash
+# Required
+TURSO_DATABASE_URL=       # Turso database connection
+TURSO_AUTH_TOKEN=          # Turso auth token
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+# Optional (features degrade gracefully without these)
+GOOGLE_CLIENT_ID=          # Google OAuth
+GOOGLE_CLIENT_SECRET=      # Google OAuth
+ORIGIN=https://seoauditlite.com
+LEMONSQUEEZY_API_KEY=      # Billing
+REPLICATE_API_TOKEN=       # OG image generation
+SENTRY_DSN=                # Error tracking
 ```
 
-## Building
+### Development
 
-To create a production version of your app:
-
-```sh
-npm run build
+```bash
+pnpm dev
 ```
 
-You can preview the production build with `npm run preview`.
+### Build
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```bash
+pnpm build
+pnpm preview
+```
+
+### Testing
+
+```bash
+pnpm test:unit      # Vitest unit tests
+pnpm test:e2e       # Playwright end-to-end tests
+pnpm test           # Run all tests
+```
+
+## Deployment
+
+Deployed on Vercel with automatic builds on push to `main`.
+
+```bash
+# Type check before deploying
+pnpm check
+
+# Build
+pnpm build
+```
+
+## Pricing
+
+| Feature | Free | Pro ($29/mo) |
+|---------|------|-------------|
+| Audits per month | 3 | Unlimited |
+| AEO score + checks | Full | Full |
+| Report retention | 7 days | 30 days |
+| PDF export | - | Yes |
+| Score tracking | - | Yes |
+| Signup required | No | Yes |
+
+## Author
+
+**Chudi Nnorukam** - [chudi.dev](https://chudi.dev)
+
+## License
+
+Proprietary. All rights reserved.

@@ -96,7 +96,23 @@
 			const data = await response.json();
 
 			if (!response.ok || !data.success) {
-				error = data.error || 'Audit failed';
+				// Handle rate limit with countdown timer
+				if (response.status === 429 && data.retryAfter) {
+					let seconds = data.retryAfter;
+					error = `Rate limited. Try again in ${seconds}s`;
+
+					const timer = setInterval(() => {
+						seconds--;
+						if (seconds <= 0) {
+							clearInterval(timer);
+							error = '';
+						} else {
+							error = `Rate limited. Try again in ${seconds}s`;
+						}
+					}, 1000);
+				} else {
+					error = data.error || 'Audit failed';
+				}
 				loading = false;
 				return;
 			}
@@ -277,7 +293,7 @@
 					<li>No signup required</li>
 					<li>7-day report retention</li>
 				</ul>
-				<button class="btn-secondary" onclick={() => document.querySelector('.audit-form input')?.focus()}>
+				<button class="btn-secondary" onclick={() => (document.querySelector('.audit-form input') as HTMLElement | null)?.focus()}>
 					Start Free
 				</button>
 			</GlassCard>
@@ -327,7 +343,7 @@
 		<GlassCard class="cta-card" glow padding="lg">
 			<h2>Ready to improve your AI visibility?</h2>
 			<p>Run your free audit now and see exactly what AI search engines see.</p>
-			<button class="btn-primary" onclick={() => document.querySelector('.audit-form input')?.focus()}>
+			<button class="btn-primary" onclick={() => (document.querySelector('.audit-form input') as HTMLElement | null)?.focus()}>
 				Start Free Audit
 				<ArrowRight size={18} weight="bold" />
 			</button>

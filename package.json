@@ -2,6 +2,11 @@
 	"name": "seoauditlite",
 	"private": true,
 	"version": "0.0.1",
+	"description": "Free AEO audit tool — score your site's readiness for AI search engines like ChatGPT, Perplexity, and Claude",
+	"author": "Chudi Nnorukam <hello@chudi.dev> (https://chudi.dev)",
+	"homepage": "https://seoauditlite.com",
+	"keywords": ["seo", "aeo", "audit", "ai-search", "answer-engine-optimization", "sveltekit", "perplexity", "chatgpt"],
+	"license": "UNLICENSED",
 	"type": "module",
 	"dependencies": {
 		"@lemonsqueezy/lemonsqueezy.js": "^4.0.0",

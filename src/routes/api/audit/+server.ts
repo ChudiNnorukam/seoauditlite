@@ -19,7 +19,8 @@ export const POST: RequestHandler = async ({ request, locals }): Promise<Respons
 			const response: AuditApiResponse = {
 				success: false,
 				error: `Rate limit exceeded. Try again in ${Math.ceil(rateCheck.resetIn / 1000)} seconds.`,
-				code: 'RATE_LIMITED'
+				code: 'RATE_LIMITED',
+				retryAfter: Math.ceil(rateCheck.resetIn / 1000)
 			};
 			return json(response, {
 				status: 429,

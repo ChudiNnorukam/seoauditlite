@@ -59,4 +59,5 @@ export interface AuditApiResponse {
   data?: AuditResult;
   error?: string;
   code?: string;
+  retryAfter?: number;
 }
