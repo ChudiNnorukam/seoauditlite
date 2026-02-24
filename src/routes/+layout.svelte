@@ -158,3 +158,16 @@
 </svelte:head>
 
 {@render children()}
+
+<footer class="border-t border-gray-800 bg-[#0d1117] mt-16">
+	<div class="max-w-5xl mx-auto px-4 py-8 flex flex-wrap items-center justify-between gap-4 text-sm text-gray-500">
+		<span>SEOAuditLite &mdash; built by <a href="https://chudi.dev" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">Chudi Nnorukam</a></span>
+		<nav class="flex flex-wrap gap-5">
+			<a href="https://chudi.dev/blog/aeo-answer-engine-optimization-explained" target="_blank" rel="noopener noreferrer" class="hover:text-gray-300 transition-colors">What is AEO?</a>
+			<a href="https://chudi.dev/blog/llms-txt-robots-txt-for-ai-crawlers" target="_blank" rel="noopener noreferrer" class="hover:text-gray-300 transition-colors">llms.txt Guide</a>
+			<a href="https://chudi.dev/blog/how-to-optimize-for-perplexity-chatgpt-ai-search" target="_blank" rel="noopener noreferrer" class="hover:text-gray-300 transition-colors">AI Search Guide</a>
+			<a href="https://review-reply-copilot.netlify.app" target="_blank" rel="noopener noreferrer" class="hover:text-gray-300 transition-colors">Review Reply Copilot</a>
+			<a href="https://chudi.dev" target="_blank" rel="noopener noreferrer" class="hover:text-gray-300 transition-colors">chudi.dev</a>
+		</nav>
+	</div>
+</footer>
