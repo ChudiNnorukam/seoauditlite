@@ -42,6 +42,16 @@
 		}
 	];
 
+	const faqSchema = {
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: faqs.map((f) => ({
+			'@type': 'Question',
+			name: f.question,
+			acceptedAnswer: { '@type': 'Answer', text: f.answer }
+		}))
+	};
+
 	const checks = [
 		{
 			icon: Robot,
@@ -136,6 +146,7 @@
 	<meta property="og:url" content="https://seoauditlite.com/" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="SEOAuditLite - Know Your AI Search Readiness" />
+	<script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
 </svelte:head>
 
 <div class="page dark">

@@ -133,12 +133,7 @@
 				"Content Extractability Score",
 				"AI Metadata Audit",
 				"Answer Format Optimization"
-			],
-			"aggregateRating": {
-				"@type": "AggregateRating",
-				"ratingValue": "4.8",
-				"ratingCount": "127"
-			}
+			]
 		}
 	</script>
 
