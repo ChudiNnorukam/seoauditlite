@@ -161,7 +161,7 @@
 			<a href="https://chudi.dev/blog/aeo-answer-engine-optimization-explained" target="_blank" rel="noopener noreferrer" class="hover:text-gray-300 transition-colors">What is AEO?</a>
 			<a href="https://chudi.dev/blog/llms-txt-robots-txt-for-ai-crawlers" target="_blank" rel="noopener noreferrer" class="hover:text-gray-300 transition-colors">llms.txt Guide</a>
 			<a href="https://chudi.dev/blog/how-to-optimize-for-perplexity-chatgpt-ai-search" target="_blank" rel="noopener noreferrer" class="hover:text-gray-300 transition-colors">AI Search Guide</a>
-			<a href="https://review-reply-copilot.netlify.app" target="_blank" rel="noopener noreferrer" class="hover:text-gray-300 transition-colors">Review Reply Copilot</a>
+			<a href="https://reviewreplycopilot.com" target="_blank" rel="noopener noreferrer" class="hover:text-gray-300 transition-colors">Review Reply Copilot</a>
 			<a href="https://chudi.dev" target="_blank" rel="noopener noreferrer" class="hover:text-gray-300 transition-colors">chudi.dev</a>
 		</nav>
 	</div>
