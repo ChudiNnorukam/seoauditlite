@@ -17,6 +17,12 @@ Results include a 0-100 AEO score, pass/warn/fail status per check, and actionab
 
 ## Live Demo
 
+## Related Writing
+
+- [How to Optimize for AI Search Engines (AEO Guide)](https://chudi.dev/blog/how-to-optimize-for-perplexity-chatgpt-ai-search) — the principles behind what SEOAuditLite checks, with implementation examples
+- [Claude Code Hooks Tutorial](https://chudi.dev/blog/claude-code-hooks-tutorial) — if you're building similar audit tooling with AI assistance
+
+
 [seoauditlite.com](https://seoauditlite.com)
 
 ## Tech Stack
